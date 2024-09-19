@@ -1,0 +1,95 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<style>
+    .module {
+        margin-bottom: 20px; /* Espacio entre módulos */
+    }
+    
+    .btn-custom {
+        background-color: #00bc8c; /* Color del botón */
+        border-color: #00bc8c; /* Color del borde del botón */
+    }
+
+    .btn-custom:hover {
+        background-color: #008e67; /* Color del botón al pasar el ratón */
+        border-color: #008e67; /* Color del borde del botón al pasar el ratón */
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="module">
+                <h3>Import Nessus File</h3>
+                <form method="post" enctype="multipart/form-data" action="{% url 'import_nessus_file' project.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_nessus_file" class="form-label">Select a Nessus file:</label>
+                        <input id="id_nessus_file" type="file" name="nessus_file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-custom btn-block">Upload Nessus File</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="module">
+                <h3>Import Netsparker XML File</h3>
+                <form method="post" enctype="multipart/form-data" action="{% url 'import_netsparker_file' project.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_netsparker_file" class="form-label">Select a Netsparker XML file:</label>
+                        <input id="id_netsparker_file" type="file" name="netsparker_file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-custom btn-block">Upload Netsparker XML File</button>
+                </form>
+            </div>
+        </div>
+
+
+        <div class="col-md-6">
+            <div class="module">
+                <h3>Import Nmap XML File</h3>
+                <form method="post" enctype="multipart/form-data" action="{% url 'import_nmap_xml' project.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_nmap_file" class="form-label">Select a Nmap XML file:</label>
+                        <input id="id_nmap_file" type="file" name="nmap_file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-custom btn-block">Upload Nmap XML File</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="module">
+                <h3>Import Acunetix XML File</h3>
+                <form method="post" enctype="multipart/form-data" action="{% url 'import_acunetix_file' project.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_acunetix_file" class="form-label">Select a Netsparker XML file:</label>
+                        <input id="id_acunetix_file" type="file" name="acunetix_file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-custom btn-block">Upload Acunetix XML File</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="module">
+                <h3>Import Burp XML File</h3>
+                <form method="post" enctype="multipart/form-data" action="{% url 'import_burp_file' project.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_burp_file" class="form-label">Select a Burp XML file:</label>
+                        <input id="id_burp_file" type="file" name="burp_file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-custom btn-block">Upload Burp XML File</button>
+                </form>
+            </div>
+        </div>     
+
+    </div>
+</div>
+{% endblock %}

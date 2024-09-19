@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="action-form">
+  <form action="" method="post">{% csrf_token %}
+    <fieldset>
+      <legend>Asignar Targets y Puertos</legend>
+      {{ form.as_p }}
+    </fieldset>
+    <div class="submit-row">
+      <!-- Aquí asumimos que "apply" es el nombre de la acción a realizar -->
+      <input type="hidden" name="action" value="apply">
+      <input type="submit" name="_apply" value="Aplicar">
+    </div>
+  </form>
+</div>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+  
+

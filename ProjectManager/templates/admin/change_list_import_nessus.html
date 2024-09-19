@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    {% if cl.result_count > 0 %}
+        {% with project_pk=cl.result_list.0.project.pk %}
+		<div class="text">
+		    {% if cl.has_add_permission %}
+			<a href="{% url 'admin:import_nessus_file' project_pk %}" class="button">Import Nessus</a>
+		    {% endif %}
+		</div>
+        {% endwith %}
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
+

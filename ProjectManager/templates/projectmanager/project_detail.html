@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>{{ project.name }} - Detalles del Proyecto</h1>
+
+  <!-- Navegación de pestañas -->
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#info">Info</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#vulnerabilities">Vulnerabilities</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#targets">Targets</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'graph_view' pk=project.id %}">GraphMap</a>
+    </li>
+</ul>
+
+
+
+  <!-- Contenido de las pestañas -->
+  <div class="tab-content">
+    <!-- Pestaña Info (detalles del proyecto) -->
+    <div id="info" class="tab-pane fade show active">
+      <h2>Detalles del Proyecto</h2>
+      <p><strong>Nombre:</strong> {{ project.name }}</p>
+      <p><strong>Descripción:</strong> {{ project.description }}</p>
+      <p><strong>Fecha de Inicio:</strong> {{ project.start_date }}</p>
+      <p><strong>Fecha de Fin:</strong> {{ project.end_date }}</p>
+    </div>
+
+    <!-- Pestaña Vulnerabilities -->
+    <div id="vulnerabilities" class="tab-pane fade">
+      <h2>Vulnerabilidades</h2>
+      <ul>
+        {% for vulnerability_name, vulnerability_list in grouped_vulnerabilities.items %}
+          <li>
+            <h3>{{ vulnerability_name }}</h3>
+            <ul>
+              {% for vulnerability in vulnerability_list %}
+                <li>{{ vulnerability.hosts_affected }} - {{ vulnerability.port }}</li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Pestaña Targets -->
+    <div id="targets" class="tab-pane fade">
+      <h2>Targets</h2>
+      <!-- Aquí puedes agregar el contenido de los targets si es necesario -->
+    </div>
+
+    <!-- Pestaña GraphMap (Mapa gráfico interactivo) -->
+    <div id="graphmap" class="tab-pane fade">
+      <h2>GraphMap</h2>
+      <div id="graphly-container" style="width: 100%; height: 500px;"></div>
+    </div>
+  </div>
+{% endblock %}

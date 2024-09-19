@@ -1,0 +1,16 @@
+<!-- En templates de tu aplicación, crea un archivo import_nmap_xml.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Import Nmap File</title>
+</head>
+<body>
+    <h1>Import Nmap XML</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="xml_file">
+        <button type="submit">Import</button>
+    </form>
+</body>
+</html>

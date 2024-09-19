@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Project</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="name">Name</label>
+        {{ form.name }}
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        {{ form.description }}
+    </div>
+    <div class="form-group">
+        <label for="start_date">Start Date</label>
+        {{ form.start_date }}
+    </div>
+    <div class="form-group">
+        <label for="end_date">End Date</label>
+        {{ form.end_date }}
+    </div>
+    <div class="form-group">
+        <label for="language">Language</label>
+        {{ form.language }}
+    </div>
+    <div class="form-group">
+        <label for="report_template">Report Template</label>
+        {{ form.report_template }}
+    </div>
+    <div class="form-group">
+        <label for="cover_template">Cover Template</label>
+        {{ form.cover_template }}
+    </div>
+    <div class="form-group">
+        <label for="scope">Scope</label>
+        {{ form.scope }}
+    </div>
+    <button type="submit" class="btn btn-primary">Save Project</button>
+  </form>
+{% endblock %}

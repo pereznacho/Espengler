@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vulnerability Manager</title>
+    <!-- Agregar Bootstrap CSS para los estilos -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Vulnerability Manager</h1>
+        <nav>
+            <a href="{% url 'create_project' %}">Create New Project</a>
+            <!-- Mostrar el enlace de "Inicio" solo si el proyecto está en el contexto -->
+            <a href="{% if project %}{% url 'project_detail' pk=project.id %}{% endif %}">Inicio</a>
+            <!-- other navigation links -->
+        </nav>
+    </header>
+    
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <footer>
+        <!-- Footer content -->
+    </footer>
+
+    <!-- Agregar jQuery y Bootstrap JavaScript justo antes de cerrar body -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>

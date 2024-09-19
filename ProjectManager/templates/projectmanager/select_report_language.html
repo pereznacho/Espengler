@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Detail</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="text-center mt-5">
+    <!-- Botón para activar el modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#languageModal">Generate Report</button>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="languageModal" tabindex="-1" role="dialog" aria-labelledby="languageSelectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="languageSelectionModalLabel">Select Report Language</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Choose the language you want to generate the report in:</p>
+        <form method="post" action="{% url 'generate_report' project_id=project_id %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="language">Language:</label>
+            <select class="form-control" id="language" name="language">
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-success">Generate Report</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

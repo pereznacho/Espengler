@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Report Template</title>
+</head>
+<body>
+    <h1>Select Report Template</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="language">Select Language:</label>
+        <select name="language" id="language">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+        </select>
+        <br><br>
+        <label for="report_template">Select Report Template:</label>
+        <select name="report_template" id="report_template">
+            {% for template in report_templates %}
+                <option value="{{ template.id }}">{{ template.name }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <button type="submit">Generate Report</button>
+    </form>
+</body>
+</html>

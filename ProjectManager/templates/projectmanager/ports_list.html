@@ -1,0 +1,11 @@
+<!-- En tu archivo 'ports_list.html' -->
+{% extends "base.html" %} <!-- Supongo que estás extendiendo una plantilla base -->
+
+{% block content %}
+    <h1>Listado de Puertos</h1>
+    <!-- Aquí se muestra la lista de puertos -->
+
+    <!-- Agrega el enlace para importar archivos .xml de Nmap -->
+    <a href="{% url 'import_nmap_xml' %}" class="addlink">Importar Archivo XML de Nmap</a>
+
+{% endblock %}

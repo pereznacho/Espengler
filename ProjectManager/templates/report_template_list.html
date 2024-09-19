@@ -1,0 +1,20 @@
+<!-- report_template_list.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Templates</title>
+</head>
+<body>
+    <h1>Report Templates</h1>
+    <ul>
+        {% for template in templates %}
+            <li>{{ template.name }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'report_template_create' %}">Create New Template</a>
+</body>
+</html>
+

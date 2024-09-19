@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vulnerability Manager</title>
+</head>
+<body>
+    <header>
+        <h1>Vulnerability Manager</h1>
+	<nav>
+	    <a href="{% url 'create_project' %}">Create New Project</a>
+	    <!-- other navigation links -->
+	</nav>
+
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        <!-- Footer content -->
+    </footer>
+</body>
+</html>

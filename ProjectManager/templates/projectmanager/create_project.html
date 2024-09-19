@@ -1,0 +1,35 @@
+{% extends 'projectmanager/base.html' %}
+
+{% block content %}
+<div class="container">
+    <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="info-tab" data-bs-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">Info</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="vulnerabilities-tab" data-bs-toggle="tab" href="#vulnerabilities" role="tab" aria-controls="vulnerabilities" aria-selected="false">Vulnerabilities</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="ports-tab" data-bs-toggle="tab" href="#ports" role="tab" aria-controls="ports" aria-selected="false">Ports</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="projectTabsContent">
+        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+            <form method="post">
+                {% csrf_token %}
+                {{ project_form.as_p }}
+                <button type="submit" class="btn btn-primary">Create Project</button>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="vulnerabilities" role="tabpanel" aria-labelledby="vulnerabilities-tab">
+            <!-- Vulnerability form or information goes here -->
+        </div>
+        <div class="tab-pane fade" id="ports" role="tabpanel" aria-labelledby="ports-tab">
+            <!-- Ports form or information goes here -->
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS (ensure you have Bootstrap included in your project) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Targets</title>
+</head>
+<body>
+    <h1>Targets</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="project">Seleccione un proyecto:</label>
+        <select name="project" id="project">
+            <option value="">Todos los proyectos</option>
+            {% for project in projects %}
+                <option value="{{ project.id }}">{{ project.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Filtrar</button>
+    </form>
+    <ul>
+        {% for host in hosts %}
+            <li>{{ host.ip_address }}</li>
+            <!-- Agrega más detalles de los hosts según sea necesario -->
+        {% endfor %}
+    </ul>
+</body>
+</html>
