@@ -1,0 +1,2270 @@
+<?xml version="1.0"?>
+<ScanGroup ExportedOn="2024-02-28">
+<Scan>
+        <Name><![CDATA[scan_name]]></Name>
+        <ShortName><![CDATA[scan_short_name]]></ShortName>
+        <StartURL><![CDATA[rest.vulnweb.com]]></StartURL>
+        <StartTime><![CDATA[2024-02-26T17:45:48.127948-03:00]]></StartTime>
+        <FinishTime><![CDATA[2024-02-26T18:39:59.436361-03:00]]></FinishTime>
+        <ScanTime><![CDATA[53 minutes, 49 seconds]]></ScanTime>
+        <Aborted><![CDATA[False]]></Aborted>
+        <Responsive><![CDATA[True]]></Responsive>
+        <Banner><![CDATA[]]></Banner>
+        <Os><![CDATA[Unix]]></Os>
+        <WebServer><![CDATA[Apache/2.4.25 (Debian)]]></WebServer>
+        <Technologies>
+            <![CDATA[
+                PHP
+            ]]>
+        </Technologies>
+        <Crawler StartUrl="http://rest.vulnweb.com/">
+            <Cookies>
+            </Cookies>
+            <SiteFiles>
+<SiteFile id="1">
+                    <Name><![CDATA[http://rest.vulnweb.com/]]></Name>
+                    <URL><![CDATA[/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="/[*]/&lt;s&gt;/&lt;s&gt;.css" Type="Path Fragment"/>
+                                <Variable Name="/&lt;s&gt;/[*]/&lt;s&gt;.css" Type="Path Fragment"/>
+                                <Variable Name="/&lt;s&gt;/&lt;s&gt;/[*].css" Type="Path Fragment"/>
+                                <Variable Name="/[*]/&lt;s&gt;.saz" Type="Path Fragment"/>
+                                <Variable Name="/&lt;s&gt;/[*].saz" Type="Path Fragment"/>
+                                <Variable Name="/[*]/&lt;s&gt;.yaml" Type="Path Fragment"/>
+                                <Variable Name="/&lt;s&gt;/[*].yaml" Type="Path Fragment"/>
+                                <Variable Name="/[*]/&lt;s&gt;.json" Type="Path Fragment"/>
+                                <Variable Name="/&lt;s&gt;/[*].json" Type="Path Fragment"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="2">
+                    <Name><![CDATA[basic_authentication]]></Name>
+                    <URL><![CDATA[/basic_authentication/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/basic_authentication/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="3">
+                    <Name><![CDATA[api]]></Name>
+                    <URL><![CDATA[/basic_authentication/api]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/basic_authentication/api]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="4">
+                    <Name><![CDATA[api]]></Name>
+                    <URL><![CDATA[/basic_authentication/api/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/basic_authentication/api/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="5">
+                    <Name><![CDATA[comments]]></Name>
+                    <URL><![CDATA[/basic_authentication/api/comments]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/basic_authentication/api/comments]]></FullURL>
+                    <Inputs>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="post_id" Type="JSON"/>
+                                <Variable Name="comment" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="6">
+                    <Name><![CDATA[comments]]></Name>
+                    <URL><![CDATA[/basic_authentication/api/comments/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/basic_authentication/api/comments/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="post_id" Type="JSON"/>
+                                <Variable Name="comment" Type="JSON"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="callback" Type="URL encoded GET"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="7">
+                    <Name><![CDATA[posts]]></Name>
+                    <URL><![CDATA[/basic_authentication/api/posts]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/basic_authentication/api/posts]]></FullURL>
+                    <Inputs>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="title" Type="JSON"/>
+                                <Variable Name="content" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="8">
+                    <Name><![CDATA[posts]]></Name>
+                    <URL><![CDATA[/basic_authentication/api/posts/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/basic_authentication/api/posts/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="id" Type="Path Fragment"/>
+                                <Variable Name="id" Type="Path Fragment"/>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="title" Type="JSON"/>
+                                <Variable Name="content" Type="JSON"/>
+                                <Variable Name="id" Type="Path Fragment"/>
+                                <Variable Name="id" Type="Path Fragment"/>
+                                <Variable Name="callback" Type="URL encoded GET"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="9">
+                    <Name><![CDATA[users]]></Name>
+                    <URL><![CDATA[/basic_authentication/api/users]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/basic_authentication/api/users]]></FullURL>
+                    <Inputs>
+                                <Variable Name="username" Type="JSON"/>
+                                <Variable Name="email" Type="JSON"/>
+                                <Variable Name="password" Type="JSON"/>
+                                <Variable Name="first_name" Type="JSON"/>
+                                <Variable Name="last_name" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="10">
+                    <Name><![CDATA[users]]></Name>
+                    <URL><![CDATA[/basic_authentication/api/users/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/basic_authentication/api/users/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="username" Type="JSON"/>
+                                <Variable Name="email" Type="JSON"/>
+                                <Variable Name="password" Type="JSON"/>
+                                <Variable Name="first_name" Type="JSON"/>
+                                <Variable Name="last_name" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="callback" Type="URL encoded GET"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="username" Type="Path Fragment"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="11">
+                    <Name><![CDATA[docs]]></Name>
+                    <URL><![CDATA[/docs/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="12">
+                    <Name><![CDATA[api_data.js]]></Name>
+                    <URL><![CDATA[/docs/api_data.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/api_data.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="13">
+                    <Name><![CDATA[api_data.json]]></Name>
+                    <URL><![CDATA[/docs/api_data.json]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/api_data.json]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="14">
+                    <Name><![CDATA[api_project.js]]></Name>
+                    <URL><![CDATA[/docs/api_project.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/api_project.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="15">
+                    <Name><![CDATA[api_project.json]]></Name>
+                    <URL><![CDATA[/docs/api_project.json]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/api_project.json]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="16">
+                    <Name><![CDATA[css]]></Name>
+                    <URL><![CDATA[/docs/css/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/css/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="17">
+                    <Name><![CDATA[style.css]]></Name>
+                    <URL><![CDATA[/docs/css/style.css]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/css/style.css]]></FullURL>
+                </SiteFile>
+<SiteFile id="18">
+                    <Name><![CDATA[fonts]]></Name>
+                    <URL><![CDATA[/docs/fonts/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/fonts/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="19">
+                    <Name><![CDATA[img]]></Name>
+                    <URL><![CDATA[/docs/img/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/img/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="20">
+                    <Name><![CDATA[index.html]]></Name>
+                    <URL><![CDATA[/docs/index.html]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/index.html]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="21">
+                    <Name><![CDATA[locales]]></Name>
+                    <URL><![CDATA[/docs/locales/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="22">
+                    <Name><![CDATA[ca.js]]></Name>
+                    <URL><![CDATA[/docs/locales/ca.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/ca.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="23">
+                    <Name><![CDATA[cs.js]]></Name>
+                    <URL><![CDATA[/docs/locales/cs.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/cs.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="24">
+                    <Name><![CDATA[de.js]]></Name>
+                    <URL><![CDATA[/docs/locales/de.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/de.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="25">
+                    <Name><![CDATA[es.js]]></Name>
+                    <URL><![CDATA[/docs/locales/es.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/es.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="26">
+                    <Name><![CDATA[fr.js]]></Name>
+                    <URL><![CDATA[/docs/locales/fr.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/fr.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="27">
+                    <Name><![CDATA[it.js]]></Name>
+                    <URL><![CDATA[/docs/locales/it.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/it.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="28">
+                    <Name><![CDATA[locale]]></Name>
+                    <URL><![CDATA[/docs/locales/locale]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/locale]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="29">
+                    <Name><![CDATA[locale.js]]></Name>
+                    <URL><![CDATA[/docs/locales/locale.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/locale.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="30">
+                    <Name><![CDATA[nl.js]]></Name>
+                    <URL><![CDATA[/docs/locales/nl.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/nl.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="31">
+                    <Name><![CDATA[pl.js]]></Name>
+                    <URL><![CDATA[/docs/locales/pl.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/pl.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="32">
+                    <Name><![CDATA[pt_br.js]]></Name>
+                    <URL><![CDATA[/docs/locales/pt_br.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/pt_br.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="33">
+                    <Name><![CDATA[ro.js]]></Name>
+                    <URL><![CDATA[/docs/locales/ro.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/ro.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="34">
+                    <Name><![CDATA[ru.js]]></Name>
+                    <URL><![CDATA[/docs/locales/ru.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/ru.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="35">
+                    <Name><![CDATA[tr.js]]></Name>
+                    <URL><![CDATA[/docs/locales/tr.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/tr.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="36">
+                    <Name><![CDATA[vi.js]]></Name>
+                    <URL><![CDATA[/docs/locales/vi.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/vi.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="37">
+                    <Name><![CDATA[zh.js]]></Name>
+                    <URL><![CDATA[/docs/locales/zh.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/zh.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="38">
+                    <Name><![CDATA[zh_cn.js]]></Name>
+                    <URL><![CDATA[/docs/locales/zh_cn.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/locales/zh_cn.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="39">
+                    <Name><![CDATA[main.js]]></Name>
+                    <URL><![CDATA[/docs/main.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/main.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="40">
+                    <Name><![CDATA[utils]]></Name>
+                    <URL><![CDATA[/docs/utils/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/utils/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="41">
+                    <Name><![CDATA[handlebars_helper]]></Name>
+                    <URL><![CDATA[/docs/utils/handlebars_helper]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/utils/handlebars_helper]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="42">
+                    <Name><![CDATA[handlebars_helper.js]]></Name>
+                    <URL><![CDATA[/docs/utils/handlebars_helper.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/utils/handlebars_helper.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="43">
+                    <Name><![CDATA[send_sample_request]]></Name>
+                    <URL><![CDATA[/docs/utils/send_sample_request]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/utils/send_sample_request]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="44">
+                    <Name><![CDATA[send_sample_request.js]]></Name>
+                    <URL><![CDATA[/docs/utils/send_sample_request.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/utils/send_sample_request.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="45">
+                    <Name><![CDATA[vendor]]></Name>
+                    <URL><![CDATA[/docs/vendor/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="46">
+                    <Name><![CDATA[bootstrap.min]]></Name>
+                    <URL><![CDATA[/docs/vendor/bootstrap.min]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/bootstrap.min]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="47">
+                    <Name><![CDATA[bootstrap.min.css]]></Name>
+                    <URL><![CDATA[/docs/vendor/bootstrap.min.css]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/bootstrap.min.css]]></FullURL>
+                </SiteFile>
+<SiteFile id="48">
+                    <Name><![CDATA[bootstrap.min.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/bootstrap.min.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/bootstrap.min.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="49">
+                    <Name><![CDATA[diff_match_patch.min]]></Name>
+                    <URL><![CDATA[/docs/vendor/diff_match_patch.min]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/diff_match_patch.min]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="50">
+                    <Name><![CDATA[diff_match_patch.min.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/diff_match_patch.min.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/diff_match_patch.min.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="51">
+                    <Name><![CDATA[handlebars.min]]></Name>
+                    <URL><![CDATA[/docs/vendor/handlebars.min]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/handlebars.min]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="52">
+                    <Name><![CDATA[handlebars.min.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/handlebars.min.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/handlebars.min.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="53">
+                    <Name><![CDATA[jquery.min]]></Name>
+                    <URL><![CDATA[/docs/vendor/jquery.min]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/jquery.min]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="54">
+                    <Name><![CDATA[jquery.min.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/jquery.min.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/jquery.min.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="55">
+                    <Name><![CDATA[list.min]]></Name>
+                    <URL><![CDATA[/docs/vendor/list.min]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/list.min]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="56">
+                    <Name><![CDATA[list.min.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/list.min.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/list.min.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="57">
+                    <Name><![CDATA[lodash.custom.min]]></Name>
+                    <URL><![CDATA[/docs/vendor/lodash.custom.min]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/lodash.custom.min]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="58">
+                    <Name><![CDATA[lodash.custom.min.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/lodash.custom.min.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/lodash.custom.min.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="59">
+                    <Name><![CDATA[path-to-regexp]]></Name>
+                    <URL><![CDATA[/docs/vendor/path-to-regexp/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/path-to-regexp/]]></FullURL>
+                </SiteFile>
+<SiteFile id="60">
+                    <Name><![CDATA[index]]></Name>
+                    <URL><![CDATA[/docs/vendor/path-to-regexp/index]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/path-to-regexp/index]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="61">
+                    <Name><![CDATA[index.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/path-to-regexp/index.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/path-to-regexp/index.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="62">
+                    <Name><![CDATA[polyfill.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/polyfill.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/polyfill.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="63">
+                    <Name><![CDATA[prettify.css]]></Name>
+                    <URL><![CDATA[/docs/vendor/prettify.css]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/prettify.css]]></FullURL>
+                </SiteFile>
+<SiteFile id="64">
+                    <Name><![CDATA[prettify]]></Name>
+                    <URL><![CDATA[/docs/vendor/prettify/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/prettify/]]></FullURL>
+                </SiteFile>
+<SiteFile id="65">
+                    <Name><![CDATA[prettify]]></Name>
+                    <URL><![CDATA[/docs/vendor/prettify/prettify]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/prettify/prettify]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="66">
+                    <Name><![CDATA[prettify.css]]></Name>
+                    <URL><![CDATA[/docs/vendor/prettify/prettify.css]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/prettify/prettify.css]]></FullURL>
+                </SiteFile>
+<SiteFile id="67">
+                    <Name><![CDATA[prettify.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/prettify/prettify.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/prettify/prettify.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="68">
+                    <Name><![CDATA[require.min.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/require.min.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/require.min.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="69">
+                    <Name><![CDATA[semver.min]]></Name>
+                    <URL><![CDATA[/docs/vendor/semver.min]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/semver.min]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="70">
+                    <Name><![CDATA[semver.min.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/semver.min.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/semver.min.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="71">
+                    <Name><![CDATA[webfontloader]]></Name>
+                    <URL><![CDATA[/docs/vendor/webfontloader]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/webfontloader]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="72">
+                    <Name><![CDATA[webfontloader.js]]></Name>
+                    <URL><![CDATA[/docs/vendor/webfontloader.js]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/docs/vendor/webfontloader.js]]></FullURL>
+                </SiteFile>
+<SiteFile id="73">
+                    <Name><![CDATA[files]]></Name>
+                    <URL><![CDATA[/files/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="74">
+                    <Name><![CDATA[fiddler_basicauthentication.saz]]></Name>
+                    <URL><![CDATA[/files/fiddler_basicauthentication.saz]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/fiddler_basicauthentication.saz]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="75">
+                    <Name><![CDATA[fiddler_jwt.saz]]></Name>
+                    <URL><![CDATA[/files/fiddler_jwt.saz]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/fiddler_jwt.saz]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="76">
+                    <Name><![CDATA[fiddler_oauth2.saz]]></Name>
+                    <URL><![CDATA[/files/fiddler_oauth2.saz]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/fiddler_oauth2.saz]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="77">
+                    <Name><![CDATA[openapi-swagger_basicauthentication.yaml]]></Name>
+                    <URL><![CDATA[/files/openapi-swagger_basicauthentication.yaml]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/openapi-swagger_basicauthentication.yaml]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="78">
+                    <Name><![CDATA[openapi-swagger_jwt.yaml]]></Name>
+                    <URL><![CDATA[/files/openapi-swagger_jwt.yaml]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/openapi-swagger_jwt.yaml]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="79">
+                    <Name><![CDATA[openapi-swagger_oauth2.yaml]]></Name>
+                    <URL><![CDATA[/files/openapi-swagger_oauth2.yaml]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/openapi-swagger_oauth2.yaml]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="80">
+                    <Name><![CDATA[postman_basicauthentication.json]]></Name>
+                    <URL><![CDATA[/files/postman_basicauthentication.json]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/postman_basicauthentication.json]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="81">
+                    <Name><![CDATA[postman_jwt.json]]></Name>
+                    <URL><![CDATA[/files/postman_jwt.json]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/postman_jwt.json]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="82">
+                    <Name><![CDATA[postman_oauth2.json]]></Name>
+                    <URL><![CDATA[/files/postman_oauth2.json]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/files/postman_oauth2.json]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="83">
+                    <Name><![CDATA[images]]></Name>
+                    <URL><![CDATA[/images/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/images/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="84">
+                    <Name><![CDATA[index.php]]></Name>
+                    <URL><![CDATA[/index.php]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/index.php]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="85">
+                    <Name><![CDATA[jwt]]></Name>
+                    <URL><![CDATA[/jwt/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/jwt/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="86">
+                    <Name><![CDATA[api]]></Name>
+                    <URL><![CDATA[/jwt/api]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/jwt/api]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="87">
+                    <Name><![CDATA[api]]></Name>
+                    <URL><![CDATA[/jwt/api/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/jwt/api/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="88">
+                    <Name><![CDATA[comments]]></Name>
+                    <URL><![CDATA[/jwt/api/comments]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/jwt/api/comments]]></FullURL>
+                    <Inputs>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="post_id" Type="JSON"/>
+                                <Variable Name="comment" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="89">
+                    <Name><![CDATA[comments]]></Name>
+                    <URL><![CDATA[/jwt/api/comments/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/jwt/api/comments/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="post_id" Type="JSON"/>
+                                <Variable Name="comment" Type="JSON"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="callback" Type="URL encoded GET"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="90">
+                    <Name><![CDATA[posts]]></Name>
+                    <URL><![CDATA[/jwt/api/posts]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/jwt/api/posts]]></FullURL>
+                    <Inputs>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="title" Type="JSON"/>
+                                <Variable Name="content" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="91">
+                    <Name><![CDATA[posts]]></Name>
+                    <URL><![CDATA[/jwt/api/posts/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/jwt/api/posts/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="postId" Type="Path Fragment"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="title" Type="JSON"/>
+                                <Variable Name="content" Type="JSON"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="callback" Type="URL encoded GET"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="92">
+                    <Name><![CDATA[users]]></Name>
+                    <URL><![CDATA[/jwt/api/users]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/jwt/api/users]]></FullURL>
+                    <Inputs>
+                                <Variable Name="username" Type="JSON"/>
+                                <Variable Name="email" Type="JSON"/>
+                                <Variable Name="password" Type="JSON"/>
+                                <Variable Name="first_name" Type="JSON"/>
+                                <Variable Name="last_name" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="93">
+                    <Name><![CDATA[users]]></Name>
+                    <URL><![CDATA[/jwt/api/users/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/jwt/api/users/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="username" Type="JSON"/>
+                                <Variable Name="email" Type="JSON"/>
+                                <Variable Name="password" Type="JSON"/>
+                                <Variable Name="first_name" Type="JSON"/>
+                                <Variable Name="last_name" Type="JSON"/>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="callback" Type="URL encoded GET"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="94">
+                    <Name><![CDATA[oauth2]]></Name>
+                    <URL><![CDATA[/oauth2/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/oauth2/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="95">
+                    <Name><![CDATA[api]]></Name>
+                    <URL><![CDATA[/oauth2/api]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/oauth2/api]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="96">
+                    <Name><![CDATA[api]]></Name>
+                    <URL><![CDATA[/oauth2/api/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/oauth2/api/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="97">
+                    <Name><![CDATA[comments]]></Name>
+                    <URL><![CDATA[/oauth2/api/comments]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/oauth2/api/comments]]></FullURL>
+                    <Inputs>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="post_id" Type="JSON"/>
+                                <Variable Name="comment" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="98">
+                    <Name><![CDATA[comments]]></Name>
+                    <URL><![CDATA[/oauth2/api/comments/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/oauth2/api/comments/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="post_id" Type="JSON"/>
+                                <Variable Name="comment" Type="JSON"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="callback" Type="URL encoded GET"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="99">
+                    <Name><![CDATA[posts]]></Name>
+                    <URL><![CDATA[/oauth2/api/posts]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/oauth2/api/posts]]></FullURL>
+                    <Inputs>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="title" Type="JSON"/>
+                                <Variable Name="content" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="100">
+                    <Name><![CDATA[posts]]></Name>
+                    <URL><![CDATA[/oauth2/api/posts/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/oauth2/api/posts/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="postId" Type="Path Fragment"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="user_id" Type="JSON"/>
+                                <Variable Name="title" Type="JSON"/>
+                                <Variable Name="content" Type="JSON"/>
+                                <Variable Name="commentId" Type="Path Fragment"/>
+                                <Variable Name="callback" Type="URL encoded GET"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="101">
+                    <Name><![CDATA[users]]></Name>
+                    <URL><![CDATA[/oauth2/api/users]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/oauth2/api/users]]></FullURL>
+                    <Inputs>
+                                <Variable Name="username" Type="JSON"/>
+                                <Variable Name="email" Type="JSON"/>
+                                <Variable Name="password" Type="JSON"/>
+                                <Variable Name="first_name" Type="JSON"/>
+                                <Variable Name="last_name" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                    </Inputs>
+                </SiteFile>
+<SiteFile id="102">
+                    <Name><![CDATA[users]]></Name>
+                    <URL><![CDATA[/oauth2/api/users/]]></URL>
+                    <FullURL><![CDATA[http://rest.vulnweb.com/oauth2/api/users/]]></FullURL>
+                    <Inputs>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="username" Type="JSON"/>
+                                <Variable Name="email" Type="JSON"/>
+                                <Variable Name="password" Type="JSON"/>
+                                <Variable Name="first_name" Type="JSON"/>
+                                <Variable Name="last_name" Type="JSON"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="username" Type="Path Fragment"/>
+                                <Variable Name="callback" Type="URL encoded GET"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="Referer" Type="HTTP Header"/>
+                                <Variable Name="User-Agent" Type="HTTP Header"/>
+                                <Variable Name="X-Forwarded-For" Type="HTTP Header"/>
+                                <Variable Name="username" Type="Path Fragment"/>
+                    </Inputs>
+                </SiteFile>
+            </SiteFiles>
+        </Crawler>
+        <ReportItems>
+<ReportItem id="1" color="red">
+                <Name><![CDATA[Weak password]]></Name>
+                <ModuleName><![CDATA[/Scripts/PerFolder/Weak_Password_Basic_Auth.script]]></ModuleName>
+                <Details><![CDATA[Username: <strong><span class="bb-dark">admin</span></strong>, Password: <strong><span class="bb-dark">123456</span></strong>.]]></Details>
+                <Affects><![CDATA[/basic_authentication/api/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[high]]></Severity>
+                <Type><![CDATA[informationdisclosure]]></Type>
+                <Impact><![CDATA[An attacker may access the contents of the password-protected page.]]></Impact>
+                <Description><![CDATA[This page is using a weak password. Acunetix was able to guess the credentials required to access this page. A weak password is short, common, a system default, or something that could be rapidly guessed by executing a brute force attack using a subset of all possible passwords, such as words in the dictionary, proper names, words based on the user name or common variations on these themes.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Enforce a strong password policy. Don't permit weak passwords or passwords based on dictionary words.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET /basic_authentication/api/ HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+Authorization: Basic YWRtaW46MTIzNDU2
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="200"><![CDATA[CWE-200]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:P/I:P/A:P]]></Descriptor>
+                  <Score><![CDATA[7.5]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[Partial]]></C>
+                  <I><![CDATA[Partial]]></I>
+                  <A><![CDATA[Partial]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[7.5]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <S><![CDATA[Unchanged]]></S>
+                  <C><![CDATA[High]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[8.7]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <VC><![CDATA[High]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                    <Reference>
+                      <Database><![CDATA[Wikipedia - Password strength]]></Database>
+                      <URL><![CDATA[https://en.wikipedia.org/wiki/Password_strength]]></URL>
+                    </Reference>
+                    <Reference>
+                      <Database><![CDATA[Authentication Hacking Attacks]]></Database>
+                      <URL><![CDATA[https://www.acunetix.com/websitesecurity/authentication/]]></URL>
+                    </Reference>
+                </References>
+            </ReportItem>
+<ReportItem id="2" color="orange">
+                <Name><![CDATA[Basic authentication over HTTP (verified)]]></Name>
+                <ModuleName><![CDATA[/Scripts/PerFolder/Basic_Auth_Over_HTTP.script]]></ModuleName>
+                <Details><![CDATA[Pages with basic authentication over HTTP:<br/><ul><li>http://rest.vulnweb.com/basic_authentication/api/</li><li>http://rest.vulnweb.com/basic_authentication/api/users/</li><li>http://rest.vulnweb.com/basic_authentication/api/users</li><li>http://rest.vulnweb.com/basic_authentication/api/comments/</li><li>http://rest.vulnweb.com/basic_authentication/api/posts/</li><li>http://rest.vulnweb.com/basic_authentication/api/comments</li><li>http://rest.vulnweb.com/basic_authentication/api</li><li>http://rest.vulnweb.com/basic_authentication/api/posts</li></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[medium]]></Severity>
+                <Type><![CDATA[sensitivedatanotoverssl]]></Type>
+                <Impact><![CDATA[User credentials are sent as cleartext and are vulnerable to packet sniffing.]]></Impact>
+                <Description><![CDATA[In the context of an HTTP transaction, basic access authentication is a method for an HTTP user agent to provide a user name and password when making a request. <br/><br/>
+One or more directories are protected using Basic Authentication over an HTTP connection. With Basic Authentication the user credentials are sent as cleartext and because HTTPS is not used, they are vulnerable to packet sniffing.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Use Basic Authentication over an HTTPS connection.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET /basic_authentication/api/ HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="522"><![CDATA[CWE-522]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:P/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[5.0]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[Partial]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[4.3]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Required]]></UI>
+                  <S><![CDATA[Unchanged]]></S>
+                  <C><![CDATA[Low]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[5.1]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[Low]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                    <Reference>
+                      <Database><![CDATA[Basic access authentication]]></Database>
+                      <URL><![CDATA[https://en.wikipedia.org/wiki/Basic_access_authentication]]></URL>
+                    </Reference>
+                </References>
+            </ReportItem>
+<ReportItem id="3" color="orange">
+                <Name><![CDATA[Insecure HTTP Usage]]></Name>
+                <ModuleName><![CDATA[/target/http_redirections.js]]></ModuleName>
+                <Details><![CDATA[]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[medium]]></Severity>
+                <Type><![CDATA[sensitivedatanotoverssl]]></Type>
+                <Impact><![CDATA[In some circumstances, it could be used for a man-in-the-middle (MitM) attack]]></Impact>
+                <Description><![CDATA[It was detected that your web application uses HTTP protocol, but doesn't automatically redirect users to HTTPS.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[It's recommended to implement best practices of HTTP Redirection into your web application. Consult web references for more information]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET / HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="16"><![CDATA[CWE-16]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Required]]></UI>
+                  <S><![CDATA[Changed]]></S>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[None]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                    <Reference>
+                      <Database><![CDATA[HTTP Redirections]]></Database>
+                      <URL><![CDATA[https://infosec.mozilla.org/guidelines/web_security#http-redirections]]></URL>
+                    </Reference>
+                </References>
+            </ReportItem>
+<ReportItem id="4" color="orange">
+                <Name><![CDATA[SSL/TLS Not Implemented (verified)]]></Name>
+                <ModuleName><![CDATA[/RPA/no_https.js]]></ModuleName>
+                <Details><![CDATA[]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[medium]]></Severity>
+                <Type><![CDATA[weakcrypto]]></Type>
+                <Impact><![CDATA[Possible information disclosure.]]></Impact>
+                <Description><![CDATA[This scan target was connected to over an unencrypted connection. A potential attacker can intercept and modify data sent and received from this site.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[The site should send and receive data over a secure (HTTPS) connection.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET / HTTP/1.1
+Referer: http://rest.vulnweb.com/
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="319"><![CDATA[CWE-319]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:M/Au:N/C:P/I:P/A:N]]></Descriptor>
+                  <Score><![CDATA[5.8]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Medium]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[Partial]]></C>
+                  <I><![CDATA[Partial]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N]]></Descriptor>
+                  <Score><![CDATA[5.4]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Required]]></UI>
+                  <S><![CDATA[Unchanged]]></S>
+                  <C><![CDATA[Low]]></C>
+                  <I><![CDATA[Low]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[5.1]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[Low]]></VC>
+                  <VI><![CDATA[Low]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                </References>
+            </ReportItem>
+<ReportItem id="5" color="orange">
+                <Name><![CDATA[Vulnerable JavaScript libraries]]></Name>
+                <ModuleName><![CDATA[/deepscan/javascript_library_audit_deepscan.js]]></ModuleName>
+                <Details><![CDATA[<ul>
+	<li><strong>jQuery 2.2.1</strong>
+	<ul>
+		<li>URL: http://rest.vulnweb.com/docs/</li>
+		<li>Detection method: The library&#x27;s name and version were determined based on its dynamic behavior. </li>
+		<li>CVE-ID: CVE-2015-9251, CVE-2020-11022, CVE-2020-11023, CVE-2019-11358</li>
+		<li>Description: Possible Cross Site Scripting via third-party text/javascript responses (1.12.0-1.12.2 mitigation reverted) / In jQuery versions greater than or equal to 1.2 and before 3.5.0, passing HTML from untrusted sources - even after sanitizing it - to one of jQuery&#x27;s DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0. / In jQuery versions greater than or equal to 1.0.3 and before 3.5.0, passing HTML containing option elements from untrusted sources - even after sanitizing it - to one of jQuery&#x27;s DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code. This problem is patched in jQuery 3.5.0.  / jQuery mishandles jQuery.extend(true, {}, ...) because of Object.prototype pollution. If an unsanitized source object contained an enumerable __proto__ property, it could extend the native Object.prototype.</li>
+		<li>References:
+			<ul>
+				<li>https://github.com/jquery/jquery/issues/2432</li>
+				<li>https://blog.jquery.com/2020/04/10/jquery-3-5-0-released/</li>
+				<li>https://mksben.l0.cm/2020/05/jquery3.5.0-xss.html</li>
+				<li>https://jquery.com/upgrade-guide/3.5/</li>
+				<li>https://api.jquery.com/jQuery.htmlPrefilter/</li>
+				<li>https://www.cvedetails.com/cve/CVE-2020-11022/</li>
+				<li>https://github.com/advisories/GHSA-gxr4-xjj5-5px2</li>
+				<li>https://www.cvedetails.com/cve/CVE-2020-11023/</li>
+				<li>https://github.com/advisories/GHSA-jpcq-cgw6-v4j6</li>
+				<li>https://github.com/jquery/jquery/pull/4333</li>
+				<li>https://nvd.nist.gov/vuln/detail/CVE-2019-11358</li>
+				<li>https://nvd.nist.gov/vuln/detail/CVE-2019-5428</li>
+				<li>https://blog.jquery.com/2019/04/10/jquery-3-4-0-released/</li>
+			</ul>
+		</li>
+	</ul>
+	</li></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[medium]]></Severity>
+                <Type><![CDATA[]]></Type>
+                <Impact><![CDATA[Consult References for more information.]]></Impact>
+                <Description><![CDATA[You are using one or more vulnerable JavaScript libraries. One or more vulnerabilities were reported for this version of the library. Consult Attack details and Web References for more information about the affected library and the vulnerabilities that were reported.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Upgrade to the latest version.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET /docs/ HTTP/1.1
+Referer: http://rest.vulnweb.com/
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="937"><![CDATA[CWE-937]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:P/I:P/A:N]]></Descriptor>
+                  <Score><![CDATA[6.4]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[Partial]]></C>
+                  <I><![CDATA[Partial]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N]]></Descriptor>
+                  <Score><![CDATA[6.5]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <S><![CDATA[Unchanged]]></S>
+                  <C><![CDATA[Low]]></C>
+                  <I><![CDATA[Low]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[6.9]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <VC><![CDATA[Low]]></VC>
+                  <VI><![CDATA[Low]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                </References>
+            </ReportItem>
+<ReportItem id="6" color="orange">
+                <Name><![CDATA[Vulnerable JavaScript libraries]]></Name>
+                <ModuleName><![CDATA[/Scripts/PerFile/Javascript_Libraries_Audit.script]]></ModuleName>
+                <Details><![CDATA[<ul>
+	<li><strong>handlebars.js 4.0.5</strong>
+	<ul>
+		<li>URL: http://rest.vulnweb.com/docs/vendor/handlebars.min</li>
+		<li>Detection method: The library&#x27;s name and version were determined based on the file&#x27;s contents. </li>
+		<li>CVE-ID: N/A</li>
+		<li>Description: Unsafe direct call of helperMissing and blockHelperMissing / Prototype pollution</li>
+		<li>References:
+			<ul>
+				<li>https://github.com/wycats/handlebars.js/blob/master/release-notes.md#v430---september-24th-2019</li>
+				<li>https://github.com/wycats/handlebars.js/blob/master/release-notes.md#v453---november-18th-2019</li>
+			</ul>
+		</li>
+	</ul>
+	</li></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[medium]]></Severity>
+                <Type><![CDATA[]]></Type>
+                <Impact><![CDATA[Consult References for more information.]]></Impact>
+                <Description><![CDATA[You are using one or more vulnerable JavaScript libraries. One or more vulnerabilities were reported for this version of the library. Consult Attack details and Web References for more information about the affected library and the vulnerabilities that were reported.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Upgrade to the latest version.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET /docs/vendor/handlebars.min HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="937"><![CDATA[CWE-937]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:P/I:P/A:N]]></Descriptor>
+                  <Score><![CDATA[6.4]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[Partial]]></C>
+                  <I><![CDATA[Partial]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N]]></Descriptor>
+                  <Score><![CDATA[6.5]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <S><![CDATA[Unchanged]]></S>
+                  <C><![CDATA[Low]]></C>
+                  <I><![CDATA[Low]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[6.9]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <VC><![CDATA[Low]]></VC>
+                  <VI><![CDATA[Low]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                </References>
+            </ReportItem>
+<ReportItem id="7" color="blue">
+                <Name><![CDATA[Clickjacking: X-Frame-Options header]]></Name>
+                <ModuleName><![CDATA[/httpdata/X_Frame_Options_not_implemented.js]]></ModuleName>
+                <Details><![CDATA[Paths without secure XFO header:<br/><ul><li>http://rest.vulnweb.com/</li><br/><li>http://rest.vulnweb.com/docs/</li><br/><li>http://rest.vulnweb.com/index.php</li><br/><li>http://rest.vulnweb.com/basic_authentication/</li><br/><li>http://rest.vulnweb.com/jwt/</li><br/><li>http://rest.vulnweb.com/docs/img/</li><br/><li>http://rest.vulnweb.com/docs/fonts/</li><br/><li>http://rest.vulnweb.com/docs/index.html</li><br/><li>http://rest.vulnweb.com/docs/css/</li><br/><li>http://rest.vulnweb.com/docs/utils/</li><br/><li>http://rest.vulnweb.com/docs/locales/</li><br/><li>http://rest.vulnweb.com/docs/vendor/</li><br/><li>http://rest.vulnweb.com/docs/vendor/path-to-regexp/</li><br/><li>http://rest.vulnweb.com/docs/vendor/prettify/</li><br/></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[low]]></Severity>
+                <Type><![CDATA[abuseoffunctionality]]></Type>
+                <Impact><![CDATA[The impact depends on the affected web application.]]></Impact>
+                <Description><![CDATA[Clickjacking (User Interface redress attack, UI redress attack, UI redressing) is a malicious technique of tricking a Web user into clicking on something different from what the user perceives they are clicking on, thus potentially revealing confidential information or taking control of their computer while clicking on seemingly innocuous web pages. <br/><br/>
+The server did not return an <strong>X-Frame-Options</strong> header with the value DENY or SAMEORIGIN, which means that this website could be at risk of a clickjacking attack. The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page inside a frame or iframe. Sites can use this to avoid clickjacking attacks, by ensuring that their content is not embedded into untrusted sites.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Configure your web server to include an X-Frame-Options header and a CSP header with frame-ancestors directive. Consult Web references for more information about the possible values for this header.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET / HTTP/1.1
+Referer: http://rest.vulnweb.com/
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="1021"><![CDATA[CWE-1021]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:M/Au:N/C:N/I:P/A:N]]></Descriptor>
+                  <Score><![CDATA[4.3]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Medium]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[Partial]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:N/I:L/A:N]]></Descriptor>
+                  <Score><![CDATA[5.8]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <S><![CDATA[Changed]]></S>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[Low]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[5.1]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[None]]></VC>
+                  <VI><![CDATA[Low]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                    <Reference>
+                      <Database><![CDATA[The X-Frame-Options response header]]></Database>
+                      <URL><![CDATA[https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options]]></URL>
+                    </Reference>
+                    <Reference>
+                      <Database><![CDATA[Clickjacking]]></Database>
+                      <URL><![CDATA[https://en.wikipedia.org/wiki/Clickjacking]]></URL>
+                    </Reference>
+                    <Reference>
+                      <Database><![CDATA[OWASP Clickjacking]]></Database>
+                      <URL><![CDATA[https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html]]></URL>
+                    </Reference>
+                    <Reference>
+                      <Database><![CDATA[Frame Buster Buster]]></Database>
+                      <URL><![CDATA[https://stackoverflow.com/questions/958997/frame-buster-buster-buster-code-needed]]></URL>
+                    </Reference>
+                </References>
+            </ReportItem>
+<ReportItem id="8" color="blue">
+                <Name><![CDATA[Missing Content-Type Header (verified)]]></Name>
+                <ModuleName><![CDATA[/RPA/Content_Type_Missing.js]]></ModuleName>
+                <Details><![CDATA[Pages where the content-type header is not specified:<br/><ul><li>http://rest.vulnweb.com/files/fiddler_basicauthentication.saz</li><li>http://rest.vulnweb.com/files/openapi-swagger_basicauthentication.yaml</li><li>http://rest.vulnweb.com/files/fiddler_jwt.saz</li><li>http://rest.vulnweb.com/files/openapi-swagger_jwt.yaml</li><li>http://rest.vulnweb.com/files/fiddler_oauth2.saz</li><li>http://rest.vulnweb.com/files/openapi-swagger_oauth2.yaml</li></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[low]]></Severity>
+                <Type><![CDATA[configuration]]></Type>
+                <Impact><![CDATA[None]]></Impact>
+                <Description><![CDATA[These page(s) does not set a Content-Type header value. This value informs the browser what kind of data to expect. If this header is missing, the browser may incorrectly handle the data. This could lead to security problems.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Set a Content-Type header value for these page(s).]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET /files/fiddler_basicauthentication.saz HTTP/1.1
+Referer: http://rest.vulnweb.com/docs/
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="16"><![CDATA[CWE-16]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Required]]></UI>
+                  <S><![CDATA[Unchanged]]></S>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[None]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                </References>
+            </ReportItem>
+<ReportItem id="9" color="blue">
+                <Name><![CDATA[Version Disclosure (PHP)]]></Name>
+                <ModuleName><![CDATA[/Scripts/PerServer/Version_Check.script]]></ModuleName>
+                <Details><![CDATA[Version detected: <strong>PHP/7.1.26</strong>.]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[low]]></Severity>
+                <Type><![CDATA[informationdisclosure]]></Type>
+                <Impact><![CDATA[An attacker might use the disclosed information to harvest specific security vulnerabilities for the version identified.]]></Impact>
+                <Description><![CDATA[The web server is sending the X-Powered-By: response headers, revealing the PHP version.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Configure your web server to prevent information leakage from its HTTP response.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <S><![CDATA[Unchanged]]></S>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/E:P]]></Descriptor>
+                  <Score><![CDATA[5.5]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <VC><![CDATA[Low]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                    <Reference>
+                      <Database><![CDATA[PHP Documentation: header_remove()]]></Database>
+                      <URL><![CDATA[https://www.php.net/manual/en/function.header-remove.php]]></URL>
+                    </Reference>
+                    <Reference>
+                      <Database><![CDATA[PHP Documentation: php.ini directive expose_php]]></Database>
+                      <URL><![CDATA[https://www.php.net/manual/en/ini.core.php#ini.expose-php]]></URL>
+                    </Reference>
+                </References>
+            </ReportItem>
+<ReportItem id="10" color="green">
+                <Name><![CDATA[Content Security Policy (CSP) Not Implemented]]></Name>
+                <ModuleName><![CDATA[/httpdata/CSP_not_implemented.js]]></ModuleName>
+                <Details><![CDATA[Paths without CSP header:<br/><ul><li>http://rest.vulnweb.com/</li><br/><li>http://rest.vulnweb.com/docs/</li><br/><li>http://rest.vulnweb.com/index.php</li><br/><li>http://rest.vulnweb.com/basic_authentication/</li><br/><li>http://rest.vulnweb.com/jwt/</li><br/><li>http://rest.vulnweb.com/docs/img/</li><br/><li>http://rest.vulnweb.com/docs/fonts/</li><br/><li>http://rest.vulnweb.com/docs/index.html</li><br/><li>http://rest.vulnweb.com/docs/css/</li><br/><li>http://rest.vulnweb.com/docs/utils/</li><br/><li>http://rest.vulnweb.com/docs/locales/</li><br/><li>http://rest.vulnweb.com/docs/vendor/</li><br/><li>http://rest.vulnweb.com/docs/vendor/path-to-regexp/</li><br/><li>http://rest.vulnweb.com/docs/vendor/prettify/</li><br/></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[informational]]></Severity>
+                <Type><![CDATA[configuration]]></Type>
+                <Impact><![CDATA[CSP can be used to prevent and/or mitigate attacks that involve content/code injection, such as cross-site scripting/XSS attacks, attacks that require embedding a malicious resource, attacks that involve malicious use of iframes, such as clickjacking attacks, and others.]]></Impact>
+                <Description><![CDATA[Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. <br/><br/>
+Content Security Policy (CSP) can be implemented by adding a <strong>Content-Security-Policy</strong> header. The value of this header is a string containing the policy directives describing your Content Security Policy. To implement CSP, you should define lists of allowed origins for the all of the types of resources that your site utilizes. For example, if you have a simple site that needs to load scripts, stylesheets, and images hosted locally, as well as from the jQuery library from their CDN, the CSP header could look like the following:
+<pre><code>
+Content-Security-Policy:
+    default-src 'self';
+    script-src 'self' https://code.jquery.com;
+</code></pre>
+<br/><br/>
+It was detected that your web application doesn't implement Content Security Policy (CSP) as the CSP header is missing from the response. It's recommended to implement Content Security Policy (CSP) into your web application.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[It's recommended to implement Content Security Policy (CSP) into your web application. Configuring Content Security Policy involves adding the <strong>Content-Security-Policy</strong> HTTP header to a web page and giving it values to control resources the user agent is allowed to load for that page.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET / HTTP/1.1
+Referer: http://rest.vulnweb.com/
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="1021"><![CDATA[CWE-1021]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Required]]></UI>
+                  <S><![CDATA[Changed]]></S>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[None]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                    <Reference>
+                      <Database><![CDATA[Content Security Policy (CSP)]]></Database>
+                      <URL><![CDATA[https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP]]></URL>
+                    </Reference>
+                    <Reference>
+                      <Database><![CDATA[Implementing Content Security Policy]]></Database>
+                      <URL><![CDATA[https://hacks.mozilla.org/2016/02/implementing-content-security-policy/]]></URL>
+                    </Reference>
+                </References>
+            </ReportItem>
+<ReportItem id="11" color="green">
+                <Name><![CDATA[Outdated JavaScript libraries]]></Name>
+                <ModuleName><![CDATA[/deepscan/javascript_library_audit_deepscan.js]]></ModuleName>
+                <Details><![CDATA[<ul>
+	<li><strong>bootstrap.js 3.3.7</strong>
+	<ul>
+		<li>URL: http://rest.vulnweb.com/docs/</li>
+		<li>Detection method: The library&#x27;s name and version were determined based on its dynamic behavior. </li>
+		<li>References:
+			<ul>
+				<li>https://github.com/twbs/bootstrap/releases</li>
+			</ul>
+		</li>
+	</ul>
+	</li></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[informational]]></Severity>
+                <Type><![CDATA[]]></Type>
+                <Impact><![CDATA[Consult References for more information.]]></Impact>
+                <Description><![CDATA[You are using an outdated version of one or more JavaScript libraries. A more recent version is available. Although your version was not found to be affected by any security vulnerabilities, it is recommended to keep libraries up to date.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Upgrade to the latest version.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET /docs/ HTTP/1.1
+Referer: http://rest.vulnweb.com/
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="937"><![CDATA[CWE-937]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:H/Au:N/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[High]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[High]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Required]]></UI>
+                  <S><![CDATA[Changed]]></S>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[High]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[None]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                </References>
+            </ReportItem>
+<ReportItem id="12" color="green">
+                <Name><![CDATA[Outdated JavaScript libraries]]></Name>
+                <ModuleName><![CDATA[/deepscan/javascript_library_audit_deepscan.js]]></ModuleName>
+                <Details><![CDATA[<ul>
+	<li><strong>RequireJS 2.1.22</strong>
+	<ul>
+		<li>URL: http://rest.vulnweb.com/docs/</li>
+		<li>Detection method: The library&#x27;s name and version were determined based on its dynamic behavior. </li>
+		<li>References:
+			<ul>
+				<li>https://github.com/requirejs/requirejs/tags</li>
+			</ul>
+		</li>
+	</ul>
+	</li></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[informational]]></Severity>
+                <Type><![CDATA[]]></Type>
+                <Impact><![CDATA[Consult References for more information.]]></Impact>
+                <Description><![CDATA[You are using an outdated version of one or more JavaScript libraries. A more recent version is available. Although your version was not found to be affected by any security vulnerabilities, it is recommended to keep libraries up to date.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Upgrade to the latest version.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET /docs/ HTTP/1.1
+Referer: http://rest.vulnweb.com/
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="937"><![CDATA[CWE-937]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:H/Au:N/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[High]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[High]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Required]]></UI>
+                  <S><![CDATA[Changed]]></S>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[High]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[None]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                </References>
+            </ReportItem>
+<ReportItem id="13" color="green">
+                <Name><![CDATA[Outdated JavaScript libraries]]></Name>
+                <ModuleName><![CDATA[/Scripts/PerFile/Javascript_Libraries_Audit.script]]></ModuleName>
+                <Details><![CDATA[<ul>
+	<li><strong>List.js 1.3.0</strong>
+	<ul>
+		<li>URL: http://rest.vulnweb.com/docs/vendor/list.min</li>
+		<li>Detection method: The library&#x27;s name and version were determined based on the file&#x27;s contents. </li>
+		<li>References:
+			<ul>
+				<li>https://github.com/javve/list.js/tags</li>
+			</ul>
+		</li>
+	</ul>
+	</li></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[informational]]></Severity>
+                <Type><![CDATA[]]></Type>
+                <Impact><![CDATA[Consult References for more information.]]></Impact>
+                <Description><![CDATA[You are using an outdated version of one or more JavaScript libraries. A more recent version is available. Although your version was not found to be affected by any security vulnerabilities, it is recommended to keep libraries up to date.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[Upgrade to the latest version.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET /docs/vendor/list.min HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="937"><![CDATA[CWE-937]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:H/Au:N/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[High]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[High]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Required]]></UI>
+                  <S><![CDATA[Changed]]></S>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:H/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[High]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[None]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                </References>
+            </ReportItem>
+<ReportItem id="14" color="green">
+                <Name><![CDATA[Permissions-Policy header not implemented]]></Name>
+                <ModuleName><![CDATA[/httpdata/permissions_policy.js]]></ModuleName>
+                <Details><![CDATA[Locations without Permissions-Policy header:<br/><ul><li>http://rest.vulnweb.com/</li><li>http://rest.vulnweb.com/docs/</li><li>http://rest.vulnweb.com/index.php</li><li>http://rest.vulnweb.com/basic_authentication/api/users/</li><li>http://rest.vulnweb.com/basic_authentication/api/users</li><li>http://rest.vulnweb.com/basic_authentication/api/comments/</li><li>http://rest.vulnweb.com/images/</li><li>http://rest.vulnweb.com/basic_authentication/api/posts/</li><li>http://rest.vulnweb.com/files/</li><li>http://rest.vulnweb.com/basic_authentication/api/comments</li><li>http://rest.vulnweb.com/basic_authentication/</li><li>http://rest.vulnweb.com/jwt/api/users/</li><li>http://rest.vulnweb.com/jwt/</li><li>http://rest.vulnweb.com/jwt/api</li><li>http://rest.vulnweb.com/jwt/api/posts/</li><li>http://rest.vulnweb.com/docs/img/</li><li>http://rest.vulnweb.com/jwt/api/users</li><li>http://rest.vulnweb.com/basic_authentication/api</li><li>http://rest.vulnweb.com/jwt/api/comments/</li><li>http://rest.vulnweb.com/docs/fonts/</li><li>http://rest.vulnweb.com/docs/index.html</li></ul>]]></Details>
+                <Affects><![CDATA[/]]></Affects>
+                <Parameter><![CDATA[]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[informational]]></Severity>
+                <Type><![CDATA[configuration]]></Type>
+                <Impact><![CDATA[]]></Impact>
+                <Description><![CDATA[The Permissions-Policy header allows developers to selectively enable and disable use of various browser features and APIs.]]></Description>
+                <DetailedInformation><![CDATA[]]></DetailedInformation>
+                <Recommendation><![CDATA[]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET / HTTP/1.1
+Referer: http://rest.vulnweb.com/
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: rest.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="1021"><![CDATA[CWE-1021]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <CVSS>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network_Accessible]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <Au><![CDATA[None]]></Au>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS>
+                <CVSS3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:N/A:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Required]]></UI>
+                  <S><![CDATA[Changed]]></S>
+                  <C><![CDATA[None]]></C>
+                  <I><![CDATA[None]]></I>
+                  <A><![CDATA[None]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </CVSS3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:N/SI:N/SA:N]]></Descriptor>
+                  <Score><![CDATA[0.0]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[Active]]></UI>
+                  <VC><![CDATA[None]]></VC>
+                  <VI><![CDATA[None]]></VI>
+                  <VA><![CDATA[None]]></VA>
+                  <SC><![CDATA[None]]></SC>
+                  <SI><![CDATA[None]]></SI>
+                  <SA><![CDATA[None]]></SA>
+                </CVSS4>
+                <References>
+                    <Reference>
+                      <Database><![CDATA[Permissions-Policy / Feature-Policy (MDN)]]></Database>
+                      <URL><![CDATA[https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Feature-Policy]]></URL>
+                    </Reference>
+                    <Reference>
+                      <Database><![CDATA[Permissions Policy (W3C)]]></Database>
+                      <URL><![CDATA[https://www.w3.org/TR/permissions-policy-1/]]></URL>
+                    </Reference>
+                </References>
+            </ReportItem>
+        </ReportItems>
+    </Scan>
+</ScanGroup>

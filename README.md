@@ -19,7 +19,7 @@ Espengler es una herramienta profesional para la **generación automatizada de r
 Clona el repositorio y configura el entorno virtual en la raíz:
 
 ```bash
-git clone <URL-del-repositorio>
+git clone https://github.com/pereznacho/Espengler.git
 cd VulnerabilityManager
 python -m venv ../venv
 source ../venv/bin/activate

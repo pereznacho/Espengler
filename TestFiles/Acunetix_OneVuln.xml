@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<ScanGroup ExportedOn="2024-02-28T14:59:20.132196">
+<Scan>
+        <ReportItems>
+<ReportItem id="1" color="maroon">
+                <Name><![CDATA[Local File Inclusion]]></Name>
+                <ModuleName><![CDATA[/Scripts/PerScheme/Script_Source_Code_Disclosure.script]]></ModuleName>
+                <Details><![CDATA[URL encoded GET input <strong><span class="bb-dark">file</span></strong> was set to <strong><span class="bb-dark">showimage.php</span></strong><br/><br/> Pattern found: <pre><span class="bb-blue">&lt;?php
+// header(&quot;Content-Length: 1&quot; /*. filesize($name)*/);
+if( isset($_GET[&quot;file&quot;]) &amp;&amp; !isset($_GET[&quot;size&quot;]) ){
+        // open the file in a binary mode
+        header(&quot;Content-Type: image/jpeg&quot;);
+        $name = $_GET[&quot;file&quot;];
+		// restrict urls
+        if (filter_var($name, FILTER_VALIDATE_URL)) {
+        	exit();
+        }
+        $fp = fopen($name, &#x27;rb&#x27;);
+        // send the right headers
+        header(&quot;Content-Type: image/jpeg&quot;);
+        // dump the picture and stop the script
+ ... </span></pre>  ]]></Details>
+                <Affects><![CDATA[/showimage.php]]></Affects>
+                <Parameter><![CDATA[file]]></Parameter>
+                <AOP_SourceFile><![CDATA[]]></AOP_SourceFile>
+                <AOP_SourceLine></AOP_SourceLine>
+                <AOP_Additional><![CDATA[]]></AOP_Additional>
+                <IsFalsePositive><![CDATA[]]></IsFalsePositive>
+                <Severity><![CDATA[Critical]]></Severity>
+                <Type><![CDATA[fileinclusion]]></Type>
+                <Impact><![CDATA[It is possible for a remote attacker to include a file from local or remote resources and/or execute arbitrary script code with the privileges of the web-server.]]></Impact>
+                <Description><![CDATA[This script is possibly vulnerable to file inclusion attacks. <br/><br/>It seems that this script includes a file which name is determined using user-supplied data. This data is not properly validated before being passed to the include function.]]></Description>
+                <Recommendation><![CDATA[Edit the source code to ensure that input is properly validated. Where is possible, it is recommended to make a list of accepted filenames and restrict the input to that list.<br/><br/>
+For PHP, the option <strong>allow_url_fopen</strong> would normally allow a programmer to open, include or otherwise use a remote file using a URL rather than a local file path. It is recommended to disable this option from php.ini.]]></Recommendation>
+                <TechnicalDetails>
+                    <Request><![CDATA[GET /showimage.php?file=showimage.php&size=160 HTTP/1.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate,br
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36
+Host: testphp.vulnweb.com
+Connection: Keep-alive
+]]></Request>
+                </TechnicalDetails>
+                <CWEList>
+                    <CWE id="20"><![CDATA[CWE-20]]></CWE>
+                </CWEList>
+                <CVEList>
+                </CVEList>
+                <cvss>
+                  <Descriptor><![CDATA[AV:N/AC:L/Au:N/C:P/I:P/A:P]]></Descriptor>
+                  <Score><![CDATA[7.5]]></Score>
+                  <AV><![CDATA[NETWORK_ACCESSIBLE]]></AV>
+                  <AC><![CDATA[LOW]]></AC>
+                  <Au><![CDATA[NONE]]></Au>
+                  <C><![CDATA[PARTIAL]]></C>
+                  <I><![CDATA[PARTIAL]]></I>
+                  <A><![CDATA[PARTIAL]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </cvss>
+                <cvss3>
+                  <Descriptor><![CDATA[CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:L]]></Descriptor>
+                  <Score><![CDATA[8.3]]></Score>
+                  <TempScore><![CDATA[]]></TempScore>
+                  <EnvScore><![CDATA[]]></EnvScore>
+                  <AV><![CDATA[NETWORK]]></AV>
+                  <AC><![CDATA[LOW]]></AC>
+                  <PR><![CDATA[NONE]]></PR>
+                  <UI><![CDATA[NONE]]></UI>
+                  <S><![CDATA[CHANGED]]></S>
+                  <C><![CDATA[LOW]]></C>
+                  <I><![CDATA[LOW]]></I>
+                  <A><![CDATA[LOW]]></A>
+                  <E><![CDATA[]]></E>
+                  <RL><![CDATA[]]></RL>
+                  <RC><![CDATA[]]></RC>
+                </cvss3>
+                <CVSS4>
+                  <Descriptor><![CDATA[CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:L/SC:L/SI:L/SA:L]]></Descriptor>
+                  <Score><![CDATA[6.9]]></Score>
+                  <AV><![CDATA[Network]]></AV>
+                  <AC><![CDATA[Low]]></AC>
+                  <PR><![CDATA[None]]></PR>
+                  <UI><![CDATA[None]]></UI>
+                  <VC><![CDATA[Low]]></VC>
+                  <VI><![CDATA[Low]]></VI>
+                  <VA><![CDATA[Low]]></VA>
+                  <SC><![CDATA[Low]]></SC>
+                  <SI><![CDATA[Low]]></SI>
+                  <SA><![CDATA[Low]]></SA>
+                </CVSS4>
+                <References>
+                    <Reference>
+                      <Database><![CDATA[PHP - Using remote files]]></Database>
+                      <URL><![CDATA[https://www.php.net/manual/en/features.remote-files.php]]></URL>
+                    </Reference>
+                    <Reference>
+                      <Database><![CDATA[OWASP PHP Top 5]]></Database>
+                      <URL><![CDATA[https://www.owasp.org/index.php/PHP_Top_5]]></URL>
+                    </Reference>
+                    <Reference>
+                      <Database><![CDATA[Remote file inclusion]]></Database>
+                      <URL><![CDATA[https://en.wikipedia.org/wiki/Remote_file_inclusion]]></URL>
+                    </Reference>
+                </References>
+            </ReportItem>
+        </ReportItems>
+    </Scan>
+</ScanGroup>

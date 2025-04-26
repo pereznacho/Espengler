@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<?xml-stylesheet href="file:///usr/bin/../share/nmap/nmap.xsl" type="text/xsl"?>
+<!-- Nmap 7.94SVN scan initiated Mon Feb 26 14:35:06 2024 as: nmap -vvv -sS -sV -Pn -p- -A -oX NmapFullPort2 44.228.249.3 -->
+<nmaprun scanner="nmap" args="nmap -vvv -sS -sV -Pn -p- -A -oX NmapFullPort2 44.228.249.3" start="1708968906" startstr="Mon Feb 26 14:35:06 2024" version="7.94SVN" xmloutputversion="1.05">
+<scaninfo type="syn" protocol="tcp" numservices="65535" services="1-65535"/>
+<verbose level="3"/>
+<debugging level="0"/>
+<taskbegin task="NSE" time="1708968907"/>
+<taskend task="NSE" time="1708968907"/>
+<taskbegin task="NSE" time="1708968907"/>
+<taskend task="NSE" time="1708968907"/>
+<taskbegin task="NSE" time="1708968907"/>
+<taskend task="NSE" time="1708968907"/>
+<taskbegin task="Parallel DNS resolution of 1 host." time="1708968907"/>
+<taskend task="Parallel DNS resolution of 1 host." time="1708968907"/>
+<taskbegin task="SYN Stealth Scan" time="1708968907"/>
+<taskprogress task="SYN Stealth Scan" time="1708968938" percent="6.25" remaining="466" etc="1708969403"/>
+<taskprogress task="SYN Stealth Scan" time="1708968968" percent="18.43" remaining="270" etc="1708969238"/>
+<taskprogress task="SYN Stealth Scan" time="1708968998" percent="33.51" remaining="181" etc="1708969179"/>
+<taskprogress task="SYN Stealth Scan" time="1708969028" percent="45.89" remaining="143" etc="1708969171"/>
+<taskprogress task="SYN Stealth Scan" time="1708969082" percent="57.81" remaining="128" etc="1708969210"/>
+<taskprogress task="SYN Stealth Scan" time="1708969112" percent="72.36" remaining="79" etc="1708969190"/>
+<taskprogress task="SYN Stealth Scan" time="1708969142" percent="86.03" remaining="39" etc="1708969180"/>
+<taskend task="SYN Stealth Scan" time="1708969179" extrainfo="65535 total ports"/>
+<taskbegin task="Service scan" time="1708969180"/>
+<taskend task="Service scan" time="1708969195" extrainfo="1 service on 1 host"/>
+<taskbegin task="Traceroute" time="1708969200"/>
+<taskend task="Traceroute" time="1708969206"/>
+<taskbegin task="Parallel DNS resolution of 4 hosts." time="1708969206"/>
+<taskend task="Parallel DNS resolution of 4 hosts." time="1708969206"/>
+<taskbegin task="NSE" time="1708969206"/>
+<taskend task="NSE" time="1708969215"/>
+<taskbegin task="NSE" time="1708969215"/>
+<taskend task="NSE" time="1708969215"/>
+<taskbegin task="NSE" time="1708969215"/>
+<taskend task="NSE" time="1708969215"/>
+<host starttime="1708968907" endtime="1708969215"><status state="up" reason="user-set" reason_ttl="0"/>
+<address addr="44.228.249.3" addrtype="ipv4"/>
+<hostnames>
+<hostname name="ec2-44-228-249-3.us-west-2.compute.amazonaws.com" type="PTR"/>
+</hostnames>
+<ports><extraports state="filtered" count="65534">
+<extrareasons reason="no-response" count="65534" proto="tcp" ports="1-79,81-65535"/>
+</extraports>
+<port protocol="tcp" portid="80"><state state="open" reason="syn-ack" reason_ttl="45"/><service name="http" product="nginx" version="1.19.0" method="probed" conf="10"><cpe>cpe:/a:igor_sysoev:nginx:1.19.0</cpe></service></port>
+</ports>
+<os><portused state="open" proto="tcp" portid="80"/>
+<osmatch name="Linux 2.6.32" accuracy="91" line="55372">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="2.6.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:2.6.32</cpe></osclass>
+</osmatch>
+<osmatch name="Linux 3.10 - 4.11" accuracy="91" line="63448">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="3.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:3</cpe></osclass>
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="4.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:4</cpe></osclass>
+</osmatch>
+<osmatch name="Linux 3.2 - 4.9" accuracy="91" line="65323">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="3.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:3</cpe></osclass>
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="4.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:4</cpe></osclass>
+</osmatch>
+<osmatch name="Linux 3.4 - 3.10" accuracy="91" line="65584">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="3.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:3</cpe></osclass>
+</osmatch>
+<osmatch name="Linux 4.15 - 5.8" accuracy="91" line="67250">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="4.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:4</cpe></osclass>
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="5.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:5</cpe></osclass>
+</osmatch>
+<osmatch name="Linux 5.0 - 5.4" accuracy="91" line="68121">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="5.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:5</cpe></osclass>
+</osmatch>
+<osmatch name="Linux 5.1" accuracy="91" line="68139">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="5.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:5.1</cpe></osclass>
+</osmatch>
+<osmatch name="Linux 2.6.32 - 3.10" accuracy="91" line="56580">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="2.6.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:2.6</cpe></osclass>
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="3.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:3</cpe></osclass>
+</osmatch>
+<osmatch name="Linux 2.6.32 - 3.13" accuracy="91" line="56610">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="2.6.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:2.6</cpe></osclass>
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="3.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:3</cpe></osclass>
+</osmatch>
+<osmatch name="Linux 2.6.39" accuracy="91" line="58199">
+<osclass type="general purpose" vendor="Linux" osfamily="Linux" osgen="2.6.X" accuracy="91"><cpe>cpe:/o:linux:linux_kernel:2.6.39</cpe></osclass>
+</osmatch>
+<osfingerprint fingerprint="SCAN(V=7.94SVN%E=4%D=2/26%OT=80%CT=%CU=%PV=N%DS=18%DC=T%G=N%TM=65DCCCFF%P=x86_64-pc-linux-gnu)&#xa;SEQ(SP=103%GCD=1%ISR=106%TI=Z%II=I%TS=A)&#xa;OPS(O1=M5B4ST11NW7%O2=M5B4ST11NW7%O3=M5B4NNT11NW7%O4=M5B4ST11NW7%O5=M5B4ST11NW7%O6=M5B4ST11)&#xa;WIN(W1=F4B3%W2=F4B3%W3=F4B3%W4=F4B3%W5=F4B3%W6=F4B3)&#xa;ECN(R=Y%DF=Y%TG=40%W=F507%O=M5B4NNSNW7%CC=Y%Q=)&#xa;T1(R=Y%DF=Y%TG=40%S=O%A=S+%F=AS%RD=0%Q=)&#xa;T2(R=N)&#xa;T3(R=N)&#xa;T4(R=Y%DF=Y%TG=40%W=0%S=A%A=Z%F=R%O=%RD=0%Q=)&#xa;U1(R=N)&#xa;IE(R=Y%DFI=N%TG=40%CD=S)&#xa;"/>
+</os>
+<uptime seconds="2261125" lastboot="Wed Jan 31 10:34:50 2024"/>
+<distance value="18"/>
+<tcpsequence index="259" difficulty="Good luck!" values="27C4FF59,3DE1632D,808BFCA7,A0EC2D8F,F37187C4,EF9D03D9"/>
+<ipidsequence class="All zeros" values="0,0,0,0,0,0"/>
+<tcptssequence class="1000HZ" values="86C5C66E,86C5C6E0,86C5C739,86C5C797,86C5C803,86C5C873"/>
+<trace port="80" proto="tcp">
+<hop ttl="1" ipaddr="192.168.0.1" rtt="12.97" host="Docsis-Gateway.fibertel.com.ar"/>
+<hop ttl="6" ipaddr="181.96.113.234" rtt="58.20" host="host234.181-96-113.telecom.net.ar"/>
+<hop ttl="7" ipaddr="195.22.220.56" rtt="33.03"/>
+<hop ttl="10" ipaddr="66.110.72.46" rtt="200.95" host="if-ae-46-2.tcore2.mln-miami.as6453.net"/>
+<hop ttl="18" ipaddr="44.228.249.3" rtt="215.50" host="ec2-44-228-249-3.us-west-2.compute.amazonaws.com"/>
+</trace>
+<times srtt="209496" rttvar="6773" to="236588"/>
+</host>
+<taskbegin task="NSE" time="1708969215"/>
+<taskend task="NSE" time="1708969215"/>
+<taskbegin task="NSE" time="1708969215"/>
+<taskend task="NSE" time="1708969215"/>
+<taskbegin task="NSE" time="1708969215"/>
+<taskend task="NSE" time="1708969215"/>
+<runstats><finished time="1708969215" timestr="Mon Feb 26 14:40:15 2024" summary="Nmap done at Mon Feb 26 14:40:15 2024; 1 IP address (1 host up) scanned in 309.27 seconds" elapsed="309.27" exit="success"/><hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>
