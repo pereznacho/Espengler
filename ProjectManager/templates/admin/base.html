@@ -1,21 +1,34 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/monokai.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
     <title>Vulnerability Manager</title>
+
+    <!-- Cargar estilos personalizados -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/ckeditor_custom.css' %}">
+
+    <!-- Cargar CKEditor -->
+    <script src="{% static 'ckeditor/ckeditor.js' %}"></script>
 </head>
 <body>
     <header>
         <h1>Vulnerability Manager</h1>
-	<nav>
-	    <a href="{% url 'create_project' %}">Create New Project</a>
-	    <!-- other navigation links -->
-	</nav>
-
+        <nav>
+            <a href="{% url 'create_project' %}">Create New Project</a>
+        </nav>
     </header>
+    
     <main>
         {% block content %}
         {% endblock %}
     </main>
+
     <footer>
         <!-- Footer content -->
     </footer>

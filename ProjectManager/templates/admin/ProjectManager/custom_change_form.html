@@ -1,0 +1,138 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        /* 🔥 Ocultar la etiqueta y el campo "Graphmap display" */
+        div.field-graphmap_display {
+            display: none !important;
+        }
+
+        /* 🔥 Ajustar el tamaño del contenedor */
+        #graphmap-container {
+            width: 95vw;
+            height: 650px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>Project: {{ project_info.name }}</h1>
+        <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab">Info</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="targets-tab" data-toggle="tab" href="#targets" role="tab">Targets</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="vulnerabilities-tab" data-toggle="tab" href="#vulnerabilities" role="tab">Vulnerabilities</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="graphmap-tab" data-toggle="tab" href="#graphmap" role="tab">GraphMap</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="projectTabsContent">
+            <div class="tab-pane fade show active" id="info" role="tabpanel">
+                <h3>Project Info</h3>
+                <p>{{ project_info.description }}</p>
+            </div>
+            <div class="tab-pane fade" id="targets" role="tabpanel">
+                <h3>Targets</h3>
+                {% for target in targets %}
+                <p>{{ target }}</p>
+                {% endfor %}
+            </div>
+            <div class="tab-pane fade" id="vulnerabilities" role="tabpanel">
+                <h3>Vulnerabilities</h3>
+                {% for vulnerability in vulnerabilities %}
+                <p>{{ vulnerability }}</p>
+                {% endfor %}
+            </div>
+            <div class="tab-pane fade" id="graphmap" role="tabpanel">
+                <div id="graphmap-container"></div>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        function drawGraphMap() {
+                            let container = document.getElementById("graphmap-container");
+                            if (!container) return;
+
+                            d3.select("#graphmap-container").selectAll("*").remove();
+                            const nodes = JSON.parse('{{ nodes|safe }}');
+                            const edges = JSON.parse('{{ edges|safe }}');
+
+                            const width = container.offsetWidth;
+                            const height = container.offsetHeight;
+
+                            const svg = d3.select("#graphmap-container").append("svg")
+                                .attr("width", width)
+                                .attr("height", height);
+
+                            const simulation = d3.forceSimulation(nodes)
+                                .force("link", d3.forceLink(edges).id(d => d.id).distance(100))
+                                .force("charge", d3.forceManyBody().strength(-50))
+                                .force("center", d3.forceCenter(width / 2, height / 2))
+                                .force("collide", d3.forceCollide().radius(40));
+
+                            const link = svg.append("g")
+                                .selectAll("line")
+                                .data(edges)
+                                .enter().append("line")
+                                .attr("stroke-width", 2)
+                                .attr("stroke", "#999");
+
+                            const node = svg.append("g")
+                                .selectAll("circle")
+                                .data(nodes)
+                                .enter().append("circle")
+                                .attr("r", 10)
+                                .attr("fill", "#007bff");
+
+                            const labels = svg.append("g")
+                                .selectAll("text")
+                                .data(nodes)
+                                .enter().append("text")
+                                .attr("font-size", "12px")
+                                .attr("fill", "#333")
+                                .attr("text-anchor", "middle")
+                                .attr("dy", 30)
+                                .text(d => d.label);
+
+                            simulation.on("tick", function () {
+                                link
+                                    .attr("x1", d => d.source.x)
+                                    .attr("y1", d => d.source.y)
+                                    .attr("x2", d => d.target.x)
+                                    .attr("y2", d => d.target.y);
+
+                                node
+                                    .attr("cx", d => d.x)
+                                    .attr("cy", d => d.y);
+
+                                labels
+                                    .attr("x", d => d.x)
+                                    .attr("y", d => d.y + 30);
+                            });
+                        }
+
+                        document.querySelector("#graphmap-tab").addEventListener("click", drawGraphMap);
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</body>

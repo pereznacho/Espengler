@@ -9,10 +9,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FirefoxLauncher = void 0;
-const fs_1 = __importDefault(require("fs"));
-const promises_1 = require("fs/promises");
-const os_1 = __importDefault(require("os"));
-const path_1 = __importDefault(require("path"));
+const node_fs_1 = __importDefault(require("node:fs"));
+const promises_1 = require("node:fs/promises");
+const node_os_1 = __importDefault(require("node:os"));
+const node_path_1 = __importDefault(require("node:path"));
 const browsers_1 = require("@puppeteer/browsers");
 const util_js_1 = require("../common/util.js");
 const assert_js_1 = require("../util/assert.js");
@@ -25,25 +25,11 @@ class FirefoxLauncher extends BrowserLauncher_js_1.BrowserLauncher {
     constructor(puppeteer) {
         super(puppeteer, 'firefox');
     }
-    static getPreferences(extraPrefsFirefox, protocol) {
+    static getPreferences(extraPrefsFirefox) {
         return {
             ...extraPrefsFirefox,
-            ...(protocol === 'webDriverBiDi'
-                ? {
-                    // Only enable the WebDriver BiDi protocol
-                    'remote.active-protocols': 1,
-                }
-                : {
-                    // Do not close the window when the last tab gets closed
-                    'browser.tabs.closeWindowWithLastTab': false,
-                    // Prevent various error message on the console
-                    // jest-puppeteer asserts that no error message is emitted by the console
-                    'network.cookie.cookieBehavior': 0,
-                    // Temporarily force disable BFCache in parent (https://bit.ly/bug-1732263)
-                    'fission.bfcacheInParent': false,
-                    // Only enable the CDP protocol
-                    'remote.active-protocols': 2,
-                }),
+            // Only enable the WebDriver BiDi protocol
+            'remote.active-protocols': 1,
             // Force all web content to use a single content process. TODO: remove
             // this once Firefox supports mouse event dispatch from the main frame
             // context. Once this happens, webContentIsolationStrategy should only
@@ -100,7 +86,7 @@ class FirefoxLauncher extends BrowserLauncher_js_1.BrowserLauncher {
         }
         await (0, browsers_1.createProfile)(browsers_1.Browser.FIREFOX, {
             path: userDataDir,
-            preferences: FirefoxLauncher.getPreferences(extraPrefsFirefox, options.protocol),
+            preferences: FirefoxLauncher.getPreferences(extraPrefsFirefox),
         });
         let firefoxExecutable;
         if (this.puppeteer._isPuppeteerCore || executablePath) {
@@ -108,7 +94,7 @@ class FirefoxLauncher extends BrowserLauncher_js_1.BrowserLauncher {
             firefoxExecutable = executablePath;
         }
         else {
-            firefoxExecutable = this.executablePath();
+            firefoxExecutable = this.executablePath(undefined);
         }
         return {
             isTempUserDataDir,
@@ -135,9 +121,9 @@ class FirefoxLauncher extends BrowserLauncher_js_1.BrowserLauncher {
                 const backupSuffix = '.puppeteer';
                 const backupFiles = ['prefs.js', 'user.js'];
                 const results = await Promise.allSettled(backupFiles.map(async (file) => {
-                    const prefsBackupPath = path_1.default.join(userDataDir, file + backupSuffix);
-                    if (fs_1.default.existsSync(prefsBackupPath)) {
-                        const prefsPath = path_1.default.join(userDataDir, file);
+                    const prefsBackupPath = node_path_1.default.join(userDataDir, file + backupSuffix);
+                    if (node_fs_1.default.existsSync(prefsBackupPath)) {
+                        const prefsPath = node_path_1.default.join(userDataDir, file);
                         await (0, promises_1.unlink)(prefsPath);
                         await (0, promises_1.rename)(prefsBackupPath, prefsPath);
                     }
@@ -153,13 +139,14 @@ class FirefoxLauncher extends BrowserLauncher_js_1.BrowserLauncher {
             }
         }
     }
-    executablePath() {
-        return this.resolveExecutablePath();
+    executablePath(_, validatePath = true) {
+        return this.resolveExecutablePath(undefined, 
+        /* validatePath=*/ validatePath);
     }
     defaultArgs(options = {}) {
         const { devtools = false, headless = !devtools, args = [], userDataDir = null, } = options;
         const firefoxArguments = [];
-        switch (os_1.default.platform()) {
+        switch (node_os_1.default.platform()) {
             case 'darwin':
                 firefoxArguments.push('--foreground');
                 break;

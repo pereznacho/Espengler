@@ -1,0 +1,63 @@
+Metadata-Version: 2.1
+Name: html2docx
+Version: 1.6.0
+Summary: Convert valid HTML input to docx.
+Home-page: https://github.com/erezlife/html2docx
+Author: eRezLife
+Author-email: noreply@erezlife.com
+Maintainer: eRezLife
+Maintainer-email: noreply@erezlife.com
+License: MIT
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Utilities
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: python-docx
+Requires-Dist: tinycss2
+
+# html2docx
+
+html2docx converts valid HTML input to docx output. The project is distributed
+under the MIT license.
+
+## Installing
+
+To install, use pip:
+
+```
+$ pip install html2docx
+```
+
+## Usage
+
+```py
+from html2docx import html2docx
+
+with open("my.html") as fp:
+    html = fp.read()
+
+# html2docx() returns an io.BytesIO() object. The HTML must be valid.
+buf = html2docx(html, title="My Document")
+
+with open("my.docx", "wb") as fp:
+    fp.write(buf.getvalue())
+```
+
+## Testing
+
+To run the test suite, use tox:
+
+```
+$ tox
+```

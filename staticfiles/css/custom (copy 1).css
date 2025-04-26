@@ -1,0 +1,207 @@
+/* 📌 Estilos personalizados para CKEditor 5 */
+.ck.ck-content {
+    color: #ffffff !important; /* 🔹 Texto blanco */
+    background-color: #3f474e !important; /* Fondo #3f474e */
+    font-size: 16px;
+}
+
+/* 📌 Corrige el color del texto sin forzar negro */
+.editor-content, 
+.cke_editable, 
+.markdown-body {
+    color: #ffffff !important;  /* Usa blanco para mejor contraste */
+    background-color: #3f474e !important;
+}
+
+/* 📌 Mantener colores y estilos personalizados de CKEditor */
+.ck.ck-content .text-color {
+    color: inherit !important;
+}
+.ck.ck-content .background-color {
+    background-color: inherit !important;
+}
+
+/* 📌 Establecer el fondo del contenedor de CKEditor */
+.ck.ck-editor__main {
+    background-color: #3f474e !important;  /* Fondo del editor */
+}
+
+/* 📌 Ajustar la barra de herramientas de CKEditor */
+.ck.ck-toolbar {
+    background-color: #2e353b !important;  /* Un tono más oscuro */
+    border-bottom: 1px solid #4f4f4f !important;
+}
+
+/* 📌 Corrige el color de los selectores múltiples en Django Admin */
+select[multiple] {
+    color: #ffffff !important;  /* Texto blanco para mejor visibilidad */
+    background-color: #3f474e !important;  /* Fondo #3f474e */
+    border: 1px solid #4f4f4f !important;
+}
+
+/* 📌 Asegurar que las opciones sean visibles */
+select[multiple] option {
+    color: #ffffff !important;  /* Texto blanco */
+    background-color: #3f474e !important;  /* Fondo #3f474e */
+}
+
+/* 📌 Forzar estilos en los selectores múltiples del Admin */
+.admin-interface select[multiple] {
+    color: #ffffff !important;
+    background-color: #3f474e !important;
+    border: 1px solid #4f4f4f !important;
+}
+
+/* 📌 Bloques de código mejorados */
+.markdown-body pre {
+    background-color: #282c34 !important;
+    color: #abb2bf !important;
+    padding: 10px;
+    border-radius: 5px;
+    font-family: "Fira Code", "Courier New", monospace;
+    overflow-x: auto;
+}
+
+/* 📌 Código en línea */
+.markdown-body code {
+    background: #1e1e1e;
+    color: #ff6a00;
+    padding: 3px;
+    border-radius: 3px;
+    font-family: "Fira Code", "Courier New", monospace;
+}
+
+/* 📌 Bloques de cita estilizados */
+.markdown-body blockquote {
+    border-left: 4px solid #3498db;
+    margin: 10px 0;
+    padding: 10px;
+    color: #ffffff;
+    font-style: italic;
+}
+
+/* 📌 Mejoras en títulos */
+.markdown-body h1, 
+.markdown-body h2, 
+.markdown-body h3 {
+    font-weight: bold;
+}
+
+/* 📌 Tablas mejoradas */
+.markdown-body table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.markdown-body th, 
+.markdown-body td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.markdown-body tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* 📌 Establecer el fondo del área de edición de CKEditor */
+.ck.ck-content {
+    background-color: #3f474e !important;  /* Fondo oscuro */
+    color: #ffffff !important;  /* Texto blanco */
+}
+
+/* 📌 Establecer el fondo del contenedor principal de CKEditor */
+.ck.ck-editor__main {
+    background-color: #3f474e !important;
+}
+
+/* 📌 Ajustar la barra de herramientas de CKEditor */
+.ck.ck-toolbar {
+    background-color: #2e353b !important;  /* Un tono más oscuro */
+    border-bottom: 1px solid #4f4f4f !important;
+}
+
+/* 📌 Cambia el fondo del área de edición de CKEditor */
+.dark-mode-editor {
+    background-color: #3f474e !important;
+    color: #ffffff !important;
+}
+
+/* 📌 Forzar fondo en CKEditor dentro del iframe */
+.cke_editable {
+    background-color: #3f474e !important;
+    color: #ffffff !important;
+}
+
+/* 📌 Personalizar CKEditor con theme Lark */
+.ck.ck-content {
+    background-color: #3f474e !important; /* Fondo oscuro */
+    color: #ffffff !important; /* Texto blanco */
+}
+
+/* 📌 Cambiar la barra de herramientas */
+.ck.ck-toolbar {
+    background-color: #2e353b !important;
+    border-bottom: 1px solid #4f4f4f !important;
+}
+
+/* 📌 Ajustar el contenido dentro del área de edición */
+.ck-content {
+    background-color: #3f474e !important; /* Fondo del editor */
+    color: #ffffff !important; /* Texto blanco */
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* 📌 Forzar el fondo oscuro dentro del área de edición de CKEditor */
+.dark-mode-editor {
+    background-color: #3f474e !important;
+    color: #ffffff !important;
+}
+
+/* 📌 Cambiar la apariencia del área editable */
+.ck.ck-content {
+    background-color: #3f474e !important; /* Fondo oscuro */
+    color: #ffffff !important; /* Texto blanco */
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* 📌 Ajustar la barra de herramientas de CKEditor */
+.ck.ck-toolbar {
+    background-color: #2e353b !important;
+    border-bottom: 1px solid #4f4f4f !important;
+}
+
+
+/* Fondo principal */
+body, .main-sidebar, .main-header, .content-wrapper, .main-footer {
+    background-color: #0D1B3D !important;
+    color: #e0e0e0;
+}
+
+/* Contenedor de tabla y bloques */
+.content, .card, .box, .content-wrapper {
+    background-color: #132040 !important;
+    color: #ffffff;
+}
+
+/* Botones */
+.btn-primary, .btn-success {
+    background-color: #00b894 !important;
+    border-color: #00b894 !important;
+}
+
+.btn-primary:hover, .btn-success:hover {
+    background-color: #019875 !important;
+    border-color: #019875 !important;
+}
+
+/* Texto de la sidebar y navbar */
+.main-header .navbar, .main-sidebar .sidebar {
+    background-color: #0D1B3D !important;
+}
+
+/* Cambiar links de navegación para que sean visibles */
+.nav-link, .brand-link {
+    color: #00f5d4 !important;
+}

@@ -1,0 +1,81 @@
+<!-- ProjectManager/templates/ProjectManager/graphmap_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graph Map - {{ project.name }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .node circle {
+            fill: #999;
+            stroke: #000;
+            stroke-width: 1.5px;
+        }
+        
+        .node text {
+            font: 15px sans-serif;
+        }
+
+        .link {
+            fill: none;
+            stroke: #000;
+            stroke-width: 1.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ project.name }} - Graph Map</h1>
+        <div id="graph"></div>
+    </div>
+
+    <script>
+        const nodes = {{ nodes|safe }};
+        const links = {{ edges|safe }};
+
+        const width = 800;
+        const height = 600;
+
+        const svg = d3.select("#graph")
+                      .append("svg")
+                      .attr("width", width)
+                      .attr("height", height);
+
+        const simulation = d3.forceSimulation(nodes)
+                             .force("link", d3.forceLink(links).id(d => d.id))
+                             .force("charge", d3.forceManyBody().strength(-400))
+                             .force("center", d3.forceCenter(width / 2, height / 2));
+
+        const link = svg.append("g")
+                        .attr("class", "links")
+                        .selectAll("line")
+                        .data(links)
+                        .enter().append("line")
+                        .attr("class", "link");
+
+        const node = svg.append("g")
+                        .attr("class", "nodes")
+                        .selectAll("g")
+                        .data(nodes)
+                        .enter().append("g");
+
+        node.append("circle")
+            .attr("r", 20);
+
+        node.append("text")
+            .attr("x", 25)
+            .attr("dy", ".35em")
+            .text(d => d.name);
+
+        simulation.on("tick", () => {
+            link.attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node.attr("transform", d => `translate(${d.x},${d.y})`);
+        });
+    </script>
+</body>
+</html>

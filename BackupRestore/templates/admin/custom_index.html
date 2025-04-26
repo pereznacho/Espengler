@@ -1,0 +1,13 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+    {{ block.super }}
+    <div class="module">
+        <table>
+            <caption>Backup & Restore</caption>
+            <tr>
+                <th><a href="{% url 'backup_dashboard' %}">Backup & Restore</a></th>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

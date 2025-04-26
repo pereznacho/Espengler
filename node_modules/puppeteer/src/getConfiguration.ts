@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {homedir} from 'os';
-import {join} from 'path';
+import {homedir} from 'node:os';
+import {join} from 'node:path';
 
 import {cosmiconfigSync} from 'cosmiconfig';
 import type {
@@ -81,7 +81,7 @@ function getBrowserSetting(
   defaultConfig:
     | ChromeSettings
     | ChromeHeadlessShellSettings
-    | FirefoxSettings = {}
+    | FirefoxSettings = {},
 ): ChromeSettings | ChromeHeadlessShellSettings | FirefoxSettings {
   if (configuration.skipDownload) {
     return {
@@ -122,12 +122,12 @@ export const getConfiguration = (): Configuration => {
   const configuration: Configuration = result ? result.config : {};
 
   configuration.logLevel = getLogLevel(
-    process.env['PUPPETEER_LOGLEVEL'] ?? configuration.logLevel
+    process.env['PUPPETEER_LOGLEVEL'] ?? configuration.logLevel,
   );
 
   // Merging environment variables.
   configuration.defaultBrowser = getDefaultBrowser(
-    process.env['PUPPETEER_BROWSER'] ?? configuration.defaultBrowser
+    process.env['PUPPETEER_BROWSER'] ?? configuration.defaultBrowser,
   );
 
   configuration.executablePath =
@@ -146,7 +146,7 @@ export const getConfiguration = (): Configuration => {
   configuration.chrome = getBrowserSetting('chrome', configuration);
   configuration['chrome-headless-shell'] = getBrowserSetting(
     'chrome-headless-shell',
-    configuration
+    configuration,
   );
   configuration.firefox = getBrowserSetting('firefox', configuration, {
     skipDownload: true,

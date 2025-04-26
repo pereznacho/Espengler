@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  espengler_web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      cache_from: []
+    container_name: Espengler
+    image: espengler_web:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+    environment:
+      - DJANGO_SETTINGS_MODULE=VulnerabilityManager.settings
+    restart: unless-stopped
+
+volumes:
+  static_volume:

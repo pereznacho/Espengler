@@ -1,17 +1,22 @@
 from django.db import models
 from deep_translator import GoogleTranslator 
 from deep_translator.exceptions import NotValidLength
+from attack_narrative.models import Writeup
+
 
 
 class Project(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
     language = models.CharField(max_length=2, choices=[('EN', 'English'), ('ES', 'Español')])
     report_template = models.ForeignKey('ReportTemplate', on_delete=models.SET_NULL, null=True, blank=True)
     scope = models.TextField(null=True, blank=True)  # Nuevo campo de alcance
     cover_template = models.ForeignKey('ReportCoverTemplate', on_delete=models.SET_NULL, null=True, blank=True)  # Aquí está el campo
+    attack_narratives = models.ManyToManyField(Writeup, related_name='projects', blank=True)
+
+
 
     def __str__(self):
         return self.name
@@ -29,6 +34,8 @@ class Target(models.Model):
     os = models.CharField(max_length=255, blank=True, null=True)  # Sistema Operativo    
     owned = models.BooleanField(default=False)
     jumped_from = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='jump_targets')
+    x_position = models.FloatField(null=True, blank=True)
+    y_position = models.FloatField(null=True, blank=True)
 
     class Meta:
         unique_together = ('ip_address', 'fqdn', 'urlAddress')
@@ -48,11 +55,13 @@ class Port(models.Model):
     service_name = models.CharField(max_length=255, blank=True, null=True)
     product = models.CharField(max_length=255, blank=True, null=True)
     version = models.CharField(max_length=255, blank=True, null=True)
-    target = models.ForeignKey('ProjectManager.Target', on_delete=models.CASCADE, related_name='ports', null=True)
+    banner = models.TextField(blank=True, null=True)  # Add this line
+    target = models.ForeignKey(Target, on_delete=models.CASCADE, related_name='ports', null=True)
     vulnerabilities = models.ManyToManyField('Vulnerability', through='PortVulnerabilityProject', related_name='associated_ports')
 
     def __str__(self):
         return f"{self.port_number}/{self.protocol}"
+
 
 
 class Vulnerability(models.Model):
@@ -121,11 +130,14 @@ class PortVulnerabilityProject(models.Model):
         return f"Port: {self.port}, Vulnerability: {self.vulnerability}, Project: {self.project}"
 
 
+
 class EvidenceImage(models.Model):
     image = models.ImageField(upload_to='evidence_images/')
+    description = models.CharField(max_length=255, default='', blank=True)
+    project = models.ForeignKey('Project', on_delete=models.CASCADE)  # Hacer que sea obligatorio
 
     def __str__(self):
-        return self.image.name
+        return self.description if self.description else 'No Description'
 
 
 class ReportTemplate(models.Model):
@@ -138,13 +150,16 @@ class ReportTemplate(models.Model):
 
 class ReportCoverTemplate(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    tipo_analisis = models.CharField(max_length=255)
-    nombre_cliente = models.CharField(max_length=255)
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
-    imagen_proveedor = models.ImageField(upload_to='imagenes/')
-    header_imagen = models.ImageField(upload_to='imagenes/', null=True, blank=True)
+    analisys_type = models.CharField(max_length=255)
+    customer_name = models.CharField(max_length=255)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    customer_image = models.ImageField(upload_to='imagenes/')
+    header_image = models.ImageField(upload_to='imagenes/', null=True, blank=True)
     customer_header_image = models.ImageField(upload_to='imagenes/', null=True, blank=True)  # Cliente    
 
     def __str__(self):
         return self.name
+
+
+

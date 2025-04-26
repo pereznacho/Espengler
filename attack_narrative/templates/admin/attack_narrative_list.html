@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>Lista de Attack Narratives</h1>
+    <ul>
+        {% for attack_narrative in attack_narratives %}
+            <li><strong>{{ attack_narrative.title }}</strong> - {{ attack_narrative.created_at }}</li>
+        {% empty %}
+            <li>No hay attack narratives disponibles.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

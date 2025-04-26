@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="import-container">
+    <h2>📥 Importar Datos desde un Archivo JSON</h2>
+    <form action="{% url 'import_data' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="json_file" required>
+        <button type="submit" class="btn btn-success">Importar Datos</button>
+    </form>
+</div>
+
+<!-- Estilos -->
+<style>
+    .import-container {
+        text-align: center;
+        padding: 20px;
+    }
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
+</style>
+{% endblock %}

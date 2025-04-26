@@ -1,0 +1,30 @@
+body.jazzmin-login-page {
+    background-color: #172042 !important;
+}
+
+body.jazzmin-login-page .login-box {
+    background-color: transparent !important;
+}
+
+body.jazzmin-login-page .login-logo a {
+    color: #ffffff !important;
+}
+
+body.jazzmin-login-page .card {
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #1e1e1e;
+    border: 1px solid #28d57a;
+    box-shadow: 0 0 12px rgba(40, 213, 122, 0.3);
+}
+
+body.jazzmin-login-page .btn-primary {
+    background-color: #28d57a !important;
+    border-color: #28d57a !important;
+    color: #000 !important; /* opcional: texto negro para mejor contraste */
+}
+
+body.jazzmin-login-page .btn-primary:hover {
+    background-color: #23be6b !important; /* un tono un poco más oscuro al pasar el mouse */
+    border-color: #23be6b !important;
+}

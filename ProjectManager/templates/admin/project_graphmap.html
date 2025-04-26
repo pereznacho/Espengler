@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+  <h1>GraphMap for {{ project.name }}</h1>
+
+  <div id="graphmap-container">
+    <script>
+      const nodes = {{ nodes|safe }};
+      const edges = {{ edges|safe }};
+
+      console.log("Nodes:", nodes);
+      console.log("Edges:", edges);
+
+      if (nodes.length > 0 && edges.length > 0) {
+        // Renderiza el gráfico con D3.js o cualquier otra librería gráfica que utilices
+        // Aquí puedes incluir tu lógica para dibujar el gráfico.
+      } else {
+        console.log("No hay datos disponibles para mostrar el gráfico.");
+      }
+    </script>
+  </div>
+{% endblock %}

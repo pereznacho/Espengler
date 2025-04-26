@@ -1,259 +1,436 @@
 from django.contrib import admin
-from django.shortcuts import render
+from django.http import HttpResponse
+from django.urls import path
+from django.shortcuts import get_object_or_404
 from django.db import models
-from .models import Project, Vulnerability, Port, EvidenceImage, Target, ReportTemplate
-from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.template.loader import get_template
 from django.utils.html import format_html
-from django import forms
-from . import views
-from .views import generate_report
-from django.forms.models import inlineformset_factory
 from django.forms import CheckboxSelectMultiple
+from django.middleware.csrf import get_token
+from .forms import ProjectAdminForm
+from django.utils.safestring import mark_safe
+from django.urls import reverse
 from tinymce.widgets import TinyMCE
-from .forms import AssignTargetsAndPortsForm
-from django.db.models import Case, Value, When
-from .models import ReportCoverTemplate
+from .models import (
+    Project,
+    Target,
+    Vulnerability,
+    ReportTemplate,
+    ReportCoverTemplate,
+    Port,
+    EvidenceImage,
+)
+from .forms import ProjectAdminForm, TargetAdminForm
+import json
+from attack_narrative.models import Writeup
+from django.views.decorators.csrf import csrf_exempt
 
 
 
-class TargetAdmin(admin.ModelAdmin):  # Cambia el nombre de la clase admin
-    list_display = ('ip_address', 'fqdn', 'urlAddress', 'project', 'os', 'owned', 'jumped_from')  # Actualiza los campos según tu modelo Target
+class TargetInline(admin.TabularInline):
+    model = Target
+    extra = 0
+
+
+class VulnerabilityInline(admin.TabularInline):
+    model = Vulnerability
+    extra = 0
+    show_change_link = True
+
+
+class ProjectAdmin(admin.ModelAdmin):
+    inlines = [VulnerabilityInline, TargetInline]
+    form = ProjectAdminForm
+    exclude = ("graphmap_display", )
+    filter_horizontal = ('attack_narratives',)
+    readonly_fields = ('graphmap_display',)
+
+    class Media:
+        css = {
+            'all': ('css/custom.css',)  # Ruta correcta
+        }
+
+    fieldsets = [
+        ("Info", {
+            "fields": [
+                "name",
+                "description",
+                "start_date",
+                "end_date",
+                "language",
+                "cover_template",
+                "report_template",
+                "scope",
+                "attack_narratives",
+            ]
+        }),
+        ("GraphMap", {
+            "fields": ["graphmap_display"],
+        }),
+    ]
+
+    readonly_fields = ["graphmap_display"]
+
+    # 🔥 Volvemos a incluir `list_display`
+    list_display = (
+        "name", "description", "start_date", "end_date", "language",
+        "cover_template", "report_template", "generate_report_button",
+        "import_nessus_link"  # ✅ Ahora sí está definido correctamente
+    )
+
+    @csrf_exempt
+    def generate_report_button(self, obj):
+        url = reverse("generate_report", args=[obj.pk])
+        return format_html(
+            '''
+            <button onclick="postToGenerateReport('{}')" style="background-color: #00bc8c; color: white; padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold;">
+                Generate Report
+            </button>
+            <script>
+                function postToGenerateReport(url) {{
+                    const form = document.createElement("form");
+                    form.method = "POST";
+                    form.action = url;
+                    form.target = "_blank";
+
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                    const csrfField = document.createElement("input");
+                    csrfField.type = "hidden";
+                    csrfField.name = "csrfmiddlewaretoken";
+                    csrfField.value = csrfToken;
+
+                    form.appendChild(csrfField);
+                    document.body.appendChild(form);
+                    form.submit();
+                }}
+            </script>
+            ''',
+            url
+        )
+
+    def get_queryset(self, request):
+        """Guardar `request` en `self.request` para poder acceder al CSRF token en `generate_report_button`."""
+        self.request = request
+        return super().get_queryset(request)
+
+    def import_nessus_link(self, obj):
+        """Botón estilizado para importar archivos Nessus con el mismo diseño que Generate Report."""
+        if obj and obj.id:
+            url = reverse('import_netsparker_file', args=[obj.id])
+            return format_html(
+                '''
+                <a href="{}" style="background-color: #00bc8c; color: white; padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; text-align: center;">
+                    + Import File
+                </a>
+                ''',
+                url
+            )
+        return "-"
+
+    import_nessus_link.short_description = "+Import File"
+
+    def attack_narratives(self, obj):
+        """Campo virtual que lista los Writeups asociados al proyecto"""
+        count = obj.attack_narratives_attack_narrative.count()
+        if count == 0:
+            return "No Writeups"
+        else:
+            writeups = obj.attack_narratives_attack_narrative.all()
+            return mark_safe("<br>".join([f"• {w.title}" for w in writeups]))
+
+
+
+    def graphmap_display(self, obj):
+        if not obj:
+            return "No project data available."
+
+        targets = Target.objects.filter(project=obj)
+
+        base_static_url = "/static/images/"
+        attack_icon = f"{base_static_url}attack.png"
+        owned_icon = f"{base_static_url}imac1.png"
+        default_icon = f"{base_static_url}imac.png"
+
+        nodes = [{
+            "id": "pentester",
+            "label": "Pentester",
+            "image": attack_icon,
+            "x": 400,
+            "y": 300
+        }]
+        node_ids = {"pentester"}
+        edges = []
+
+        for i, target in enumerate(targets):
+            node_id = str(target.id)
+            label = target.ip_address or target.fqdn or target.urlAddress or "Unnamed"
+            x = target.x_position if target.x_position is not None else 200 + (i * 100)
+            y = target.y_position if target.y_position is not None else 100 + (i * 50)
+
+            nodes.append({
+                "id": node_id,
+                "label": label,
+                "image": owned_icon if target.owned else default_icon,
+                "x": x,
+                "y": y
+            })
+            node_ids.add(node_id)
+
+        existing_node_ids = {str(n["id"]) for n in nodes}
+
+        for target in targets:
+            target_id = str(target.id)
+            if target_id not in existing_node_ids:
+                continue
+
+            if target.owned and not target.jumped_from:
+                source_id = "pentester"
+            elif target.jumped_from_id and str(target.jumped_from_id) in existing_node_ids:
+                source_id = str(target.jumped_from_id)
+            else:
+                continue
+
+            if source_id in existing_node_ids and source_id != target_id:
+                edges.append({"source": source_id, "target": target_id})
+
+        nodes_json = json.dumps(nodes)
+        edges_json = json.dumps(edges)
+        save_url_base = reverse('save_node_position', args=[0]).replace('/0/', '')
+
+        graphmap_html = f"""
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <div id="graphmap-container" 
+                style="width: 850px; height: 650px; border: 1px solid #ddd; border-radius: 8px; padding: 10px; background-color: #f9f9f9;">
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {{
+                function updateGraph() {{
+                    var container = document.getElementById("graphmap-container");
+                    if (!container) {{
+                        console.error("GraphMap container not found.");
+                        return;
+                    }}
+
+                    d3.select("#graphmap-container").selectAll("*").remove();
+
+                    const nodes = {nodes_json};
+                    const edges = {edges_json};
+                    const width = container.offsetWidth;
+                    const height = container.offsetHeight;
+
+                    const svg = d3.select("#graphmap-container").append("svg")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .call(d3.zoom().scaleExtent([0.5, 2]).on("zoom", function (event) {{
+                            svg.attr("transform", event.transform);
+                        }}))
+                        .append("g");
+
+                    nodes.forEach(n => {{
+                        if (typeof n.x === "number" && typeof n.y === "number") {{
+                            n.fx = n.x;
+                            n.fy = n.y;
+                        }}
+                    }});
+
+                    const simulation = d3.forceSimulation(nodes)
+                        .force("link", d3.forceLink(edges).id(d => d.id).distance(100))
+                        .force("charge", d3.forceManyBody().strength(-50))
+                        .force("center", d3.forceCenter(width / 2, height / 2))
+                        .force("collide", d3.forceCollide().radius(40));
+
+                    const link = svg.append("g")
+                        .selectAll("line")
+                        .data(edges)
+                        .enter().append("line")
+                        .attr("stroke-width", 2)
+                        .attr("stroke", "#999");
+
+                    const node = svg.append("g")
+                        .selectAll("image")
+                        .data(nodes)
+                        .enter().append("image")
+                        .attr("xlink:href", d => d.image)
+                        .attr("width", 40)
+                        .attr("height", 40)
+                        .attr("x", d => d.x - 20)
+                        .attr("y", d => d.y - 20)
+                        .call(d3.drag()
+                            .on("start", dragStarted)
+                            .on("drag", dragged)
+                            .on("end", dragEnded));
+
+                    const labels = svg.append("g")
+                        .selectAll("text")
+                        .data(nodes)
+                        .enter().append("text")
+                        .attr("font-size", "12px")
+                        .attr("fill", "#333")
+                        .attr("text-anchor", "middle")
+                        .attr("dy", 1)
+                        .text(d => d.label);
+
+                    simulation.on("tick", function () {{
+                        link
+                            .attr("x1", d => d.source.x)
+                            .attr("y1", d => d.source.y)
+                            .attr("x2", d => d.target.x)
+                            .attr("y2", d => d.target.y);
+
+                        node
+                            .attr("x", d => d.x - 20)
+                            .attr("y", d => d.y - 20);
+
+                        labels
+                            .attr("x", d => d.x)
+                            .attr("y", d => d.y + 35);
+                    }});
+
+                    function dragStarted(event, d) {{
+                        if (!event.active) simulation.alphaTarget(0.3).restart();
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    }}
+
+                    function dragged(event, d) {{
+                        d.fx = event.x;
+                        d.fy = event.y;
+                    }}
+
+                    function dragEnded(event, d) {{
+                        if (!event.active) simulation.alphaTarget(0);
+                        d.fx = null;
+                        d.fy = null;
+
+                        if (d.id !== "pentester") {{
+                            const csrfToken = getCookie("csrftoken");
+                            fetch("{save_url_base}/" + d.id + "/", {{
+                                method: "POST",
+                                headers: {{
+                                    "Content-Type": "application/x-www-form-urlencoded",
+                                    "X-CSRFToken": csrfToken
+                                }},
+                                body: `x=${{d.x}}&y=${{d.y}}`
+                            }}).then(r => console.log("💾 Posición guardada", r));
+                        }}
+                    }}
+
+                    function getCookie(name) {{
+                        let cookieValue = null;
+                        if (document.cookie && document.cookie !== "") {{
+                            const cookies = document.cookie.split(";");
+                            for (let i = 0; i < cookies.length; i++) {{
+                                const cookie = cookies[i].trim();
+                                if (cookie.substring(0, name.length + 1) === (name + "=")) {{
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }}
+                            }}
+                        }}
+                        return cookieValue;
+                    }}
+                }}
+
+                setTimeout(updateGraph, 1500);
+                document.getElementById("graphmap-tab").addEventListener("click", function () {{
+                    setTimeout(updateGraph, 1000);
+                }});
+            }});
+        </script>
+        """
+        return mark_safe(graphmap_html)
+
+admin.site.register(Project, ProjectAdmin)
+
+@admin.register(ReportTemplate)
+class ReportTemplateAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        models.TextField: {"widget": TinyMCE()},
+    }
+    list_display = ("name", "used_by_project", "used_by_customer")
+
+    def used_by_project(self, obj):
+        project = Project.objects.filter(report_template=obj).first()
+        return project.name if project else "-"
+    used_by_project.short_description = "Project"
+
+    def used_by_customer(self, obj):
+        try:
+            project = Project.objects.filter(report_template=obj).first()
+            if project and project.cover_template and hasattr(project.cover_template, 'nombre_cliente'):
+                return project.cover_template.nombre_cliente
+        except Exception as e:
+            return f"Error: {e}"
+        return "-"
+
+
+
+
+class TargetAdmin(admin.ModelAdmin):
+    form = TargetAdminForm
+    list_display = ("ip_address", "fqdn", "urlAddress", "project", "os", "owned", "jumped_from")
+    list_filter = ('project', 'owned')
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "jumped_from":
             kwargs["widget"] = CheckboxSelectMultiple()
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
-admin.site.register(Target, TargetAdmin)  # Registra el modelo con su clase admin
 
-class ReportTemplateAdmin(admin.ModelAdmin):
-    formfield_overrides = {
-        models.TextField: {'widget': TinyMCE()},
-    }
-
-class ImportNessusInline(admin.TabularInline):
-    model = Vulnerability
-    extra = 0
-
-    def has_add_permission(self, request):
-        return False
-
-class VulnerabilityInlineFormSet(inlineformset_factory(Project, Vulnerability, fields='__all__')):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['import_nessus_button'] = forms.CharField(
-            widget=forms.TextInput(attrs={'type': 'button', 'value': '+Import Nessus'}),
-            required=False
-        )
-
-class VulnerabilityInline(admin.TabularInline):
-    model = Vulnerability
-    extra = 1
-
-    class Media:
-        js = ['static/js/custom_import_button.js']
-
-    def import_nessus_button(self, obj):
-        url = reverse('admin:import_nessus_file', args=[obj.project.pk])
-        return format_html('<a class="button" href="{}">+Import Nessus</a>', url)
-
-    import_nessus_button.short_description = '+Import Nessus'
-
-
+admin.site.register(Target, TargetAdmin)
 
 
 @admin.register(ReportCoverTemplate)
 class ReportCoverTemplateAdmin(admin.ModelAdmin):
-    list_display = ('name', 'tipo_analisis', 'nombre_cliente')
+    list_display = ("name", "analisys_type", "customer_name")
 
+@admin.register(Port)
+class PortAdmin(admin.ModelAdmin):
+    list_display = ("port_and_protocol", "banner_summary", "target_host_display", "project_name")
+    search_fields = ("port_number", "protocol", "banner", "target__fqdn", "target__urlAddress", "target__ip_address", "target__project__name")
 
+    def port_and_protocol(self, obj):
+        return f"{obj.port_number}/{obj.protocol}"
+    port_and_protocol.short_description = "Port"
 
+    def banner_summary(self, obj):
+        return (obj.banner[:50] + "...") if obj.banner and len(obj.banner) > 50 else obj.banner or "-"
+    banner_summary.short_description = "Banner"
 
-class HostInline(admin.TabularInline):
-    model = Target
-    extra = 1
+    def target_host_display(self, obj):
+        if obj.target:
+            return obj.target.fqdn or obj.target.urlAddress or str(obj.target.ip_address)
+        return "-"
+    target_host_display.short_description = "Host"
 
-
-class ProjectAdminForm(forms.ModelForm):
-    class Meta:
-        model = Project
-        fields = ['name', 'description', 'start_date', 'end_date', 'language']
-
-
-
-
-class ProjectAdmin(admin.ModelAdmin):
-    inlines = [VulnerabilityInline, HostInline]
-    form = ProjectAdminForm
-    list_display = ('name', 'description', 'start_date', 'end_date', 'language', 'cover_template', 'report_template', 'generate_report_button', 'import_nessus_link')
-    actions = ['generate_project_report_action']
-
-    fieldsets = [
-        ('Info', {'fields': ['name', 'description', 'start_date', 'end_date', 'language', 'cover_template', 'report_template', 'scope']}),
-        ('Vulnerabilities', {'fields': [], 'classes': ['collapse']}),
-    ]
-
-    def configurar_tapa_reporte_link(self, obj):
-        url = reverse('configurar_tapa_reporte', args=[obj.id])
-        return format_html('<a href="{}">Configurar Tapa del Reporte</a>', url)
-
-    configurar_tapa_reporte_link.short_description = 'Configurar Tapa'
-
-    def generate_report_button(self, obj):
-        return format_html('<a class="button" href="{}">Generate Report</a>', reverse('generate_report', args=[obj.pk]))
-
-    generate_report_button.short_description = "Generate Report"
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        extra_context = extra_context or {}
-        extra_context['import_nessus_url'] = reverse('import_nessus_file', args=[object_id])
-        return super().change_view(request, object_id, form_url, extra_context=extra_context)
-
-    def get_urls(self):
-        from django.urls import path
-
-        urls = super().get_urls()
-        custom_urls = [
-            path('<int:pk>/info/', self.admin_site.admin_view(views.project_info), name='project_info'),
-            path('<int:pk>/vulnerabilities/', self.admin_site.admin_view(views.project_vulnerabilities), name='project_vulnerabilities'),
-            path('<int:pk>/ports/', self.admin_site.admin_view(views.project_ports), name='project_ports'),
-            path('project/generate_report/<int:project_id>/', views.generate_report, name='generate_report'),
-            path('<int:pk>/hosts/', self.admin_site.admin_view(self.project_hosts), name='project_hosts'),
-        ]
-        return custom_urls + urls
-
-    def project_hosts(self, request, pk):
-        project = get_object_or_404(Project, pk=pk)
-        hosts = Host.objects.filter(project=project)
-        return render(request, 'admin/project_hosts.html', {'project': project, 'hosts': hosts})
-
-    def get_fieldsets(self, request, obj=None):
-        if obj:
-            return super().get_fieldsets(request, obj)
-        else:
-            return super().get_fieldsets(request, obj)[:-1]
-
-    def generate_project_report_action(self, request, queryset):
-        for project in queryset:
-            generate_project_report(project.pk)
-        self.message_user(request, "Reportes generados exitosamente.")
-        return HttpResponseRedirect(reverse('admin:app_project_changelist'))
-
-    generate_project_report_action.short_description = "Generar Informes para Proyectos Seleccionados"
-
-    def import_nessus_link(self, obj):
-        url = reverse('import_netsparker_file', args=[obj.id])
-        return format_html("<a href='{}'>Import File</a>", url)
-
-    import_nessus_link.short_description = "Import Files"
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "report_template":
-            kwargs["queryset"] = ReportTemplate.objects.all()
-        elif db_field.name == "cover_template":
-            kwargs["queryset"] = ReportCoverTemplate.objects.all()
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-
-
-
-class AssignTargetsAndPortsForm(forms.Form):
-    _selected_action = forms.CharField(widget=forms.MultipleHiddenInput)
-    targets = forms.ModelMultipleChoiceField(queryset=Target.objects.all(), required=False)
-    ports = forms.CharField(max_length=255, help_text="Ingresa los puertos separados por comas")
-
-
-
-
+    def project_name(self, obj):
+        return obj.target.project.name if obj.target and obj.target.project else "-"
+    project_name.short_description = "Project"
 
 
 class VulnerabilityAdmin(admin.ModelAdmin):
-    list_display = ('risk_factor', 'name', 'project', 'hosts_affected', 'port', 'cvss_temporal_score')
-    list_filter = ('project', 'risk_factor', 'port')
-    actions = ['import_nessus_action', 'assign_targets_and_ports']
-
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        # Definimos el orden de criticidad
-        criticity_order = ['Critical', 'High', 'Medium', 'Low']
-        # Ordenamos el queryset por el orden de criticidad definido
-        queryset = queryset.order_by(Case(*[When(risk_factor=risk, then=pos) for pos, risk in enumerate(criticity_order)]))
-        return queryset
+    list_display = ("risk_factor", "name", "project", "hosts_affected", "port", "cvss_temporal_score")
+    list_filter = ("project", "risk_factor", "port")
 
 
+    def import_nessus_file(self, request):
+        """Vista para importar archivos Nessus"""
+        return HttpResponse("Aquí se manejaría la importación del archivo Nessus.")
 
-    def assign_targets_and_ports(modeladmin, request, queryset):
-        form = AssignTargetsAndPortsForm(initial={'_selected_action': request.POST.getlist('_selected_action')})
+@admin.register(EvidenceImage)
+class EvidenceImageAdmin(admin.ModelAdmin):
+    list_display = ("image_preview", "description", "project")
+    search_fields = ("description", "project__name")
 
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" width="100" />', obj.image.url)
+        return "No Image"
+    image_preview.short_description = "Preview"
 
-        if 'apply' in request.POST:
-            form = AssignTargetsAndPortsForm(request.POST)
-
-            if form.is_valid():
-                targets = form.cleaned_data['targets']
-                ports = form.cleaned_data['ports']
-                ports_list = ports.split(',')
-
-                for vulnerability in queryset:
-                    vulnerability.targets.add(*targets)  # Asegúrate de que tu modelo pueda manejar esto
-                    # Asumiendo que tienes una manera de asignar puertos, modifica según tu modelo
-                    vulnerability.ports = ports_list
-                    vulnerability.save()
-
-                modeladmin.message_user(request, "Targets y puertos asignados correctamente")
-                return HttpResponseRedirect(request.get_full_path())
-
-        if not form:
-            form = AssignTargetsAndPortsForm(initial={'_selected_action': request.POST.getlist(admin.ACTION_CHECKBOX_NAME)})
-
-        return render(request, 'admin/assign_targets_and_ports.html', {'items': queryset, 'form': form})
-
-    assign_targets_and_ports.short_description = "Asignar Targets y Puertos"
-
-    def import_nessus_button(self, obj):
-        url = reverse('import_nessus_file', args=[obj.project.pk])
-        return format_html('<a class="button" href="{}">Import Nessus</a>', url)
-
-    import_nessus_button.short_description = 'Import Nessus'
-
-    def import_nessus_action(self, request, queryset):
-        self.message_user(request, "Archivos de Nessus importados con éxito.")
-        return HttpResponseRedirect(request.path)
-
-    import_nessus_action.short_description = "Importar archivos de Nessus"
-
-    def project_link(self, obj):
-        url = reverse('change_project', args=[obj.project.pk])
-        return format_html('<a href="{}">Ver Proyecto</a>', url)
-
-    def show_description(self, obj):
-        return obj.description
-
-    show_description.short_description = 'Descripción'
-
-    def show_solution(self, obj):
-        return obj.solution
-
-    show_solution.short_description = 'Solución'
-
-    def show_evidence(self, obj):
-        return obj.evidence
-
-    show_evidence.short_description = 'Evidencia'
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        extra_context = extra_context or {}
-        import_nessus_url = reverse('import_nessus_file', args=[object_id])
-        import_nessus_button = format_html(
-            '<a class="button" href="{}">+Import Nessus</a>', import_nessus_url
-        )
-        extra_context['import_nessus_button'] = import_nessus_button
-
-        return super().change_view(request, object_id, form_url, extra_context=extra_context)
-
-admin.site.register(Project, ProjectAdmin)
 admin.site.register(Vulnerability, VulnerabilityAdmin)
-admin.site.register(EvidenceImage)
-admin.site.register(Port)
-admin.site.register(ReportTemplate, ReportTemplateAdmin)
+

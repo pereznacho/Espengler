@@ -1,0 +1,19 @@
+/* Fuerza color negro para los writeups */
+.select2-selection__choice, 
+.select2-results__option, 
+.select2-selection__rendered {
+    color: black !important;  /* Texto negro */
+    background-color: white !important; /* Fondo blanco */
+}
+
+/* También asegurar que los elementos seleccionados sean legibles */
+.select2-selection__choice {
+    background-color: #f8f9fa !important; /* Fondo gris claro */
+    border: 1px solid #ccc !important;
+}
+
+/* Si CKEditor afecta estilos, lo forzamos */
+.cke_contents .select2-selection__choice, 
+.cke_contents .select2-results__option {
+    color: black !important;
+}

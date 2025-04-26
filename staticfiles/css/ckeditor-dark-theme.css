@@ -1,0 +1,23 @@
+/* 📌 Aplicar fondo oscuro al contenido dentro del iframe de CKEditor */
+.ck.ck-editor__editable {
+    background-color: #3f474e !important;
+    color: #ffffff !important;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* 📌 Corregir fondo del iframe */
+.cke_inner {
+    background-color: #3f474e !important;
+}
+
+/* 📌 Ajustar la barra de herramientas de CKEditor */
+.ck.ck-toolbar {
+    background-color: #2e353b !important;
+    border-bottom: 1px solid #4f4f4f !important;
+}
+
+/* 📌 Evitar que CKEditor sobrescriba los colores */
+.ck.ck-editor__editable p {
+    color: #ffffff !important;
+}

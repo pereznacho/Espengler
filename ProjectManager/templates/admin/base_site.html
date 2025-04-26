@@ -1,29 +1,55 @@
 {% extends "admin/base.html" %}
 {% load static i18n %}
 
-{% block title %}Panel de Administración{% endblock %}
+{% block title %}Panel de Administración - EspEngler{% endblock %}
 
 {% block extrastyle %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin.css' %}">
+    {{ block.super }}
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}" id="custom-css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/fix_select2.css' %}">
 {% endblock %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate "Home" %}</a>
-{% if title %}> {{ title }}{% endif %}
-</div>
-{% endblock %}
+{% block extrahead %}
+    {{ block.super }}
 
-{% block content_title %}
-<h1>{{ title }}</h1>
+    <!-- jQuery para Select2 (si aún no está cargado) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Fix para Select2 -->
+    <script src="{% static 'js/fix_select2.js' %}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function () {
+                // ✅ Inyectar estilos si por algún motivo no se cargaron
+                const stylesToCheck = ["custom.css", "fix_select2.css"];
+
+                stylesToCheck.forEach(function (filename) {
+                    const isLoaded = Array.from(document.styleSheets).some(sheet => sheet.href && sheet.href.includes(filename));
+
+                    if (!isLoaded) {
+                        const link = document.createElement("link");
+                        link.href = "{% static 'css/" + filename + "' %}";
+                        link.type = "text/css";
+                        link.rel = "stylesheet";
+                        document.head.appendChild(link);
+                        console.log("✅ " + filename + " inyectado manualmente");
+                    } else {
+                        console.log("✅ " + filename + " ya estaba cargado");
+                    }
+                });
+
+                // 🔹 Ajustar estilo del área editable de CKEditor si es necesario
+                const editorArea = document.querySelector('.ck-editor__editable');
+                if (editorArea) {
+                    editorArea.style.color = "white";  // Cambiado de negro a blanco por coherencia con fondo oscuro
+                }
+            }, 1000);  // Esperamos a que el DOM y CKEditor terminen de cargar
+        });
+    </script>
 {% endblock %}
 
 {% block content %}
-<!-- Custom admin content goes here -->
-{% endblock %}
-
-{% block footer %}
-<div class="footer">
-{% translate "Your Company Name" %} - {% translate "Footer Content Here" %}
-</div>
+    {{ block.super }}
 {% endblock %}

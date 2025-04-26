@@ -1,0 +1,13 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div>
+    <h1>Import Markdown File</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>Select a Markdown file (.md) exported:</p>
+        <input type="file" name="file" required>
+        <button type="submit" class="button">Import</button>
+    </form>
+</div>
+{% endblock %}

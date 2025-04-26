@@ -1,0 +1,10 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+    <li>
+        <a href="{% url 'admin:attack_narrative_import_obsidian' %}" class="btn btn-success">
+            <i class="fas fa-file-import"></i> Import Markdown File
+        </a>
+    </li>
+    {{ block.super }}
+{% endblock %}

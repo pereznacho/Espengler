@@ -1,0 +1,15 @@
+/* 🔹 Forzar color negro si no hay color definido */
+.ckeditor-content {
+    color: black !important;
+}
+
+/* 🔹 Mantener los colores personalizados asignados */
+.ckeditor-content span {
+    display: inline;
+}
+
+/* 🔹 Ajustar el fondo de CKEditor si se necesita */
+.ckeditor-content {
+    background-color: #343a40 !important;
+    padding: 10px;
+}

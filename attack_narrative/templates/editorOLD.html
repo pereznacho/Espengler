@@ -1,0 +1,34 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}">
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    <script src="{% static 'js/config.js' %}"></script>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="editor" id="editor_id"></textarea>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof CKEDITOR !== "undefined") {
+                CKEDITOR.replace('editor_id'); // Sin configuración externa
+    
+                CKEDITOR.on('instanceReady', function(event) {
+                    console.log('CKEditor cargado correctamente.');
+                });
+            } else {
+                console.error("CKEditor no se cargó correctamente.");
+            }
+        });
+    </script>
+</body>
+</html>

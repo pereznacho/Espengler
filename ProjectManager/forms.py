@@ -1,5 +1,5 @@
 from django import forms
-from .models import Project, Vulnerability, EvidenceImage, PortVulnerabilityProject, ReportCoverTemplate, ReportTemplate
+from .models import Project, Vulnerability, EvidenceImage, PortVulnerabilityProject, ReportCoverTemplate, ReportTemplate, Target
 from tinymce.widgets import TinyMCE
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -102,4 +102,20 @@ class BurpUploadForm(forms.Form):
 class ReportCoverForm(forms.ModelForm):
     class Meta:
         model = ReportCoverTemplate
-        fields = ['name', 'tipo_analisis', 'nombre_cliente', 'fecha_inicio', 'fecha_fin', 'imagen_proveedor', 'header_imagen']
+        fields = ['name', 'analisys_type', 'customer_name', 'start_date', 'end_date', 'customer_image', 'header_image']
+
+class ProjectAdminForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = '__all__'  # O especifica los campos necesarios
+
+
+class TargetAdminForm(forms.ModelForm):
+    class Meta:
+        model = Target
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.project:
+            self.fields['jumped_from'].queryset = Target.objects.filter(project=self.instance.project)

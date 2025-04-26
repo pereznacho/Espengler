@@ -1,0 +1,17 @@
+/* Ajustar color del texto en la lista desplegable */
+.select2-container--default .select2-results__option {
+    color: black !important;
+    background-color: white !important;
+}
+
+/* Ajustar color de los elementos seleccionados */
+.select2-container--default .select2-selection__choice {
+    color: black !important;
+    background-color: #f8f9fa !important;
+}
+
+/* Asegurar contraste en la selección */
+.select2-container--default .select2-selection {
+    background-color: white !important;
+    border: 1px solid #ccc !important;
+}

@@ -1,63 +1,176 @@
-{% extends 'base.html' %}
-{% block content %}
-  <h1>{{ project.name }} - Detalles del Proyecto</h1>
+{% extends "base.html" %}
+{% load static %}
 
-  <!-- Navegación de pestañas -->
-  <ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a class="nav-link active" data-toggle="tab" href="#info">Info</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#vulnerabilities">Vulnerabilities</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#targets">Targets</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{% url 'graph_view' pk=project.id %}">GraphMap</a>
-    </li>
-</ul>
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        #graphmap-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
 
+<body>
+    <div class="container mt-5">
+        <h1>Detalles del Proyecto: {{ project_info.name }}</h1>
 
+        <!-- Pestañas -->
+        <ul class="nav nav-tabs" id="projectTabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#info">Info</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#targets">Targets</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#vulnerabilities">Vulnerabilities</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#attack_narratives">Writeups</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#graphmap">GraphMap</a>
+            </li>
+        </ul>
 
-  <!-- Contenido de las pestañas -->
-  <div class="tab-content">
-    <!-- Pestaña Info (detalles del proyecto) -->
-    <div id="info" class="tab-pane fade show active">
-      <h2>Detalles del Proyecto</h2>
-      <p><strong>Nombre:</strong> {{ project.name }}</p>
-      <p><strong>Descripción:</strong> {{ project.description }}</p>
-      <p><strong>Fecha de Inicio:</strong> {{ project.start_date }}</p>
-      <p><strong>Fecha de Fin:</strong> {{ project.end_date }}</p>
+        <!-- Contenido de las Pestañas -->
+        <div class="tab-content">
+            <!-- Info -->
+            <div class="tab-pane fade show active" id="info">
+                <h3>Información General</h3>
+                <p>Nombre: {{ project_info.name }}</p>
+                <p>Descripción: {{ project_info.description }}</p>
+                <p>Fecha de Inicio: {{ project_info.start_date }}</p>
+                <p>Fecha de Fin: {{ project_info.end_date }}</p>
+            </div>
+
+            <!-- Targets -->
+            <div class="tab-pane fade" id="targets">
+                <h3>Targets</h3>
+                {% if targets %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>IP Address</th>
+                                <th>FQDN</th>
+                                <th>OS</th>
+                                <th>Owned</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for target in targets %}
+                                <tr>
+                                    <td>{{ target.ip_address }}</td>
+                                    <td>{{ target.fqdn }}</td>
+                                    <td>{{ target.os }}</td>
+                                    <td>{{ target.owned|yesno:"Yes,No" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No hay targets disponibles.</p>
+                {% endif %}
+            </div>
+
+            <!-- Vulnerabilities -->
+            <div class="tab-pane fade" id="vulnerabilities">
+                <h3>Vulnerabilities</h3>
+                {% if vulnerabilities %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Hosts Affected</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vulnerability in vulnerabilities %}
+                                <tr>
+                                    <td>{{ vulnerability.name }}</td>
+                                    <td>{{ vulnerability.description }}</td>
+                                    <td>{{ vulnerability.hosts_affected }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No hay vulnerabilidades disponibles.</p>
+                {% endif %}
+            </div>
+
+            <!-- ✅ Nueva Pestaña para Writeups -->
+            <div class="tab-pane fade" id="attack_narratives">
+                <h3>Writeups Asignados</h3>
+                {% if attack_narratives %}
+                    <ul>
+                        {% for attack_narrative in attack_narratives %}
+                            <li>
+                                <strong>{{ attack_narrative.title }}</strong>
+                                <div>{{ attack_narrative.content_html|safe }}</div>  <!-- ✅ Renderiza el contenido con estilos -->
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No hay Writeups asignados a este proyecto.</p>
+                {% endif %}
+            </div>
+
+            <!-- GraphMap -->
+            <div class="tab-pane fade" id="graphmap">
+                <h3>GraphMap</h3>
+                <div id="graphmap-container"></div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const nodesData = JSON.parse('{{ nodes|safe }}');
+                        const linksData = JSON.parse('{{ edges|safe }}');
+
+                        const svg = d3.select("#graphmap-container").append("svg")
+                            .attr("width", "100%")
+                            .attr("height", 600);
+
+                        const simulation = d3.forceSimulation(nodesData)
+                            .force("link", d3.forceLink(linksData).id(d => d.id).distance(150))
+                            .force("charge", d3.forceManyBody().strength(-300))
+                            .force("center", d3.forceCenter(300, 300));
+
+                        const link = svg.append("g")
+                            .selectAll("line")
+                            .data(linksData)
+                            .enter().append("line")
+                            .attr("stroke-width", 2)
+                            .attr("stroke", "#999");
+
+                        const node = svg.append("g")
+                            .selectAll("circle")
+                            .data(nodesData)
+                            .enter().append("circle")
+                            .attr("r", 20)
+                            .attr("fill", "#007bff");
+
+                        simulation.on("tick", () => {
+                            link
+                                .attr("x1", d => d.source.x)
+                                .attr("y1", d => d.source.y)
+                                .attr("x2", d => d.target.x)
+                                .attr("y2", d => d.target.y);
+
+                            node
+                                .attr("cx", d => d.x)
+                                .attr("cy", d => d.y);
+                        });
+                    });
+                </script>
+            </div>
+        </div>
     </div>
-
-    <!-- Pestaña Vulnerabilities -->
-    <div id="vulnerabilities" class="tab-pane fade">
-      <h2>Vulnerabilidades</h2>
-      <ul>
-        {% for vulnerability_name, vulnerability_list in grouped_vulnerabilities.items %}
-          <li>
-            <h3>{{ vulnerability_name }}</h3>
-            <ul>
-              {% for vulnerability in vulnerability_list %}
-                <li>{{ vulnerability.hosts_affected }} - {{ vulnerability.port }}</li>
-              {% endfor %}
-            </ul>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <!-- Pestaña Targets -->
-    <div id="targets" class="tab-pane fade">
-      <h2>Targets</h2>
-      <!-- Aquí puedes agregar el contenido de los targets si es necesario -->
-    </div>
-
-    <!-- Pestaña GraphMap (Mapa gráfico interactivo) -->
-    <div id="graphmap" class="tab-pane fade">
-      <h2>GraphMap</h2>
-      <div id="graphly-container" style="width: 100%; height: 500px;"></div>
-    </div>
-  </div>
-{% endblock %}
+</body>

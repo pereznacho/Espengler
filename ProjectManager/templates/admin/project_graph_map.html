@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<h1>GraphMap for {{ project.name }}</h1>
+<div id="graph" style="height: 600px;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/graphly@1.0.0/dist/graphly.min.js"></script>
+<script>
+    const graphData = {{ graph_data|safe }};
+    const graph = new Graphly.Graph("graph");
+
+    graphData.nodes.forEach(node => graph.addNode(node.id, {label: node.label}));
+    graphData.edges.forEach(edge => graph.addEdge(edge.from, edge.to));
+    
+    graph.render();
+</script>
+{% endblock %}

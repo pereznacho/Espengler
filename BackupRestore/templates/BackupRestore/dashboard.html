@@ -1,0 +1,94 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Backup & Restore</h1>
+    <p class="description">Export and import your application data here.</p>
+
+    <div class="backup-restore-container">
+        <!-- Export -->
+        <div class="export-section">
+            <form action="{% url 'export_data' %}" method="GET">
+                <button type="submit" class="button export-btn">
+                    📤 Export Data
+                </button>
+            </form>
+        </div>
+
+        <!-- Import -->
+        <div class="import-section">
+            <form action="{% url 'import_data' %}" method="POST" enctype="multipart/form-data" id="importForm">
+                {% csrf_token %}
+                <input type="file" name="backup_file" id="importFile" accept=".json" required class="file-input">
+                <button type="submit" class="button import-btn">
+                    📥 Import Data
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #ffffff;
+        margin-bottom: 10px;
+    }
+
+    .description {
+        font-size: 16px;
+        color: #aaaaaa;
+        margin-bottom: 20px;
+    }
+
+    .backup-restore-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        background: #2a2d34;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .export-section,
+    .import-section {
+        text-align: center;
+    }
+
+    .button {
+        padding: 12px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #00bc8c; /* Color actualizado */
+        color: white;
+        transition: 0.3s;
+    }
+
+    .button:hover {
+        opacity: 0.8;
+    }
+
+    .file-input {
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #555;
+        border-radius: 5px;
+        background: #1e1e1e;
+        color: #ffffff;
+    }
+</style>
+{% endblock %}
