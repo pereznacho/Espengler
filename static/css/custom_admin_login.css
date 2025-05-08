@@ -1,30 +1,64 @@
+:root {
+    --background-color: #172042;
+    --primary-color: #28d57a;
+    --primary-color-dark: #1e9b5c;
+    --secondary-color: #1e1e1e;
+}
+
 body.jazzmin-login-page {
-    background-color: #172042 !important;
+    height: unset;
+    background-color: var(--background-color);
 }
 
-body.jazzmin-login-page .login-box {
-    background-color: transparent !important;
+.login-box {
+    padding-inline: 1rem;
 }
 
-body.jazzmin-login-page .login-logo a {
-    color: #ffffff !important;
+.card {
+    margin-inline: auto;
+    border: unset;
+    box-shadow: unset;
+    background-color: unset;
 }
 
-body.jazzmin-login-page .card {
-    border-radius: 10px;
-    padding: 20px;
-    background-color: #1e1e1e;
-    border: 1px solid #28d57a;
-    box-shadow: 0 0 12px rgba(40, 213, 122, 0.3);
+.card-body {
+    padding: unset;
 }
 
-body.jazzmin-login-page .btn-primary {
-    background-color: #28d57a !important;
-    border-color: #28d57a !important;
-    color: #000 !important; /* opcional: texto negro para mejor contraste */
+@media screen and (min-width: 400px) {
+    .card {
+        max-width: 400px;
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        background-color: var(--secondary-color);
+    }
+
+    .card-body {
+        padding: 3rem 2rem;
+    }
 }
 
-body.jazzmin-login-page .btn-primary:hover {
-    background-color: #23be6b !important; /* un tono un poco más oscuro al pasar el mouse */
-    border-color: #23be6b !important;
+.login-box-msg {
+    font-size: 1.2rem;
+}
+
+.form-control {
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-color-dark);
+    border-color: var(--primary-color-dark);
+}
+
+img {
+    display: block;
+    width: 100%;
+    height: auto;
 }
