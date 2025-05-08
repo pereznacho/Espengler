@@ -1,9 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
@@ -12,7 +14,7 @@
 
 <body>
     <div class="container mt-5">
-        <h1>Welcome to the Vulnerability Manager</h1>
+        <h1 class="home-welcome">Welcome to the Vulnerability Manager</h1>
         <p>This is the home page. Use the navigation to explore the site.</p>
         <a href="{% url 'admin:index' %}">Go to Admin Panel</a>
     </div>
