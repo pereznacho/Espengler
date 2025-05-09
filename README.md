@@ -22,6 +22,7 @@ Clona el repositorio y configura el entorno virtual en la raíz:
 ```bash
 git clone https://github.com/pereznacho/Espengler.git
 cd VulnerabilityManager
+python -m venv ../venv
 source ../venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
