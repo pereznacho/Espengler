@@ -53,6 +53,8 @@ docker run -d -p 8000:8000 --name espengler_container espengler
 
 Visita [http://localhost:8000/](http://localhost:8000/) en tu navegador.
 
+También podes descargar el contenedor desde https://hub.docker.com/r/nachin519/espengler
+
 > **Importante:** El contenedor creará automáticamente un superusuario con usuario `Espengler` y contraseña `Demo2025$` que deberías cambiar por seguridad.
 
 ---
