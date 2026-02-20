@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Tux pingüino (Linux): cuerpo, ojos, pico -->
+  <path fill="#333" d="M16 5c-3 0-5 2-6 4.5C8 8 6 9 5 11c-1 2-1 4 0 6l-1 7h4l1.5-5c.5.3 1 .5 1.5.5h1v6h4v-6h1c.5 0 1-.2 1.5-.5L24 24h4l-1-7c1-2 1-4 0-6-1-2-3-3-5-1.5C21 7 19 5 16 5z"/>
+  <circle cx="11" cy="14" r="2.5" fill="#fff"/>
+  <circle cx="21" cy="14" r="2.5" fill="#fff"/>
+  <circle cx="11" cy="14" r="1" fill="#333"/>
+  <circle cx="21" cy="14" r="1" fill="#333"/>
+  <ellipse cx="16" cy="21" rx="3" ry="2" fill="#fcc624"/>
+</svg>

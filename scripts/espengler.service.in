@@ -1,0 +1,14 @@
+[Unit]
+Description=Espengler - Offensive Security & Pentest Reporting
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=@INSTALL_DIR@
+Environment=DJANGO_SETTINGS_MODULE=VulnerabilityManager.settings
+ExecStart=@INSTALL_DIR@/venv/bin/python manage.py runserver 0.0.0.0:8000
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

@@ -27,14 +27,19 @@ from attack_narrative.models import WriteupImage, Writeup
 from googletrans import Translator
 from deep_translator import GoogleTranslator
 from googletrans import Translator
-from PIL import Image
+from PIL import Image, ImageDraw, ImageEnhance
 from bs4 import BeautifulSoup
 from html2docx import html2docx
 import matplotlib.pyplot as plt
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 import markdown
 
+try:
+    import cairosvg
+except ImportError:
+    cairosvg = None
 
 # Importaciones de Django
 from django.shortcuts import render, get_object_or_404, redirect
@@ -44,8 +49,9 @@ from django.db import transaction
 from django.db.models import Case, When, Value, IntegerField
 from django.conf import settings
 from django.urls import reverse
-from django.utils.html import strip_tags
+from django.utils.html import strip_tags, escape
 from django.template.loader import render_to_string
+from django.templatetags.static import static
 from django.contrib.auth import login
 from django.core.exceptions import MultipleObjectsReturned
 from django.conf import settings
@@ -84,6 +90,12 @@ from django.http import HttpResponse  # ✅ Soluciona "HttpResponse is not defin
 from django.contrib.auth.forms import UserCreationForm  # ✅ Soluciona "UserCreationForm is not defined"
 from ProjectManager.models import ReportCoverTemplate as ReportCover
 from ProjectManager.utils import risk_factor_to_numeric, translate_text
+from ProjectManager.image_utils import (
+    download_external_images,
+    add_image_to_doc,
+    add_base64_image_to_doc_safe,
+    resolve_image_path,
+)
 
 
 
@@ -91,8 +103,9 @@ from ProjectManager.utils import risk_factor_to_numeric, translate_text
 logger = logging.getLogger(__name__)
 
 
+@login_required
 def home(request):
-    return render(request, 'home.html')
+    return redirect('project_list')
 
 
 google_translator = GoogleTranslator(source='en', target='es')
@@ -140,11 +153,18 @@ def clean_html(raw_html):
     return cleantext
 
 
+def get_projects_queryset(user):
+    """Admin (staff) ve todos los proyectos; consultant solo los asignados (members)."""
+    if getattr(user, 'is_staff', False):
+        return Project.objects.all()
+    return Project.objects.filter(members=user)
+
 
 def create_or_edit_project(request, project_id=None):
     project = None
     if project_id:
-        project = get_object_or_404(Project, id=project_id)
+        qs = get_projects_queryset(request.user) if getattr(request.user, 'is_authenticated', False) else Project.objects.all()
+        project = get_object_or_404(qs, id=project_id)
 
     if request.method == 'POST':
         form = ProjectForm(request.POST, instance=project)
@@ -158,30 +178,42 @@ def create_or_edit_project(request, project_id=None):
 
 
 # Vista para crear proyectos
+@login_required
 def create_project(request):
     if request.method == 'POST':
         project_form = ProjectForm(request.POST)
         if project_form.is_valid():
-            project = project_form.save(commit=False)
-            project.report_template = project_form.cleaned_data['report_template']
-            project.save()
-            return redirect('project_list')
+            project = project_form.save()
+            return redirect('project_detail', pk=project.pk)
     else:
         project_form = ProjectForm()
 
     return render(request, 'projectmanager/create_project.html', {'project_form': project_form})
 
 
-# Vista para listar todos los proyectos
+# Vista para listar todos los proyectos (admin: todos; consultant: solo asignados)
+@login_required
 def project_list(request):
-    projects = Project.objects.all()
+    projects = get_projects_queryset(request.user).order_by('-id')
     return render(request, 'projectmanager/project_list.html', {'projects': projects})
 
 
+@login_required
+def project_delete(request, project_id):
+    """Delete project and all related data (vulnerabilities, targets, ports, evidence). Does not delete Cover/Report templates."""
+    project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
+    if request.method == 'POST':
+        name = project.name
+        project.delete()
+        messages.success(request, f'Project "{name}" and all its data have been deleted.')
+        return redirect('project_list')
+    return render(request, 'projectmanager/project_delete_confirm.html', {'project': project})
+
 
 # Vista para detalles de un proyecto específico
+@login_required
 def project_detail(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(get_projects_queryset(request.user), pk=pk)
     attack_narratives = project.attack_narratives.all()  # ✅ Obtener los Writeups de attack_narrative asociados
 
     # Agrupar vulnerabilidades por nombre
@@ -232,9 +264,20 @@ def project_detail(request, pk):
         doc.save(response)
         return response
 
+    targets = Target.objects.filter(project=project).select_related('jumped_from')
+    vulnerabilities_list = list(Vulnerability.objects.filter(project=project))
+    criticity_order = {'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3}
+    vulnerabilities_sorted_for_report = sorted(
+        vulnerabilities_list,
+        key=lambda x: criticity_order.get(x.risk_factor, 4)
+    )
     return render(request, 'projectmanager/project_detail.html', {
         'project': project,
-        'attack_narratives': attack_narratives,  # ✅ Agregamos los attack_narratives al contexto
+        'project_info': project,
+        'targets': targets,
+        'vulnerabilities': vulnerabilities_list,
+        'vulnerabilities_sorted_for_report': vulnerabilities_sorted_for_report,
+        'attack_narratives': attack_narratives,
         'grouped_vulnerabilities': grouped_vulnerabilities,
         'nodes': nodes,
         'edges': edges,
@@ -288,9 +331,10 @@ def graphmap_detail(request, pk):
 
 
 # Vista para importar archivo Nessus
+@login_required
 def import_nessus_file(request, pk):
     from deep_translator import GoogleTranslator
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(get_projects_queryset(request.user), pk=pk)
 
     if request.method == 'POST':
         form = NessusFileUploadForm(request.POST, request.FILES)
@@ -376,7 +420,7 @@ def import_nessus_file(request, pk):
                         project=project
                     )
 
-            return redirect('admin:ProjectManager_vulnerability_changelist')
+            return redirect('project_detail', pk=project.pk)
     else:
         form = NessusFileUploadForm()
 
@@ -398,32 +442,24 @@ class AssignTargetsAndPortsView(View):
         if form.is_valid():
             # Aquí manejas la lógica de guardado, por ejemplo:
             form.save()
-            messages.success(request, 'Targets y Puertos asignados correctamente.')
+            messages.success(request, 'Targets and ports assigned successfully.')
             return redirect('alguna_url_después_de_guardar')  # Asegúrate de reemplazar esto con una URL válida
         else:
-            messages.error(request, 'Por favor, corrija los errores en el formulario.')
+            messages.error(request, 'Please correct the errors in the form.')
         return render(request, self.template_name, {'form': form})
 
 
 
-def project_hosts(request, pk):
-    try:
-        project = Project.objects.get(pk=pk)
-    except Project.DoesNotExist:
-        return render(request, 'error.html', {'message': 'El proyecto no existe'})
-
-    hosts = Target.objects.filter(project=project)  # ✅ Cambiado de Host a Target
-    return render(request, 'project_hosts.html', {'project': project, 'hosts': hosts})
-
+@login_required
 def targets_view(request):
-    # Obtener todos los proyectos disponibles para mostrar en el formulario
-    projects = Project.objects.all()
+    # Proyectos visibles para el usuario (admin: todos; consultant: solo asignados)
+    projects = get_projects_queryset(request.user)
 
     # Filtrar los hosts disponibles en función del proyecto seleccionado en el formulario
     if request.method == 'POST':
         project_id = request.POST.get('project')
         if project_id:
-            project = Project.objects.get(pk=project_id)
+            project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
             hosts = Target.objects.filter(project=project)
         else:
             # Si no se selecciona ningún proyecto, mostrar todos los hosts
@@ -432,13 +468,13 @@ def targets_view(request):
         # Si no hay datos enviados por el formulario, mostrar todos los hosts
         hosts = Target.objects.all()
 
-    return render(request, 'targets.html', {'hosts': hosts, 'projects': projects})
+    return render(request, 'projectmanager/targets.html', {'hosts': hosts, 'projects': projects})
 
 
 #Nmap Parsers
-# Asegúrate de que la función acepte el argumento 'pk'
+@login_required
 def import_nmap_recon_file(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(get_projects_queryset(request.user), pk=pk)
     form = NmapFileUploadForm()  # Inicializa el formulario aquí
     if request.method == 'POST':
         form = NmapFileUploadForm(request.POST, request.FILES)  # Re-inicializa el formulario con los datos enviados
@@ -448,17 +484,19 @@ def import_nmap_recon_file(request, pk):
             root = tree.getroot()
 
             for host in root.findall('host'):
-                status = host.find('status').get('state')
+                status_el = host.find('status')
+                status = status_el.get('state') if status_el is not None else ''
                 if status == 'up':
-                    ip_address = host.find("address[@addrtype='ipv4']").get('addr')
+                    addr_el = host.find("address[@addrtype='ipv4']")
+                    ip_address = addr_el.get('addr') if addr_el is not None else None
+                    if ip_address is None:
+                        continue
                     fqdn_element = host.find("hostnames/hostname[@type='PTR']")
                     fqdn = fqdn_element.get('name', '') if fqdn_element is not None else ''
-                    # Crear o actualizar el Target
-                    Target.objects.update_or_create(
-                        project=project,
-                        ip_address=ip_address,
-                        defaults={'fqdn': fqdn}
-                    )
+                    try:
+                        Target.objects.get(project=project, ip_address=ip_address)
+                    except Target.DoesNotExist:
+                        Target.objects.create(project=project, ip_address=ip_address, fqdn=fqdn)
             # Redirecciona a otra vista una vez completado el proceso
             return redirect('admin:ProjectManager_vulnerability_changelist')
 
@@ -467,8 +505,9 @@ def import_nmap_recon_file(request, pk):
 
 
 # Vista para importar y procesar archivo Nmap XML de escaneo completo de puertos
+@login_required
 def import_nmap_xml(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(get_projects_queryset(request.user), pk=pk)
     if request.method == 'POST':
         form = NmapFileUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -477,32 +516,51 @@ def import_nmap_xml(request, pk):
             root = tree.getroot()
 
             for host in root.findall('.//host'):
-                status = host.find('.//status').get('state')
+                status_el = host.find('.//status')
+                status = status_el.get('state') if status_el is not None else ''
                 if status == 'up':
-                    ip_address = host.find('.//address[@addrtype="ipv4"]').get('addr')
+                    addr_el = host.find('.//address[@addrtype="ipv4"]')
+                    ip_address = addr_el.get('addr') if addr_el is not None else None
+                    if ip_address is None:
+                        continue
                     fqdn_elements = host.findall('.//hostname')
                     fqdn = ' / '.join(elem.get('name') for elem in fqdn_elements if elem is not None)
                     os_match = host.find('.//os/osmatch')
                     os_name = os_match.get('name') if os_match else ""
 
-                    target, created = Target.objects.update_or_create(
-                        project=project, ip_address=ip_address,
-                        defaults={'fqdn': fqdn, 'os': os_name})
+                    try:
+                        target = Target.objects.get(project=project, ip_address=ip_address)
+                        target.fqdn = fqdn
+                        target.os = os_name
+                        target.save()
+                    except Target.DoesNotExist:
+                        target = Target.objects.create(project=project, ip_address=ip_address, fqdn=fqdn, os=os_name)
 
                     for port_element in host.findall('.//port'):
                         port_id = port_element.get('portid')
-                        protocol = port_element.get('protocol')
-                        state = port_element.find('.//state').get('state')
+                        port_number = int(port_id) if port_id is not None else 0
+                        protocol = port_element.get('protocol') or 'tcp'
+                        state_el = port_element.find('.//state')
+                        state = state_el.get('state') if state_el is not None else ''
                         service_element = port_element.find('.//service')
                         service_name = service_element.get('name') if service_element else ''
                         product = service_element.get('product') if service_element else ''
                         version = service_element.get('version') if service_element else ''
 
-                        Port.objects.update_or_create(
-                            target=target, port_number=port_id, protocol=protocol,
-                            defaults={'state': state, 'service_name': service_name, 'product': product, 'version': version})
+                        try:
+                            port = Port.objects.get(target=target, port_number=port_number, protocol=protocol)
+                            port.state = state
+                            port.service_name = service_name
+                            port.product = product
+                            port.version = version
+                            port.save()
+                        except Port.DoesNotExist:
+                            Port.objects.create(
+                                target=target, port_number=port_number, protocol=protocol,
+                                state=state, service_name=service_name, product=product, version=version
+                            )
 
-            return redirect('admin:ProjectManager_vulnerability_changelist')
+            return redirect('project_detail', pk=project.pk)
     else:
         form = NmapFileUploadForm()
 
@@ -510,26 +568,93 @@ def import_nmap_xml(request, pk):
 
 
 
-# Tapa
-def configurar_tapa_reporte(request):
-    if request.method == 'POST':
-        form = ReportCoverForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Guardar la información en el modelo correspondiente
-            cover = ReportCover(
-                tipo_analisis=form.cleaned_data['tipo_analisis'],
-                nombre_cliente=form.cleaned_data['nombre_cliente'],
-                fecha_inicio=form.cleaned_data['fecha_inicio'],
-                fecha_fin=form.cleaned_data['fecha_fin'],
-                imagen_proveedor=form.cleaned_data['imagen_proveedor'],
-                header_imagen=form.cleaned_data['header_imagen']
-            )
-            cover.save()
-            return redirect('reporte_generado')  # Redirigir a la vista donde se genera el reporte
-    else:
-        form = ReportCoverForm()
+def _cover_template_image_urls(cover_template):
+    """Devuelve un dict con las URLs de las imágenes de la plantilla de portada (vacío si no hay archivo)."""
+    urls = {'background': '', 'header_left': '', 'header_right': '', 'customer_image': ''}
+    if not cover_template:
+        return urls
+    if getattr(cover_template, 'background_image', None) and cover_template.background_image:
+        urls['background'] = cover_template.background_image.url
+    if getattr(cover_template, 'header_image', None) and cover_template.header_image:
+        urls['header_left'] = cover_template.header_image.url
+    if getattr(cover_template, 'customer_header_image', None) and cover_template.customer_header_image:
+        urls['header_right'] = cover_template.customer_header_image.url
+    if getattr(cover_template, 'customer_image', None) and cover_template.customer_image:
+        urls['customer_image'] = cover_template.customer_image.url
+    return urls
 
-    return render(request, 'configurar_tapa_reporte.html', {'form': form})
+
+def _default_cover_layout():
+    """Layout por defecto: posiciones y tamaños en % (left, top, width, height)."""
+    return {
+        "header_left": {"left": 2, "top": 2, "width": 18, "height": 8},
+        "header_right": {"left": 80, "top": 2, "width": 18, "height": 8},
+        "title_block": {"left": 5, "top": 22, "width": 90, "height": 25},
+        "customer_image": {"left": 10, "top": 55, "width": 80, "height": 35},
+    }
+
+
+# Tapa
+@login_required
+def configurar_tapa_reporte(request, project_id):
+    import json
+    project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
+    
+    if project.cover_template:
+        template = project.cover_template
+    else:
+        template = ReportCoverTemplate(name=f"Cover for {project.name}")
+    
+    if request.method == 'POST':
+        form = ReportCoverForm(request.POST, request.FILES, instance=template)
+        if form.is_valid():
+            template = form.save(commit=False)
+            layout_raw = request.POST.get('cover_layout_json') or '{}'
+            try:
+                template.cover_layout = json.loads(layout_raw)
+            except (ValueError, TypeError):
+                template.cover_layout = _default_cover_layout()
+            template.save()
+            project.cover_template = template
+            project.save()
+            return redirect('project_detail', pk=project_id)
+    else:
+        form = ReportCoverForm(instance=template)
+
+    cover_image_urls = _cover_template_image_urls(form.instance)
+    layout = (form.instance.cover_layout or _default_cover_layout()) if form.instance.pk else _default_cover_layout()
+    cover_layout_json = json.dumps(layout)
+    return render(request, 'projectmanager/cover_designer.html', {
+        'form': form, 'project': project, 'cover_image_urls': cover_image_urls,
+        'cover_layout_json': cover_layout_json,
+    })
+
+
+@login_required
+def visual_cover_designer_template(request, template_id):
+    """Diseñador visual de portada para una plantilla (desde el admin, sin proyecto)."""
+    import json
+    template = get_object_or_404(ReportCoverTemplate, pk=template_id)
+    if request.method == 'POST':
+        form = ReportCoverForm(request.POST, request.FILES, instance=template)
+        if form.is_valid():
+            template = form.save(commit=False)
+            layout_raw = request.POST.get('cover_layout_json') or '{}'
+            try:
+                template.cover_layout = json.loads(layout_raw)
+            except (ValueError, TypeError):
+                template.cover_layout = _default_cover_layout()
+            template.save()
+            return redirect('cover_template_list')
+    else:
+        form = ReportCoverForm(instance=template)
+    cover_image_urls = _cover_template_image_urls(form.instance)
+    layout = form.instance.cover_layout or _default_cover_layout()
+    cover_layout_json = json.dumps(layout)
+    return render(request, 'projectmanager/cover_designer.html', {
+        'form': form, 'project': None, 'template': template, 'cover_image_urls': cover_image_urls,
+        'cover_layout_json': cover_layout_json,
+    })
 
 
 
@@ -550,14 +675,149 @@ def project_ports(request, object_id):
     project = get_object_or_404(Project, pk=object_id)
     return render(request, 'admin/project_ports.html', {'project': project})
 
+@login_required
+@require_POST
+def toggle_target_owned(request, target_id):
+    """Toggle target owned status (for inline edit in Targets table)."""
+    target = get_object_or_404(Target, pk=target_id)
+    get_object_or_404(get_projects_queryset(request.user), pk=target.project_id)
+    target.owned = not target.owned
+    target.save()
+    return JsonResponse({'owned': target.owned})
+
+
+@login_required
+def target_edit(request, project_id, target_id):
+    """Ver y editar un target del proyecto (como en Admin)."""
+    project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
+    target = get_object_or_404(Target, pk=target_id, project=project)
+    from .forms import TargetEditForm
+    if request.method == 'POST':
+        form = TargetEditForm(request.POST, instance=target)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Target updated successfully.')
+            return redirect('project_detail', pk=project_id)
+    else:
+        form = TargetEditForm(instance=target)
+    return render(request, 'projectmanager/target_edit.html', {
+        'form': form,
+        'target': target,
+        'project': project,
+    })
+
+
+@login_required
+def profile_edit(request):
+    """Editar perfil del usuario (nombre, apellido, email)."""
+    if request.method == 'POST':
+        from .forms import UserProfileForm
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('project_list')
+    else:
+        from .forms import UserProfileForm
+        form = UserProfileForm(instance=request.user)
+    return render(request, 'projectmanager/profile_edit.html', {'form': form})
+
+
+@login_required
+def app_password_change(request):
+    """Vista de cambio de contraseña de la sección app (no Admin)."""
+    from django.contrib.auth.views import PasswordChangeView
+    from .forms import AppPasswordChangeForm
+    from django.urls import reverse_lazy
+    view = PasswordChangeView.as_view(
+        form_class=AppPasswordChangeForm,
+        template_name='projectmanager/account/password_change.html',
+        success_url=reverse_lazy('app_password_change_done'),
+    )
+    return view(request)
+
+
+@login_required
+def app_password_change_done(request):
+    """Confirmación tras cambiar contraseña (sección app)."""
+    return render(request, 'projectmanager/account/password_change_done.html')
+
+
+@login_required
+def project_member_list(request):
+    """Lista de proyectos para gestionar miembros (admin: todos; consultant: solo asignados)."""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    projects = get_projects_queryset(request.user).order_by('name')
+    return render(request, 'projectmanager/project_member_list.html', {'projects': projects})
+
+
+@login_required
+def project_members_manage(request, project_id):
+    """Gestionar miembros de un proyecto: listar y añadir usuarios."""
+    from django.contrib.auth import get_user_model
+    from .forms import AddProjectMemberForm
+    User = get_user_model()
+    project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
+    members = project.members.all().order_by('username')
+    if request.method == 'POST':
+        form = AddProjectMemberForm(project, request.POST)
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            project.members.add(user)
+            messages.success(request, f'User {user.username} added to the project.')
+            return redirect('project_members_manage', project_id=project_id)
+    else:
+        form = AddProjectMemberForm(project)
+    can_add_more = form.fields['user'].queryset.exists()
+    return render(request, 'projectmanager/project_members_manage.html', {
+        'project': project,
+        'members': members,
+        'form': form,
+        'can_add_more': can_add_more,
+    })
+
+
+@login_required
+@require_POST
+def project_member_remove(request, project_id, user_id):
+    """Quitar un usuario del proyecto."""
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
+    user = get_object_or_404(User, pk=user_id)
+    project.members.remove(user)
+    messages.success(request, f'User {user.username} removed from the project.')
+    return redirect('project_members_manage', project_id=project_id)
+
+
+@login_required
+def user_create(request):
+    """Crear nuevo usuario (sección app). Solo usuarios staff. Tras crear, redirige a lista de miembros para asignar a proyectos."""
+    from .forms import CustomUserCreationForm
+    if not request.user.is_staff:
+        messages.error(request, 'You do not have permission to create users.')
+        return redirect('project_member_list')
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'User {form.cleaned_data["username"]} created. Assign them to projects from "Project members".')
+            return redirect('project_member_list')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'projectmanager/user_create.html', {'form': form})
+
+
 # Vista para cambiar los detalles de un proyecto
+@login_required
 def change_project(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(get_projects_queryset(request.user), pk=pk)
     if request.method == 'POST':
         form = ChangeProjectForm(request.POST, instance=project)
         if form.is_valid():
             form.save()
-            return redirect('project_list')
+            return redirect('project_detail', pk=project.pk)
     else:
         form = ChangeProjectForm(instance=project)
 
@@ -577,15 +837,71 @@ def translate_to_spanish(text):
     
 
     
-def add_vulnerability(request):
+@login_required
+def add_vulnerability(request, project_id=None):
+    from .forms import VulnerabilityFullForm
+    project = None
+    if project_id:
+        project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
+    else:
+        return redirect('project_list')
     if request.method == 'POST':
-        form = VulnerabilityForm(request.POST)
+        form = VulnerabilityFullForm(request.POST, project=project)
+        if form.is_valid():
+            vuln = form.save(commit=False)
+            if project:
+                vuln.project = project
+            vuln.save()
+            form.save_m2m()
+            if project:
+                return redirect('project_detail', pk=project.pk)
+            return redirect('project_list')
+    else:
+        form = VulnerabilityFullForm(project=project)
+    return render(request, 'projectmanager/add_vulnerability.html', {'form': form, 'project': project})
+
+
+@login_required
+def vulnerability_edit(request, project_id, vuln_id):
+    """Edit an existing vulnerability (name, description, solution, evidence, severity, etc.)."""
+    project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
+    vuln = get_object_or_404(Vulnerability, pk=vuln_id, project=project)
+    from .forms import VulnerabilityFullForm
+    if request.method == 'POST':
+        form = VulnerabilityFullForm(request.POST, instance=vuln, project=project)
         if form.is_valid():
             form.save()
-            return redirect('vulnerability_list')  # Cambia 'vulnerability_list' por el nombre de tu vista de listado de vulnerabilidades
+            form.save_m2m()
+            messages.success(request, 'Vulnerability updated successfully.')
+            return redirect('project_detail', pk=project_id)
     else:
-        form = VulnerabilityForm()
-    return render(request, 'projectmanager/add_vulnerability.html', {'form': form})
+        form = VulnerabilityFullForm(instance=vuln, project=project)
+    return render(request, 'projectmanager/vulnerability_edit.html', {
+        'form': form,
+        'project': project,
+        'vulnerability': vuln,
+    })
+
+
+@login_required
+def add_evidence_image(request, project_id):
+    from .forms import EvidenceImageForm
+    project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
+    if request.method == 'POST':
+        form = EvidenceImageForm(request.POST, request.FILES, project=project)
+        if form.is_valid():
+            evidence = form.save(commit=False)
+            evidence.project = project
+            evidence.save()
+            # Optionally attach this evidence to the selected vulnerability
+            vulnerability = form.cleaned_data.get('vulnerability')
+            if vulnerability:
+                vulnerability.evidence_images.add(evidence)
+            next_url = request.GET.get('next') or request.POST.get('next') or reverse('project_detail', args=[project.pk])
+            return redirect(next_url)
+    else:
+        form = EvidenceImageForm(project=project)
+    return render(request, 'projectmanager/add_evidence_image.html', {'form': form, 'project': project})
 
 
 
@@ -764,7 +1080,7 @@ def generate_vulnerability_table(doc, vulnerabilities, language):
 
         # Añadir la imagen de la evidencia adicional si está disponible
         extra_evidence_image_cell = table.cell(5, 1)
-        evidence_images = EvidenceImage.objects.filter(vulnerability__name=vulnerability_name)
+        evidence_images = EvidenceImage.objects.filter(vulnerability_set__name=vulnerability_name)
         for evidence_image in evidence_images:
             image_path = os.path.join(settings.MEDIA_ROOT, evidence_image.image.name)
             if os.path.exists(image_path):
@@ -986,7 +1302,7 @@ def generate_overall_vulns_chart(doc, vulnerabilities):
     bars = ax.bar(severity_levels, values, color=[severity_colors[s] for s in severity_levels])
 
     ax.set_ylabel('Cantidad')
-    ax.set_title('Resumen de Vulnerabilidades por Severidad')
+    ax.set_title('Vulnerability Summary by Severity')
     ax.set_ylim(0, max(values) + 1)
     ax.grid(axis='y', linestyle='--', alpha=0.6)
 
@@ -1007,7 +1323,7 @@ def generate_overall_vulns_chart(doc, vulnerabilities):
 
     # Insertar en el doc
     doc.add_picture(buffer, width=Inches(5.5))
-    doc.add_paragraph("Figura: Distribución de Vulnerabilidades por Severidad").alignment = 1
+    doc.add_paragraph("Figure: Vulnerability Distribution by Severity").alignment = 1
 
 
 def process_attack_narrative_html(attack_narrative_content):
@@ -1493,18 +1809,25 @@ def add_base64_image_to_doc(doc, base64_str, ext):
         doc.add_paragraph(error_message)
 
 # Añadir funcionalidad para parsear el contenido del Writeup y mantener los estilos, incluyendo imágenes
-def add_attack_narrative_to_document(doc, attack_narrative_content, writeup_name, request):
+def add_attack_narrative_to_document(doc, attack_narrative_content, writeup_name, request, language='en'):
     """
     Inserta el contenido del writeup al documento DOCX respetando los estilos:
     - Comandos simples <code> con texto fucsia + fondo gris oscuro
     - Bloques de código <pre><code class="language-*"> como tabla gris oscuro con texto blanco
-    - Manejo de imágenes
+    - Manejo de imágenes (external images are downloaded and saved locally first)
     """
     if not writeup_name or writeup_name.strip() == "":
         writeup_name = "Unknown_Writeup"
 
-    protected_path = os.path.join(settings.PROTECTED_MEDIA_ROOT, writeup_name)
+    safe_folder = writeup_name.replace(" ", "_")
+    protected_path = os.path.join(settings.PROTECTED_MEDIA_ROOT, safe_folder)
     os.makedirs(protected_path, exist_ok=True)
+
+    # --- Step A: Download external images and rewrite HTML before processing ---
+    attack_narrative_content = download_external_images(
+        attack_narrative_content, writeup_name
+    )
+    logger.info("Pre-processed HTML for writeup '%s' (external images downloaded)", writeup_name)
 
     soup = BeautifulSoup(attack_narrative_content, 'html.parser')
 
@@ -1570,49 +1893,51 @@ def add_attack_narrative_to_document(doc, attack_narrative_content, writeup_name
             image_src = element.get('src')
             if image_src:
                 if image_src.startswith('data:image/'):
+                    # Base64 embedded image — use margin-safe insertion
                     base64_data = image_src.split(',')[1]
-                    ext = image_src.split(';')[0].split('/')[1]
-                    add_base64_image_to_doc(doc, base64_data, ext)
+                    add_base64_image_to_doc_safe(doc, base64_data, 'png')
 
                 elif "/protected_media/" in image_src or settings.MEDIA_URL in image_src:
-                    image_filename = os.path.basename(image_src)
-                    image_path = os.path.join(protected_path, image_filename)
-                    protected_image_url = f"http://localhost:8000/protected_media/{writeup_name}/{image_filename}"
-
-                    if os.path.exists(image_path):
-                        with open(image_path, 'rb') as img_file:
-                            image_data = img_file.read()
+                    # Local image from protected_media or media folder
+                    image_path = resolve_image_path(image_src, writeup_name)
+                    if image_path:
+                        add_image_to_doc(doc, image_path)
                     else:
+                        # Fallback: try fetching via HTTP with session cookies
+                        image_filename = os.path.basename(image_src)
+                        protected_image_url = f"http://localhost:8000/protected_media/{safe_folder}/{image_filename}"
                         image_data = fetch_protected_image(protected_image_url, request)
-
-                    if image_data:
-                        ext = os.path.splitext(image_filename)[1].replace('.', '')
-                        add_base64_image_to_doc(doc, base64.b64encode(image_data).decode('utf-8'), ext)
-                    else:
-                        paragraph = doc.add_paragraph()
-                        paragraph.add_run(f'[Imagen no encontrada: {protected_image_url}]')
+                        if image_data:
+                            add_image_to_doc(doc, image_data)
+                        else:
+                            logger.warning("Image not found: %s (writeup=%s)", image_src, writeup_name)
+                            doc.add_paragraph(f'[Image not found: {image_src}]')
 
                 elif image_src.startswith('/'):
-                    static_image_path = os.path.join(settings.BASE_DIR, image_src.lstrip('/'))
-                    if os.path.exists(static_image_path):
-                        with open(static_image_path, 'rb') as img_file:
-                            image_data = img_file.read()
-                        ext = os.path.splitext(static_image_path)[1].replace('.', '')
-                        add_base64_image_to_doc(doc, base64.b64encode(image_data).decode('utf-8'), ext)
+                    # Static/root-relative path
+                    image_path = resolve_image_path(image_src, writeup_name)
+                    if image_path:
+                        add_image_to_doc(doc, image_path)
                     else:
-                        paragraph = doc.add_paragraph()
-                        paragraph.add_run(f'[Imagen no encontrada en Static: {image_src}]')
+                        logger.warning("Static image not found: %s (writeup=%s)", image_src, writeup_name)
+                        doc.add_paragraph(f'[Image not found: {image_src}]')
 
-                elif image_src.startswith('blob:') or image_src.startswith('http'):
+                elif image_src.startswith('http'):
+                    # External URL (should have been downloaded already by download_external_images,
+                    # but handle as fallback for edge cases like blob: URLs)
                     try:
-                        response = requests.get(image_src)
-                        response.raise_for_status()
-                        image_data = response.content
-                        ext = 'jpg'
-                        add_base64_image_to_doc(doc, base64.b64encode(image_data).decode('utf-8'), ext)
+                        resp = requests.get(image_src, timeout=10)
+                        resp.raise_for_status()
+                        # Save locally to avoid re-downloading
+                        from ProjectManager.image_utils import _download_and_save
+                        local = _download_and_save(image_src, protected_path)
+                        if local:
+                            add_image_to_doc(doc, local)
+                        else:
+                            add_image_to_doc(doc, resp.content)
                     except requests.exceptions.RequestException as e:
-                        paragraph = doc.add_paragraph()
-                        paragraph.add_run(f'[Error al descargar imagen: {str(e)}]')
+                        logger.error("Failed to download image %s: %s", image_src, e)
+                        doc.add_paragraph(f'[Error al descargar imagen: {str(e)}]')
 
         elif element.name == 'h1':
             doc.add_heading(element.text, level=1)
@@ -1635,7 +1960,7 @@ def serve_protected_media(request, writeup_name, filename):
     if os.path.exists(file_path):
         return FileResponse(open(file_path, "rb"), content_type="image/png")  # Ajustar content-type según imagen
     else:
-        return HttpResponseNotFound("❌ Imagen no encontrada.")
+        return HttpResponseNotFound("Image not found.")
 
 
 
@@ -1692,12 +2017,12 @@ def protected_media_view(request, writeup_name, filename):
     file_path = os.path.join(settings.PROTECTED_MEDIA_ROOT, writeup_name, filename)
 
     if not request.user.is_authenticated:
-        return HttpResponseForbidden("❌ No tienes permisos para ver esta imagen.")
+        return HttpResponseForbidden("You do not have permission to view this image.")
 
     if os.path.exists(file_path):
         return FileResponse(open(file_path, 'rb'), content_type='image/png')  # Ajusta el content_type si es necesario
     else:
-        return HttpResponseNotFound("❌ Imagen no encontrada.")
+        return HttpResponseNotFound("Image not found.")
 
 
 def fetch_protected_image(image_url, request):
@@ -2135,7 +2460,7 @@ def insertar_writeup_con_imagenes(writeup, doc):
                 except Exception as e:
                     print(f"❌ Error al procesar imagen {image_path}: {e}")
             else:
-                print(f"⚠️ Imagen no encontrada en path: {image_path}")
+                print(f"⚠️ Image not found at path: {image_path}")
 
         # Eliminamos el <img> para que html2docx no la duplique
         img_tag.decompose()
@@ -2168,14 +2493,31 @@ def insert_table_of_contents(doc):
 
 
 
-@csrf_exempt
+@login_required
 def save_node_position(request, target_id):
     if request.method == "POST":
-        x = request.POST.get("x")
-        y = request.POST.get("y")
+        # Consultant node (id 0) has no DB record; skip saving
+        if target_id == 0:
+            return JsonResponse({"status": "success"})
+        # Support both JSON and form-encoded bodies
+        import json as _json
+        if request.content_type == "application/json":
+            try:
+                data = _json.loads(request.body)
+            except _json.JSONDecodeError:
+                return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+            x = data.get("x")
+            y = data.get("y")
+        else:
+            x = request.POST.get("x")
+            y = request.POST.get("y")
+
+        if x is None or y is None:
+            return JsonResponse({"status": "error", "message": "x and y are required"}, status=400)
 
         try:
             target = Target.objects.get(id=target_id)
+            get_object_or_404(get_projects_queryset(request.user), pk=target.project_id)
             target.x_position = float(x)
             target.y_position = float(y)
             target.save()
@@ -2188,30 +2530,144 @@ def save_node_position(request, target_id):
 
 
 
+
+def create_element(name):
+    return OxmlElement(name)
+
+def create_attribute(element, name, value):
+    element.set(ns.qn(name), value)
+
+TOC_PLACEHOLDER = "###TOC_PLACEHOLDER###"
+
+def _collect_toc_entries_after_placeholder(doc, placeholder_para, exclude_titles=None):
+    """Recorre el documento y recoge (level, text) de cada Heading que esté después del placeholder."""
+    exclude_titles = set(exclude_titles or [])
+    paras = list(doc.paragraphs)
+    try:
+        start_idx = next(i for i, p in enumerate(paras) if p == placeholder_para) + 1
+    except StopIteration:
+        start_idx = 0
+    entries = []
+    for para in paras[start_idx:]:
+        if not para.style.name.startswith("Heading"):
+            continue
+        try:
+            level = int(para.style.name.replace("Heading ", ""))
+        except ValueError:
+            level = 1
+        text = para.text.strip()
+        if not text or text in exclude_titles:
+            continue
+        entries.append((level, text))
+    return entries
+
+def _create_toc_field_paragraph(doc):
+    """Crea un párrafo con el campo TOC de Word (números de página al actualizar en Word)."""
+    paragraph = doc.add_paragraph()
+    run = paragraph.add_run()
+    fldChar = create_element('w:fldChar')
+    create_attribute(fldChar, 'w:fldCharType', 'begin')
+    run._r.append(fldChar)
+    instrText = create_element('w:instrText')
+    create_attribute(instrText, 'xml:space', 'preserve')
+    # \\o "1-3" = niveles 1-3, \\h = hipervínculos, \\z = ocultar números de párrafo, \\u = usar estilos, \\p = números de página (Título.........N)
+    instrText.text = 'TOC \\o "1-3" \\h \\z \\u \\p'
+    run._r.append(instrText)
+    fldChar = create_element('w:fldChar')
+    create_attribute(fldChar, 'w:fldCharType', 'separate')
+    run._r.append(fldChar)
+    fldChar = create_element('w:fldChar')
+    create_attribute(fldChar, 'w:fldCharType', 'end')
+    run._r.append(fldChar)
+    return paragraph
+
+def _replace_toc_placeholder_with_field(doc, placeholder_text=TOC_PLACEHOLDER):
+    """Sustituye el párrafo que contiene ###TOC_PLACEHOLDER### por un campo TOC de Word (con números de página)."""
+    placeholder_para = None
+    for para in doc.paragraphs:
+        if placeholder_text in (para.text or ""):
+            placeholder_para = para
+            break
+    if not placeholder_para:
+        return
+    toc_para = _create_toc_field_paragraph(doc)
+    toc_elem = toc_para._element
+    toc_elem.getparent().remove(toc_elem)
+    parent = placeholder_para._element.getparent()
+    parent.replace(placeholder_para._element, toc_elem)
+
+def insert_table_of_contents(doc):
+    """Inserta el campo Word TOC al final del documento (se actualiza al abrir en Word). Incluye números de página."""
+    _create_toc_field_paragraph(doc)
+
+
+def _set_update_fields_on_open(doc):
+    """Activa la actualización de campos al abrir el documento en Word (para que el TOC muestre números de página)."""
+    try:
+        update_el = OxmlElement('w:updateFields')
+        update_el.set(qn('w:val'), 'true')
+        doc.settings.element.append(update_el)
+    except Exception:
+        pass
+
+
+def add_footer_page_number(doc):
+    """Añade número de página en el pie de cada página (campo PAGE)."""
+    section = doc.sections[0]
+    footer = section.footer
+    # Limpiar párrafos existentes del footer si los hay
+    for p in footer.paragraphs:
+        p.clear()
+    if not footer.paragraphs:
+        footer.add_paragraph()
+    para = footer.paragraphs[0]
+    para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = para.add_run()
+    # Campo PAGE: muestra el número de página actual
+    fldChar1 = create_element('w:fldChar')
+    create_attribute(fldChar1, 'w:fldCharType', 'begin')
+    instrText = create_element('w:instrText')
+    create_attribute(instrText, 'xml:space', 'preserve')
+    instrText.text = 'PAGE'
+    fldChar2 = create_element('w:fldChar')
+    create_attribute(fldChar2, 'w:fldCharType', 'end')
+    run._r.append(fldChar1)
+    run._r.append(instrText)
+    run._r.append(fldChar2)
+
+def set_document_background(doc, color):
+    """
+    Sets the background color of the document.
+    """
+    if not color: return
+    color = color.lstrip('#')
+    background = OxmlElement('w:background')
+    background.set(qn('w:color'), color)
+    doc.element.insert(0, background)
+    display_shape = OxmlElement('w:displayBackgroundShape')
+    doc.settings.element.append(display_shape)
+
+
+@login_required
 def generate_report(request, project_id):
     print(f"🚨 Generando reporte para Proyecto ID {project_id} con método {request.method}")
     if request.method == 'POST':
-        project = get_object_or_404(Project, pk=project_id)
+        project = get_object_or_404(get_projects_queryset(request.user), pk=project_id)
         print(f"🛠 DEBUG -> Buscando Writeups para Project ID: {project.id}")
         attack_narratives = Writeup.objects.filter(project=project)
         print(f"✅ DEBUG -> Writeups encontrados: {attack_narratives.count()}")
 
 
-        # 📌 Obtener el idioma directamente desde el modelo
-        project_language = project.language.lower()
-        if "es" in project_language:
-            language = "es"
-        else:
-            language = "en"
+        # Report labels and headers are always in English
+        language = "en"
 
-
-        print(f"🛠 DEBUG -> Generando reporte en idioma: {language}")
+        print(f"🛠 DEBUG -> Generating report in language: {language}")
 
 
         # 📌 Extraer la cookie de sesión del usuario autenticado
         session_cookie = request.session.session_key
         if not session_cookie:
-            return HttpResponse("❌ Error: No se encontró la sesión del usuario.", status=403)
+            return HttpResponse("Error: User session not found.", status=403)
 
         # 📌 Extraer el token CSRF si está disponible
         csrf_token = request.COOKIES.get('csrftoken', '')
@@ -2238,7 +2694,7 @@ def generate_report(request, project_id):
 
         except subprocess.CalledProcessError as e:
             print(f"❌ ERROR en Puppeteer: {e.stderr}")
-            return HttpResponse(f"Error al generar el GraphMap: {e.stderr}", status=500)
+            return HttpResponse(f"Error generating the GraphMap: {e.stderr}", status=500)
 
         # 📄 CONTINUAR con la generación del reporte en lugar de hacer un return aquí
         print("✅ Imagen de GraphMap generada correctamente. Continuando con el reporte...")
@@ -2246,61 +2702,87 @@ def generate_report(request, project_id):
         # Crear el documento
         doc = Document()
 
+        # Pie de página con número de página en todas las hojas
+        add_footer_page_number(doc)
+
+        # Apply background color if configured
+        if project.report_template and project.report_template.background_color:
+            try:
+                set_document_background(doc, project.report_template.background_color)
+            except Exception as e:
+                print(f"Error setting background color: {e}")
+
 
         # --- Sección de la Tapa del Reporte ---
         cover = project.cover_template
         if cover:
             # Título utilizando el nombre del proyecto
             title = doc.add_heading(level=1)
-            title_run = title.add_run(f"Pruebas de Seguridad Ofensiva: {getattr(cover, 'analisys_type', 'N/A')} - {project.name}")
+            title_run = title.add_run(f"Offensive Security Testing: {getattr(cover, 'analisys_type', 'N/A')} - {project.name}")
             title_run.font.size = Pt(24)  # Tamaño de 24 pt
             title_run.bold = True  # Negrita
             title.alignment = 1  # Centrar el título
 
+            subtitle_text = getattr(cover, 'subtitle', '') or ''
+            if subtitle_text:
+                sub_para = doc.add_paragraph(subtitle_text)
+                sub_para.alignment = 1
+                for run in sub_para.runs:
+                    run.font.size = Pt(12)
+                sub_para.paragraph_format.space_after = Pt(6)
+            consultant_text = getattr(cover, 'consultant_name', '') or ''
+            if consultant_text:
+                cons_para = doc.add_paragraph(consultant_text if language == 'es' else consultant_text)
+                cons_para.alignment = 1
+                for run in cons_para.runs:
+                    run.font.size = Pt(10)
+                cons_para.paragraph_format.space_after = Pt(6)
+
             # Añadir el texto "| REPORTE EJECUTIVO/TÉCNICO |"
             report_type_paragraph = doc.add_paragraph()
-            report_type_run = report_type_paragraph.add_run("| REPORTE EJECUTIVO/TÉCNICO |")
+            report_type_run = report_type_paragraph.add_run("| EXECUTIVE/TECHNICAL REPORT |")
             report_type_run.bold = True  # Negrita
             report_type_run.font.size = Pt(15.5)  # Tamaño de 15.5 pt
             report_type_run.font.color.rgb = RGBColor(255, 140, 0)  # Color naranja
             report_type_paragraph.alignment = 1  # Centrar el texto
 
-            # Fechas del compromiso
+            # Engagement dates
             fecha_inicio = project.start_date.strftime("%d/%m/%Y")
             fecha_fin = project.end_date.strftime("%d/%m/%Y")
-            fechas_texto = f"Fecha de inicio del compromiso: {fecha_inicio} / Fecha de finalización del compromiso: {fecha_fin}"
+            fechas_texto = f"Engagement start date: {fecha_inicio} / Engagement end date: {fecha_fin}"
             fecha_paragraph = doc.add_paragraph(fechas_texto)
-            fecha_paragraph.alignment = 1  # Centrar las fechas
+            fecha_paragraph.alignment = 1  # Center dates
             fecha_run = fecha_paragraph.runs[0]
             fecha_run.font.size = Pt(8)  # Tamaño de 8 pt
 
-            # --- Sección para añadir la imagen del proveedor al ancho total de la página ---
+
+
+
+
+            # --- Imagen principal (escalable según customer_image_scale) ---
             if cover.customer_image:
-                # Obtener la sección actual
                 section = doc.sections[0]
                 page_width = section.page_width
+                usable = page_width - section.left_margin - section.right_margin
+                scale_pct = max(10, min(100, getattr(cover, 'customer_image_scale', 100) or 100))
+                image_width = usable * (scale_pct / 100.0)
 
-                # Añadir el párrafo para la imagen
                 paragraph = doc.add_paragraph()
-                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER  # Alinear el párrafo al centro
+                paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 paragraph.paragraph_format.space_before = Pt(0)
                 paragraph.paragraph_format.space_after = Pt(0)
                 paragraph.paragraph_format.left_indent = Pt(0)
                 paragraph.paragraph_format.right_indent = Pt(0)
                 paragraph.paragraph_format.first_line_indent = Pt(0)
-
-                # Ajustar los márgenes del párrafo para permitir que la imagen ocupe todo el ancho
-                # Establecer indentaciones negativas mayores que los márgenes de la página
-                extra_space = Inches(0.1)  # Ajusta este valor si es necesario
-                paragraph.paragraph_format.left_indent = -section.left_margin - extra_space
-                paragraph.paragraph_format.right_indent = -section.right_margin - extra_space
-
-                # Insertar la imagen ajustando su ancho al ancho total de la página más el espacio extra
-                image_width = page_width + (extra_space * 2)
+                if scale_pct >= 100:
+                    extra_space = Inches(0.1)
+                    paragraph.paragraph_format.left_indent = -section.left_margin - extra_space
+                    paragraph.paragraph_format.right_indent = -section.right_margin - extra_space
+                    image_width = page_width + (extra_space * 2)
                 run = paragraph.add_run()
                 run.add_picture(cover.customer_image.path, width=image_width)
             else:
-                doc.add_paragraph("No se seleccionó una imagen de proveedor para este reporte.")
+                doc.add_paragraph("No provider image was selected for this report.")
             # --- Fin de la Sección ---
 
 
@@ -2352,32 +2834,22 @@ def generate_report(request, project_id):
 
             # Si no se seleccionó una tapa para el reporte
             if not cover.header_image and not cover.customer_header_image:
-                doc.add_paragraph("No se seleccionó una tapa para este reporte.")
+                doc.add_paragraph("No cover was selected for this report.")
         # --- Fin de la Sección de la Tapa del Reporte ---
 
 
-        # 👉 Insertar un salto de página después de la portada
+        # Salto de página: la portada queda en página 1; el contenido (TOC + cuerpo) empieza en página 2.
         doc.add_page_break()
 
-        # 👉 Título del índice
-        doc.add_heading("Tabla de Contenidos" if language == "es" else "Table of Contents", level=1)
-
-        # 👉 Insertar el índice real
-        insert_table_of_contents(doc)
-
-
-        # 👉 Insertar otro salto de página para empezar el cuerpo del reporte
-        doc.add_page_break()
-
-
-
-        # Obtener el contenido del reporte
+        # Obtener el contenido del reporte (el template debe incluir "Table of Contents", intro y ###TOC_PLACEHOLDER###)
         report_content = project.report_template.content if project.report_template else ''
 
 
-        # Obtener todas las vulnerabilidades del proyecto y ordenarlas por criticidad
+        # Obtener todas las vulnerabilidades del proyecto y ordenarlas por criticidad.
+        # OWASP: evidence/description/solution can contain tool output (payloads); python-docx
+        # inserts plain text only, so no HTML/script injection in the DOCX.
         vulnerabilities = list(Vulnerability.objects.filter(project=project).order_by('-risk_factor'))
-        # 🔥 Ajustar descripción y solución al idioma seleccionado
+        # Ajustar descripción y solución al idioma seleccionado
         for vuln in vulnerabilities:
             if language == 'es':
                 vuln.description = vuln.description_es or vuln.description
@@ -2512,7 +2984,7 @@ def generate_report(request, project_id):
 
                 else:
                     # Si no hay puertos, insertar un mensaje informativo
-                    no_ports_paragraph = doc.add_paragraph("No se encontraron puertos para este proyecto.")
+                    no_ports_paragraph = doc.add_paragraph("No ports were found for this project.")
                     para._element.addnext(no_ports_paragraph._element)
 
                 # Salir del bucle ya que el marcador ha sido reemplazado
@@ -2651,7 +3123,7 @@ def generate_report(request, project_id):
 
             # Añadir la imagen de la evidencia adicional si está disponible
             extra_evidence_image_cell = table.cell(5, 1)
-            evidence_images = EvidenceImage.objects.filter(vulnerability__name=vulnerability_name)
+            evidence_images = EvidenceImage.objects.filter(vulnerability_set__name=vulnerability_name)
             for evidence_image in evidence_images:
                 image_path = os.path.join(settings.MEDIA_ROOT, evidence_image.image.name)
                 if os.path.exists(image_path):
@@ -2759,11 +3231,11 @@ def generate_report(request, project_id):
                 if writeup.content_html:
                     doc.add_heading(writeup.title, level=2)
 
-                    soup = BeautifulSoup(writeup.content_html, "html.parser")
-
-                    section = doc.sections[0]
-                    usable_width = section.page_width - section.left_margin - section.right_margin
-                    usable_width_inches = usable_width / 914400
+                    # --- Pre-process: download any remaining external images ---
+                    processed_html = download_external_images(
+                        writeup.content_html, writeup.title
+                    )
+                    soup = BeautifulSoup(processed_html, "html.parser")
 
                     # 🔄 Recorremos todos los elementos en orden
                     for el in soup.contents:
@@ -2776,19 +3248,10 @@ def generate_report(request, project_id):
                             image_path = os.path.join(settings.PROTECTED_MEDIA_ROOT, writeup.title, filename)
 
                             if os.path.exists(image_path):
-                                try:
-                                    with Image.open(image_path) as img:
-                                        width, height = img.size
-                                        aspect_ratio = height / width
-                                        scaled_height = usable_width_inches * aspect_ratio
-
-                                    doc.add_picture(image_path, width=Inches(usable_width_inches), height=Inches(scaled_height))
-                                    doc.add_paragraph()
-                                    print(f"🖼️ Imagen insertada en orden desde: {image_path}")
-                                except Exception as e:
-                                    print(f"❌ Error insertando imagen {image_path}: {e}")
+                                add_image_to_doc(doc, image_path)
+                                logger.info("Image inserted from: %s", image_path)
                             else:
-                                print(f"⚠️ Imagen no encontrada: {image_path}")
+                                logger.warning("Image not found: %s", image_path)
                         else:
                             # 🔍 Buscar imágenes anidadas dentro del tag (p, div, etc.)
                             for img_tag in el.find_all("img"):
@@ -2797,45 +3260,30 @@ def generate_report(request, project_id):
                                 image_path = os.path.join(settings.PROTECTED_MEDIA_ROOT, writeup.title, filename)
 
                                 if os.path.exists(image_path):
-                                    try:
-                                        with Image.open(image_path) as img:
-                                            width, height = img.size
-                                            aspect_ratio = height / width
-                                            scaled_height = usable_width_inches * aspect_ratio
-
-                                        doc.add_picture(image_path, width=Inches(usable_width_inches), height=Inches(scaled_height))
-                                        doc.add_paragraph()
-                                        print(f"🖼️ Imagen anidada insertada desde: {image_path}")
-                                    except Exception as e:
-                                        print(f"❌ Error insertando imagen anidada {image_path}: {e}")
+                                    add_image_to_doc(doc, image_path)
+                                    logger.info("Nested image inserted from: %s", image_path)
                                 else:
-                                    print(f"⚠️ Imagen anidada no encontrada: {image_path}")
+                                    logger.warning("Nested image not found: %s", image_path)
 
                                 img_tag.decompose()
 
                             # 👉 Insertar el bloque restante como HTML limpio (ya sin <img>)
                             try:
                                 add_attack_narrative_to_document(doc, str(el), writeup.title, request, language)
-                                print(f"✅ Se insertó contenido del writeup para: {writeup.title}")
+                                logger.info("Writeup content inserted for: %s", writeup.title)
                             except Exception as e:
-                                print(f"❌ Error insertando contenido del writeup en {writeup.title}: {e}")
+                                logger.error("Error inserting writeup content for %s: %s", writeup.title, e)
 
             print("✅ Todos los Writeups fueron insertados correctamente, en orden y desde protected_media.")
         else:
             print("⚠️ No hay Writeups asignados al Proyecto.")
 
 
-        # 🔚 Recolectar títulos para el índice (Heading1, Heading2, etc.)
-        toc_entries = []
-        for para in doc.paragraphs:
-            if para.style.name.startswith("Heading") and para.text.strip():
-                try:
-                    level = int(para.style.name.replace("Heading ", ""))
-                except ValueError:
-                    level = 1
-                toc_entries.append((level, para.text.strip()))
+        # Sustituir ###TOC_PLACEHOLDER### por el campo TOC de Word (mostrará números de página al abrir/actualizar)
+        _replace_toc_placeholder_with_field(doc)
 
-
+        # Actualizar campos al abrir en Word para que el TOC muestre números de página
+        _set_update_fields_on_open(doc)
 
         # Guardar el documento en un buffer y preparar la respuesta
         buffer = io.BytesIO()
@@ -2858,29 +3306,32 @@ def generate_report(request, project_id):
 
 
 def generate_vulnerabilities_table(project, language):
-    # Obtener todas las vulnerabilidades del proyecto
+    """
+    Builds an HTML table of vulnerabilities. All user-supplied content (evidence,
+    description, solution, hosts_affected) is escaped to prevent XSS (OWASP A03).
+    """
     vulnerabilities = Vulnerability.objects.filter(project=project)
-
-    # Ordenar las vulnerabilidades por nivel de criticidad
     vulnerabilities = sorted(vulnerabilities, key=lambda x: risk_factor_to_numeric(x.risk_factor, language))
 
-    # Crear la tabla HTML
     table_html = '<table border="1">'
     table_html += '<tr><th>Affected Hosts</th><th>Ports</th><th>Description</th><th>Solution</th><th>Evidence</th></tr>'
 
     for vulnerability in vulnerabilities:
-        # Obtener los detalles de la vulnerabilidad
         hosts_affected = vulnerability.hosts_affected if vulnerability.hosts_affected else 'Unknown'
-        ports = vulnerability.port if vulnerability.port else 'Unknown'
+        ports = str(vulnerability.port) if vulnerability.port else 'Unknown'
         description = vulnerability.description_es if language == 'es' else vulnerability.description
         solution = vulnerability.solution_es if language == 'es' else vulnerability.solution
         evidence = vulnerability.evidence if vulnerability.evidence else 'Unknown'
+        # Escape user content to prevent XSS when this HTML is rendered (OWASP Top 10)
+        hosts_affected = escape(hosts_affected)
+        ports = escape(ports)
+        description = escape(description or '')
+        solution = escape(solution or '')
+        evidence = escape(evidence)
 
-        # Agregar una fila a la tabla
         table_html += f'<tr><td>{hosts_affected}</td><td>{ports}</td><td>{description}</td><td>{solution}</td><td>{evidence}</td></tr>'
 
     table_html += '</table>'
-    
     return table_html
 
 
@@ -2928,10 +3379,12 @@ def apply_styles(paragraph, element):
 
 
 #Area de Template para customizar el reporte:
+@login_required
 def report_template_list(request):
     templates = ReportTemplate.objects.all()
     return render(request, 'report_template_list.html', {'templates': templates})
 
+@login_required
 def report_template_create(request):
     if request.method == 'POST':
         form = ReportTemplateForm(request.POST, request.FILES)
@@ -2942,6 +3395,7 @@ def report_template_create(request):
         form = ReportTemplateForm()
     return render(request, 'report_template_form.html', {'form': form})
 
+@login_required
 def report_template_edit(request, pk):
     template = get_object_or_404(ReportTemplate, pk=pk)
     if request.method == 'POST':
@@ -2953,31 +3407,42 @@ def report_template_edit(request, pk):
         form = ReportTemplateForm(instance=template)
     return render(request, 'report_template_form.html', {'form': form})
 
+@login_required
 def report_template_delete(request, pk):
     template = get_object_or_404(ReportTemplate, pk=pk)
     template.delete()
     return redirect('report_template_list')
 
-def editor_page(request):
+
+# Cover templates (new UI, no admin)
+@login_required
+def cover_template_list(request):
+    templates = ReportCoverTemplate.objects.all().order_by('name')
+    return render(request, 'projectmanager/cover_template_list.html', {'templates': templates})
+
+
+@login_required
+def cover_template_create(request):
     if request.method == 'POST':
-        form = TinyMCEForm(request.POST)
+        form = ReportCoverForm(request.POST, request.FILES)
         if form.is_valid():
-            content = form.cleaned_data['content']
-            # Procesar el formulario aquí, por ejemplo, guardar el contenido en la base de datos
-            # En este ejemplo, simplemente mostramos el contenido en la consola del servidor
-            print("Contenido del formulario:", content)
-            return HttpResponse("Contenido guardado correctamente.")
+            template = form.save()
+            return redirect('visual_cover_designer_template', template_id=template.pk)
     else:
-        form = TinyMCEForm()
-    return render(request, 'editor_page.html', {'form': form})
+        form = ReportCoverForm()
+    return render(request, 'projectmanager/cover_template_form.html', {'form': form})
 
 
-
-
+@login_required
+def cover_template_delete(request, pk):
+    template = get_object_or_404(ReportCoverTemplate, pk=pk)
+    template.delete()
+    return redirect('cover_template_list')
 
 # Netsparker Parser
+@login_required
 def import_netsparker_file(request, pk):
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(get_projects_queryset(request.user), pk=pk)
     
     if request.method == 'POST':
         form = NetsparkerFileUploadForm(request.POST, request.FILES)
@@ -2989,23 +3454,30 @@ def import_netsparker_file(request, pk):
             # Extraer y procesar la URL base del módulo <target>
             target_url = root.find('.//target/url').text if root.find('.//target/url') is not None else None
 
-            # Verificar y actualizar/crear el Target si target_url existe
+            # Verificar y actualizar/crear el Target si target_url existe (get+save pattern to avoid select_for_update / SQLite lock)
             if target_url:
-                target, created = Target.objects.update_or_create(
-                    project=project,
-                    urlAddress=target_url,
-                    defaults={}  # Añade aquí cualquier campo adicional que necesites actualizar
-                )
+                try:
+                    target = Target.objects.get(project=project, urlAddress=target_url)
+                except Target.DoesNotExist:
+                    target = Target.objects.create(project=project, urlAddress=target_url)
 
             for vuln in root.findall('.//vulnerability'):
-                vuln_url = vuln.find('url').text
-                severity = vuln.find('severity').text
-                title = vuln.find('title').text
-                description_html = vuln.find('description').text or ""
-                remedy_html = vuln.find('remedy').text or ""
-                externalReferences_html = vuln.find('externalReferences').text or ""
-                rawrequest = vuln.find('rawrequest').text or ""
-                rawresponse = vuln.find('rawresponse').text or ""
+                url_el = vuln.find('url')
+                vuln_url = url_el.text if url_el is not None and url_el.text else ""
+                sev_el = vuln.find('severity')
+                severity = sev_el.text if sev_el is not None and sev_el.text else ""
+                title_el = vuln.find('title')
+                title = title_el.text if title_el is not None and title_el.text else "Unknown"
+                desc_el = vuln.find('description')
+                description_html = (desc_el.text or "") if desc_el is not None else ""
+                remedy_el = vuln.find('remedy')
+                remedy_html = (remedy_el.text or "") if remedy_el is not None else ""
+                ext_el = vuln.find('externalReferences')
+                externalReferences_html = (ext_el.text or "") if ext_el is not None else ""
+                rawreq_el = vuln.find('rawrequest')
+                rawrequest = (rawreq_el.text or "") if rawreq_el is not None else ""
+                rawresp_el = vuln.find('rawresponse')
+                rawresponse = (rawresp_el.text or "") if rawresp_el is not None else ""
 
                 # Limpiar los campos HTML
                 description_clean = clean_html(description_html)
@@ -3019,23 +3491,30 @@ def import_netsparker_file(request, pk):
                 # Construir el texto de evidencia
                 evidence_text = f"Request:\n{rawrequest}\nResponse:\n{rawresponse}"
 
-                # Actualizar o crear la vulnerabilidad con todos los datos procesados
-                vulnerability, vuln_created = Vulnerability.objects.update_or_create(
-                    project=project,
-                    name=title,
-                    defaults={
-                        'description': description_clean,
-                        'solution': remedy_clean,
-                        'description_es': description_es,
-                        'solution_es': remedy_es,
-                        'risk_factor': severity,
-                        'see_also': externalReferences_clean,
-                        'hosts_affected': vuln_url,  # Considera manejar múltiples URLs adecuadamente
-                        'evidence': evidence_text
-                    }
-                )
+                # Get or create vulnerability without select_for_update (avoids SQLite "database is locked")
+                defaults = {
+                    'description': description_clean,
+                    'solution': remedy_clean,
+                    'description_es': description_es,
+                    'solution_es': remedy_es,
+                    'risk_factor': severity,
+                    'see_also': externalReferences_clean,
+                    'hosts_affected': vuln_url,
+                    'evidence': evidence_text
+                }
+                try:
+                    vulnerability = Vulnerability.objects.get(project=project, name=title)
+                    for key, value in defaults.items():
+                        setattr(vulnerability, key, value)
+                    vulnerability.save()
+                except Vulnerability.DoesNotExist:
+                    vulnerability = Vulnerability.objects.create(
+                        project=project,
+                        name=title,
+                        **defaults
+                    )
 
-            return redirect(reverse('admin:ProjectManager_project_changelist'))
+            return redirect('project_detail', pk=project.pk)
     else:
         form = NetsparkerFileUploadForm()
 
@@ -3043,10 +3522,29 @@ def import_netsparker_file(request, pk):
 
 
 
-#Users register
-def login_view(request):
-    # Lógica de la vista de inicio de sesión
-    return render(request, 'registration/login.html')
+# App login/logout (new-version UI, same Django auth)
+def app_login(request):
+    from django.contrib.auth.views import LoginView
+    from django.contrib.auth.forms import AuthenticationForm
+    if request.user.is_authenticated:
+        return redirect('project_list')
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            from django.contrib.auth import login
+            user = form.get_user()
+            login(request, user)
+            next_url = request.GET.get('next') or request.POST.get('next') or settings.LOGIN_REDIRECT_URL
+            return redirect(next_url)
+    else:
+        form = AuthenticationForm(request)
+    return render(request, 'projectmanager/login.html', {'form': form, 'next': request.GET.get('next', '')})
+
+
+def app_logout(request):
+    from django.contrib.auth import logout
+    logout(request)
+    return render(request, 'projectmanager/logout.html')
 
 def register_view(request):
     if request.method == 'POST':
@@ -3077,9 +3575,10 @@ def register(request):
 
 
 #Parser Acunetix
+@login_required
 def import_acunetix_xml(request, pk):
     from deep_translator import GoogleTranslator
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(get_projects_queryset(request.user), pk=pk)
 
     if request.method == 'POST':
         xml_file = request.FILES.get('acunetix_file')
@@ -3104,30 +3603,42 @@ def import_acunetix_xml(request, pk):
                 unique_hosts_affected.add(start_url)
 
             for host in unique_hosts_affected:
-                Target.objects.update_or_create(
-                    project=project,
-                    urlAddress=host,
-                    defaults={'fqdn': host, 'os': os_name}
-                )
+                try:
+                    t = Target.objects.get(project=project, urlAddress=host)
+                    t.fqdn = host
+                    t.os = os_name
+                    t.save()
+                except Target.DoesNotExist:
+                    Target.objects.create(project=project, urlAddress=host, fqdn=host, os=os_name)
 
             for scan in root.findall('.//Scan'):
                 start_url = scan.find('StartURL').text if scan.find('StartURL') is not None else ''
                 crawler_start_url = scan.get('StartUrl', start_url)
 
-                target_host = Target.objects.get(project=project, urlAddress=crawler_start_url)
+                try:
+                    target_host = Target.objects.get(project=project, urlAddress=crawler_start_url)
+                except Target.DoesNotExist:
+                    target_host = Target.objects.create(project=project, urlAddress=crawler_start_url, fqdn=crawler_start_url or '', os=os_name)
 
                 for report_item in scan.findall('.//ReportItem'):
-                    name = report_item.find('Name').text or ''
-                    description_text = f"Description:\n{report_item.find('Description').text or ''}\n"
-                    impact_text = f"Impact:\n{report_item.find('Impact').text or ''}\n"
-                    details_text = f"Details:\n{report_item.find('Details').text or ''}\n"
-                    full_description = description_text + impact_text + details_text
+                    name_el = report_item.find('Name')
+                    name = (name_el.text or '') if name_el is not None else ''
+                    desc_el = report_item.find('Description')
+                    desc_t = (desc_el.text or '') if desc_el is not None else ''
+                    impact_el = report_item.find('Impact')
+                    impact_t = (impact_el.text or '') if impact_el is not None else ''
+                    details_el = report_item.find('Details')
+                    details_t = (details_el.text or '') if details_el is not None else ''
+                    full_description = f"Description:\n{desc_t}\nImpact:\n{impact_t}\nDetails:\n{details_t}\n"
 
-                    recommendation_text = report_item.find('Recommendation').text or ''
-                    severity = report_item.find('Severity').text.capitalize() if report_item.find('Severity') is not None else ''
+                    rec_el = report_item.find('Recommendation')
+                    recommendation_text = (rec_el.text or '') if rec_el is not None else ''
+                    sev_el = report_item.find('Severity')
+                    severity = sev_el.text.capitalize() if sev_el is not None and sev_el.text else ''
                     
                     technical_details = report_item.find('.//TechnicalDetails')
-                    request_text = technical_details.find('Request').text if technical_details is not None and technical_details.find('Request') is not None else ''
+                    req_el = technical_details.find('Request') if technical_details is not None else None
+                    request_text = (req_el.text or '') if req_el is not None else ''
                     response_text = ""  # Se puede expandir si es necesario
 
                     evidence = f"Request:\n{request_text}\nResponse:\n{response_text}"
@@ -3150,7 +3661,7 @@ def import_acunetix_xml(request, pk):
                         target_host=target_host
                     )
 
-            return redirect(reverse('admin:ProjectManager_project_changelist'))
+            return redirect('project_detail', pk=project.pk)
 
     return render(request, 'admin/import_file.html', {'project': project})
 
@@ -3191,12 +3702,13 @@ def clean_and_translate_html(text, lang='es'):
 
 
 #Parser Burpsuite XML file
+@login_required
 def import_burp_xml(request, pk):
     from deep_translator import GoogleTranslator
     import re
     from collections import defaultdict
 
-    project = get_object_or_404(Project, pk=pk)
+    project = get_object_or_404(get_projects_queryset(request.user), pk=pk)
 
     if request.method == 'POST':
         form = BurpUploadForm(request.POST, request.FILES)
@@ -3213,11 +3725,15 @@ def import_burp_xml(request, pk):
                 host_url = host_tag.text if host_tag is not None else ""
                 unique_hosts_by_ip[ip_address].add(host_url)
 
-                severity = item.find('severity').text.capitalize() if item.find('severity') is not None else ""
-                name = item.find('name').text if item.find('name') is not None else ""
+                sev_el = item.find('severity')
+                severity = sev_el.text.capitalize() if sev_el is not None and sev_el.text else ""
+                name_el = item.find('name')
+                name = name_el.text if name_el is not None and name_el.text else ""
 
-                description_raw = item.find('issueBackground').text or ""
-                remediation_raw = item.find('remediationBackground').text or ""
+                issue_bg = item.find('issueBackground')
+                description_raw = (issue_bg.text or "") if issue_bg is not None else ""
+                remed_bg = item.find('remediationBackground')
+                remediation_raw = (remed_bg.text or "") if remed_bg is not None else ""
 
                 # Limpiar etiquetas HTML si vienen con <p>, <b>, etc.
                 clean_description = re.sub(r'<[^>]*>', '', description_raw).strip()
@@ -3273,7 +3789,7 @@ def import_burp_xml(request, pk):
                                 vuln.evidence += f"\n\n{evidence}"
                             vuln.save()
 
-            return redirect(reverse('admin:ProjectManager_project_changelist'))
+            return redirect('project_detail', pk=project.pk)
     else:
         form = BurpUploadForm()
 
@@ -3283,32 +3799,439 @@ def import_burp_xml(request, pk):
 
 
 
-def graph_map_view(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    targets = Target.objects.filter(project=project)
+# Proxy Simple Icons: tipos que usan SVG del CDN (los que se veían mal en PNG local)
+GRAPH_ICON_CDN = {
+    'linux': ('linux', 'FCC624'),
+    'ubuntu': ('ubuntu', 'E95420'),
+    'debian': ('debian', 'A81D33'),
+    'kali': ('kalilinux', '557C94'),
+    'printer_hp': ('hp', '0096D6'),
+    'nas_synology': ('synology', '2D7EC1'),
+    'firewall': ('fortinet', 'EE3124'),
+}
 
-    # Preparar datos para el gráfico
+# Única fuente de verdad: tipo de nodo -> archivo en static/images/graphmap/
+GRAPH_ICON_STATIC = {
+    'windows': 'windows.png', 'windows_xp': 'windows.png', 'windows_vista': 'windows.png',
+    'windows_7': 'windows.png', 'windows_8': 'windows.png', 'windows_10': 'windows.png', 'windows_11': 'windows.png',
+    'linux': 'linux.png', 'ubuntu': 'ubuntu.png', 'debian': 'debian.png', 'kali': 'kali.png',
+    'arch': 'arch.png', 'fedora': 'fedora.png', 'redhat': 'redhat.png', 'macos': 'macos.png',
+    'android': 'android.png', 'ios': 'macos.png', 'server': 'linux.png',
+    'printer': 'unknown.png', 'printer_epson': 'unknown.png', 'printer_hp': 'unknown.png',
+    'printer_canon': 'unknown.png', 'printer_brother': 'unknown.png', 'printer_lexmark': 'unknown.png',
+    'router': 'unknown.png', 'router_cisco': 'unknown.png', 'router_netgear': 'unknown.png',
+    'router_tplink': 'unknown.png', 'router_mikrotik': 'unknown.png', 'router_ubiquiti': 'unknown.png',
+    'router_dlink': 'unknown.png', 'router_aruba': 'unknown.png',
+    'nas': 'unknown.png', 'nas_synology': 'unknown.png', 'nas_qnap': 'unknown.png',
+    'iot': 'unknown.png', 'iot_raspberrypi': 'unknown.png', 'iot_arduino': 'unknown.png',
+    'camera': 'unknown.png', 'camera_hikvision': 'unknown.png', 'camera_dahua': 'unknown.png', 'camera_axis': 'unknown.png',
+    'firewall': 'unknown.png', 'switch': 'unknown.png', 'unknown': 'unknown.png',
+}
+
+# Tipos de nodo que usan la plantilla imac (computadora con OS en pantalla)
+GRAPH_IMAC_TYPES = {
+    'windows', 'windows_xp', 'windows_vista', 'windows_7', 'windows_8', 'windows_10', 'windows_11',
+    'linux', 'ubuntu', 'debian', 'kali', 'arch', 'fedora', 'redhat', 'macos', 'android', 'ios',
+    'server', 'unknown',
+}
+# Mapeo tipo -> SVG local (nombre en static/images/graphmap/) o URL CDN para SVG
+GRAPH_OS_ICON_SOURCE = {
+    'windows': 'windows.svg', 'windows_xp': 'windows.svg', 'windows_vista': 'windows.svg',
+    'windows_7': 'windows.svg', 'windows_8': 'windows.svg', 'windows_10': 'windows.svg', 'windows_11': 'windows.svg',
+    'linux': 'linux.svg', 'ubuntu': 'ubuntu.svg', 'debian': 'debian.svg', 'kali': 'kali.svg',
+    'arch': 'arch.svg', 'fedora': 'fedora.svg', 'redhat': 'redhat.svg', 'macos': 'macos.svg',
+    'ios': 'macos.svg', 'server': 'linux.svg', 'unknown': 'unknown.svg',
+    'android': 'https://cdn.simpleicons.org/android/3DDC84',
+}
+
+
+def _svg_to_png(svg_content_or_path, size_px, is_url=False):
+    """Convierte SVG a PNG de tamaño size_px. svg_content_or_path: path local (str) o URL (str)."""
+    if cairosvg is None:
+        return None
+    try:
+        if is_url:
+            png_bytes = cairosvg.svg2png(url=svg_content_or_path, output_width=size_px, output_height=size_px)
+        else:
+            path = str(svg_content_or_path)
+            with open(path, 'rb') as f:
+                svg_bytes = f.read()
+            png_bytes = cairosvg.svg2png(bytestring=svg_bytes, output_width=size_px, output_height=size_px)
+    except Exception:
+        return None
+    if not png_bytes:
+        return None
+    return Image.open(BytesIO(png_bytes)).convert('RGBA')
+
+
+def _draw_lightning_overlay(img):
+    """Dibuja rayos eléctricos en los bordes de la imagen (efecto comprometido)."""
+    w, h = img.size
+    overlay = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(overlay)
+    # Rayos: líneas en zigzag blanco/amarillo semitransparentes
+    import random
+    random.seed(42)
+    for _ in range(8):
+        x0 = random.randint(0, w)
+        y0 = 0 if random.random() > 0.5 else h
+        pts = [(x0, y0)]
+        for _ in range(4):
+            pts.append((pts[-1][0] + random.randint(-40, 40), pts[-1][1] + (random.randint(10, 30) if y0 == 0 else -random.randint(10, 30))))
+        d.line(pts, fill=(255, 255, 200, 180), width=3)
+    for _ in range(6):
+        x0 = random.randint(0, w)
+        y0 = random.randint(0, h)
+        pts = [(x0, y0)]
+        for _ in range(3):
+            pts.append((pts[-1][0] + random.randint(-25, 25), pts[-1][1] + random.randint(-25, 25)))
+        d.line(pts, fill=(255, 220, 100, 160), width=2)
+    return Image.alpha_composite(img, overlay)
+
+
+@login_required
+@xframe_options_sameorigin
+def graph_icon_proxy(request):
+    """Proxy de iconos Simple Icons (mismo origen para evitar CORS/OpaqueResponseBlocking). GET type=ubuntu|linux|debian|..."""
+    node_type = (request.GET.get('type') or 'unknown').strip().lower()
+    if node_type not in GRAPH_ICON_CDN:
+        raise Http404("Unknown icon type")
+    slug, color = GRAPH_ICON_CDN[node_type]
+    url = f"https://cdn.simpleicons.org/{slug}/{color}"
+    try:
+        r = requests.get(url, timeout=5)
+        r.raise_for_status()
+    except Exception:
+        raise Http404("Icon unavailable")
+    resp = HttpResponse(r.content, content_type='image/svg+xml')
+    resp['Cache-Control'] = 'public, max-age=86400'
+    return resp
+
+
+@login_required
+@xframe_options_sameorigin
+def graph_node_image(request):
+    """Genera una imagen PNG: imac (o imacRED si owned) + icono del OS en la pantalla; si owned, rayos."""
+    node_type = (request.GET.get('type') or 'unknown').strip().lower()
+    owned = request.GET.get('owned', '0') == '1'
+    if node_type not in GRAPH_IMAC_TYPES:
+        node_type = 'unknown'
+    base = str(settings.BASE_DIR)
+    static_root = str(settings.STATIC_ROOT) if settings.STATIC_ROOT else ''
+    images_dir = os.path.join(static_root or os.path.join(base, 'static'), 'images')
+    if not os.path.isdir(images_dir):
+        images_dir = os.path.join(base, 'static', 'images')
+    imac_filename = 'imacRED.png' if owned else 'imac.png'
+    imac_path = os.path.join(images_dir, imac_filename)
+    if not os.path.isfile(imac_path):
+        imac_path = os.path.join(base, 'static', 'images', imac_filename)
+    if not os.path.isfile(imac_path):
+        raise Http404(f"{imac_filename} not found")
+    img = Image.open(imac_path).convert('RGBA')
+    # Generar a 128px para que al mostrarse en el nodo (~48px) el logo se vea nítido
+    OUT_SIZE = 128
+    w, h = img.size
+    if w != OUT_SIZE or h != OUT_SIZE:
+        img = img.resize((OUT_SIZE, OUT_SIZE), Image.Resampling.LANCZOS)
+        w, h = OUT_SIZE, OUT_SIZE
+    # Zona pantalla: proporciones para que el logo ocupe la mayor parte
+    screen_left = int(w * 0.12)
+    screen_top = int(h * 0.10)
+    screen_right = int(w * 0.88)
+    screen_bottom = int(h * 0.56)
+    screen_w = screen_right - screen_left
+    screen_h = screen_bottom - screen_top
+    icon_size = min(screen_w, screen_h)
+    # Obtener icono OS: priorizar SVG con cairosvg (logos correctos) y luego PNG
+    icon_source = GRAPH_OS_ICON_SOURCE.get(node_type, 'unknown.svg')
+    icon_png = None
+    graphmap_dir = os.path.join(base, 'static', 'images', 'graphmap')
+    svg_path = None
+    if not (isinstance(icon_source, str) and icon_source.startswith('http')):
+        icon_basename = os.path.splitext(icon_source)[0]
+        svg_path = os.path.join(graphmap_dir, icon_source)
+    # 1) Si hay cairosvg y SVG local, usarlo (Debian, Ubuntu, Linux, etc. se ven correctos)
+    if cairosvg and svg_path and os.path.isfile(svg_path):
+        icon_png = _svg_to_png(svg_path, icon_size, is_url=False)
+    if icon_png is None and isinstance(icon_source, str) and icon_source.startswith('http') and cairosvg:
+        icon_png = _svg_to_png(icon_source, icon_size, is_url=True)
+    if icon_png is None:
+        png_by_type = os.path.join(graphmap_dir, node_type + '.png')
+        if os.path.isfile(png_by_type):
+            try:
+                icon_png = Image.open(png_by_type).convert('RGBA')
+            except Exception:
+                pass
+    if icon_png is None and svg_path and not (isinstance(icon_source, str) and icon_source.startswith('http')):
+        icon_basename = os.path.splitext(icon_source)[0]
+        png_path = os.path.join(graphmap_dir, icon_basename + '.png')
+        if os.path.isfile(png_path):
+            try:
+                icon_png = Image.open(png_path).convert('RGBA')
+            except Exception:
+                pass
+    if icon_png is not None:
+        icon_png = icon_png.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
+        paste_x = screen_left + (screen_w - icon_size) // 2
+        paste_y = screen_top + (screen_h - icon_size) // 2
+        mask = icon_png.split()[3] if icon_png.mode == 'RGBA' and len(icon_png.split()) >= 4 else icon_png
+        img.paste(icon_png, (paste_x, paste_y), mask)
+    else:
+        # Fallback sin cairosvg: dibujar un rectángulo de color en la pantalla (indicador de OS)
+        fill_colors = {'windows': (0, 120, 212), 'linux': (252, 198, 36), 'ubuntu': (233, 84, 32), 'macos': (85, 85, 85), 'unknown': (100, 100, 100)}
+        rgb = fill_colors.get(node_type, fill_colors['unknown'])
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([screen_left, screen_top, screen_right, screen_bottom], fill=rgb, outline=(60, 60, 60))
+    # Equipos comprometidos: solo imacRED.png (sin rayos); la base roja es suficiente
+    buf = BytesIO()
+    img.save(buf, format='PNG')
+    buf.seek(0)
+    resp = HttpResponse(buf.getvalue(), content_type='image/png')
+    resp['Cache-Control'] = 'public, max-age=3600'
+    return resp
+
+
+@login_required
+@never_cache
+@xframe_options_sameorigin
+def graph_map_view(request, project_id):
+    project = get_object_or_404(get_projects_queryset(request.user), id=project_id)
+    # Consulta fresca: sin caché para que owned/OS siempre estén actualizados
+    targets = list(Target.objects.filter(project=project).select_related('jumped_from').order_by('id'))
+
+    CONSULTANT_NODE_ID = 0
     nodes = []
-    links = []
+    edges = []
+    targets_with_predecessor = set()
 
     for target in targets:
-        nodes.append({
-            'id': target.ip_address or target.fqdn or target.urlAddress,
-            'type': 'windows' if 'windows' in target.os.lower() else 'linux' if 'linux' in target.os.lower() else 'unknown'
-        })
+        label = target.ip_address or target.fqdn or target.urlAddress or f"Target-{target.pk}"
+        os_info = (target.os or "").lower().strip()
+        # Windows version mapping: variantes explícitas y por número de versión
+        if any(x in os_info for x in ('xp', 'windows xp')):
+            node_type = 'windows_xp'
+        elif any(x in os_info for x in ('vista', 'windows vista')):
+            node_type = 'windows_vista'
+        elif any(x in os_info for x in ('win 7', 'win7', 'windows 7', 'windows7')) or ('windows' in os_info and '7' in os_info) or ('win' in os_info and '7' in os_info):
+            node_type = 'windows_7'
+        elif any(x in os_info for x in ('win 8', 'win8', 'windows 8', 'windows8')) or ('windows' in os_info and '8' in os_info) or ('win' in os_info and '8' in os_info):
+            node_type = 'windows_8'
+        elif any(x in os_info for x in ('win 10', 'win10', 'windows 10', 'windows10')) or ('windows' in os_info and '10' in os_info) or ('win' in os_info and '10' in os_info):
+            node_type = 'windows_10'
+        elif any(x in os_info for x in ('win 11', 'win11', 'windows 11', 'windows11')) or ('windows' in os_info and '11' in os_info) or ('win' in os_info and '11' in os_info):
+            node_type = 'windows_11'
+        elif any(x in os_info for x in ('windows', 'win')):
+            node_type = 'windows'
+        elif any(x in os_info for x in ('ios', 'iphone', 'ipad')):
+            node_type = 'ios'
+        elif any(x in os_info for x in ('darwin', 'mac os', 'macos', 'os x', 'osx', 'apple')):
+            node_type = 'macos'
+        elif 'android' in os_info:
+            node_type = 'android'
+        elif 'ubuntu' in os_info:
+            node_type = 'ubuntu'
+        elif 'debian' in os_info:
+            node_type = 'debian'
+        elif 'kali' in os_info:
+            node_type = 'kali'
+        elif 'arch' in os_info:
+            node_type = 'arch'
+        elif 'fedora' in os_info:
+            node_type = 'fedora'
+        elif any(x in os_info for x in ('centos', 'rhel', 'red hat', 'redhat')):
+            node_type = 'redhat'
+        elif any(x in os_info for x in ('linux', 'gnu/linux')):
+            node_type = 'linux'
+        # Impresoras (marca primero, luego genérico)
+        elif any(x in os_info for x in ('epson', 'epson printer')):
+            node_type = 'printer_epson'
+        elif any(x in os_info for x in ('hp printer', 'hewlett', 'hp laserjet', 'hp deskjet')):
+            node_type = 'printer_hp'
+        elif any(x in os_info for x in ('canon printer', 'canon pixma', 'canon imageclass')):
+            node_type = 'printer_canon'
+        elif any(x in os_info for x in ('brother printer', 'brother hl', 'brother mfc')):
+            node_type = 'printer_brother'
+        elif any(x in os_info for x in ('lexmark', 'xerox printer', 'samsung printer')):
+            node_type = 'printer_lexmark'
+        elif any(x in os_info for x in ('printer', 'impresora', 'print server')):
+            node_type = 'printer'
+        # Routers / networking
+        elif any(x in os_info for x in ('cisco', 'ios-xe', 'ios xe', 'catalyst')):
+            node_type = 'router_cisco'
+        elif any(x in os_info for x in ('netgear', 'netgear router', 'night hawk')):
+            node_type = 'router_netgear'
+        elif any(x in os_info for x in ('tp-link', 'tplink', 'tp link')):
+            node_type = 'router_tplink'
+        elif any(x in os_info for x in ('mikrotik', 'routeros')):
+            node_type = 'router_mikrotik'
+        elif any(x in os_info for x in ('ubiquiti', 'unifi', 'edgeos')):
+            node_type = 'router_ubiquiti'
+        elif any(x in os_info for x in ('d-link', 'dlink')):
+            node_type = 'router_dlink'
+        elif any(x in os_info for x in ('aruba', 'arubaos')):
+            node_type = 'router_aruba'
+        elif any(x in os_info for x in ('router', 'gateway', 'access point', 'ap ', 'wifi')):
+            node_type = 'router'
+        # NAS / almacenamiento
+        elif any(x in os_info for x in ('synology', 'dsm', 'diskstation')):
+            node_type = 'nas_synology'
+        elif any(x in os_info for x in ('qnap', 'qts', 'turbo nas')):
+            node_type = 'nas_qnap'
+        elif any(x in os_info for x in ('nas', 'network storage', 'storage')):
+            node_type = 'nas'
+        # IoT / embebidos
+        elif any(x in os_info for x in ('raspberry', 'raspberry pi', 'rpi')):
+            node_type = 'iot_raspberrypi'
+        elif any(x in os_info for x in ('arduino', 'esp32', 'esp8266', 'espressif')):
+            node_type = 'iot_arduino'
+        elif any(x in os_info for x in ('iot', 'embedded', 'smart device', 'sensor')):
+            node_type = 'iot'
+        # Cámaras IP / vigilancia
+        elif any(x in os_info for x in ('hikvision', 'hik connect')):
+            node_type = 'camera_hikvision'
+        elif any(x in os_info for x in ('dahua', 'dhi-')):
+            node_type = 'camera_dahua'
+        elif any(x in os_info for x in ('axis camera', 'axis communications')):
+            node_type = 'camera_axis'
+        elif any(x in os_info for x in ('camera', 'ip camera', 'cámara', 'nvr', 'dvr')):
+            node_type = 'camera'
+        # Servidores / otros
+        elif any(x in os_info for x in ('server', 'esxi', 'vmware', 'proxmox', 'hyper-v')):
+            node_type = 'server'
+        elif any(x in os_info for x in ('firewall', 'pfsense', 'opnsense', 'fortinet', 'palo alto')):
+            node_type = 'firewall'
+        elif any(x in os_info for x in ('switch', 'layer 2', 'layer 3')):
+            node_type = 'switch'
+        else:
+            node_type = 'unknown'
+
+        node = {
+            'id': target.pk,
+            'label': label,
+            'type': node_type,
+            'owned': target.owned,
+            'ip': target.ip_address or '',
+            'fqdn': target.fqdn or '',
+            'url': target.urlAddress or '',
+        }
+        # #region agent log
+        if target.owned or (label and '10.0.3.14' in label):
+            import json as _json
+            try:
+                with open('/Users/orion/Desktop/Espengler-2.0/.cursor/debug.log', 'a') as _f:
+                    _f.write(_json.dumps({'location': 'views.py:graph_map_view', 'message': 'target node', 'data': {'id': target.pk, 'label': label, 'type': node_type, 'os_raw': (target.os or '')[:80], 'owned': target.owned}, 'timestamp': int(__import__('time').time() * 1000)}) + '\n')
+            except Exception:
+                pass
+        # #endregion
+
+        if target.x_position is not None and target.y_position is not None:
+            node['x'] = target.x_position
+            node['y'] = target.y_position
+            node['fixed'] = {'x': True, 'y': True}
+
+        ports = Port.objects.filter(target=target)
+        node['ports'] = [{'number': p.port_number, 'protocol': p.protocol, 'service': p.service_name or ''} for p in ports]
+
+        nodes.append(node)
+
         if target.jumped_from:
-            links.append({
-                'source': target.jumped_from.ip_address or target.jumped_from.fqdn or target.jumped_from.urlAddress,
-                'target': target.ip_address or target.fqdn or target.urlAddress
+            targets_with_predecessor.add(target.pk)
+            edges.append({
+                'from': target.jumped_from.pk,
+                'to': target.pk,
             })
 
+    # Consultant node as center of activity (id 0)
+    consultant_node = {
+        'id': CONSULTANT_NODE_ID,
+        'label': 'Consultant',
+        'type': 'consultant',
+        'owned': False,
+    }
+    nodes.insert(0, consultant_node)
+    entry_point_ids = [t.pk for t in targets if t.pk not in targets_with_predecessor]
+    for tid in entry_point_ids:
+        edges.append({'from': CONSULTANT_NODE_ID, 'to': tid})
+
+    # Legend: only OS/types present in the graph (+ consultant, + owned if any)
+    type_labels = {
+        'consultant': 'Consultant',
+        'owned': 'Compromised',
+        'windows': 'Windows',
+        'windows_xp': 'Windows XP',
+        'windows_vista': 'Windows Vista',
+        'windows_7': 'Windows 7',
+        'windows_8': 'Windows 8',
+        'windows_10': 'Windows 10',
+        'windows_11': 'Windows 11',
+        'linux': 'Linux',
+        'ubuntu': 'Ubuntu',
+        'debian': 'Debian',
+        'kali': 'Kali',
+        'arch': 'Arch',
+        'fedora': 'Fedora',
+        'redhat': 'Red Hat',
+        'macos': 'macOS',
+        'android': 'Android',
+        'ios': 'iOS',
+        'printer': 'Printer',
+        'printer_epson': 'Epson',
+        'printer_hp': 'HP Printer',
+        'printer_canon': 'Canon',
+        'printer_brother': 'Brother',
+        'printer_lexmark': 'Lexmark/Xerox',
+        'router': 'Router',
+        'router_cisco': 'Cisco',
+        'router_netgear': 'Netgear',
+        'router_tplink': 'TP-Link',
+        'router_mikrotik': 'MikroTik',
+        'router_ubiquiti': 'Ubiquiti',
+        'router_dlink': 'D-Link',
+        'router_aruba': 'Aruba',
+        'nas': 'NAS',
+        'nas_synology': 'Synology',
+        'nas_qnap': 'QNAP',
+        'iot': 'IoT',
+        'iot_raspberrypi': 'Raspberry Pi',
+        'iot_arduino': 'Arduino/ESP',
+        'camera': 'Camera',
+        'camera_hikvision': 'Hikvision',
+        'camera_dahua': 'Dahua',
+        'camera_axis': 'Axis',
+        'server': 'Server',
+        'firewall': 'Firewall',
+        'switch': 'Switch',
+        'unknown': 'Unknown',
+    }
+    detected_types = set(n['type'] for n in nodes)
+    if any(n.get('owned') for n in nodes if n.get('id') != CONSULTANT_NODE_ID):
+        detected_types.add('owned')
+    detected_os_types = [(t, type_labels.get(t, t)) for t in sorted(detected_types, key=lambda x: (0 if x == 'consultant' else 1, 0 if x == 'owned' else 1, x))]
+
+    import json
+    # Única fuente de verdad: URLs de iconos desde el backend (evita desincronizar con la plantilla)
+    icon_urls = {}
+    for t, filename in GRAPH_ICON_STATIC.items():
+        icon_urls[t] = static('images/graphmap/' + filename)
+    for t in GRAPH_ICON_CDN:
+        icon_urls[t] = reverse('graph_icon_proxy') + '?type=' + t
     context = {
         'project': project,
-        'nodes': nodes,
-        'links': links
+        'nodes_json': json.dumps(nodes),
+        'edges_json': json.dumps(edges),
+        'icon_urls_json': json.dumps(icon_urls),
+        'consultant_img': static('images/attack.png'),
+        'owned_img': static('images/imac1.png'),
+        'detected_os_types': detected_os_types,
+        'embed': request.GET.get('embed') == '1',
     }
-
-    return render(request, 'projectmanager/graph_map.html', context)
+    response = render(request, 'projectmanager/graph_map.html', context)
+    # never_cache ya añade cabeceras; reforzamos para navegadores
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    response['Vary'] = 'Cookie'
+    return response
 
 
 

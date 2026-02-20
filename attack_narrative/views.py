@@ -1,16 +1,16 @@
 import os
 import requests
 from bs4 import BeautifulSoup
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.text import slugify
 
 from .models import Writeup, Tag
 from .utils import import_obsidian_note
+from .forms import WriteupForm
 
 
 def download_image_from_url(url, writeup_title):
@@ -43,9 +43,14 @@ def import_attack_narrative(request):
     """
     if request.method == "POST":
         file = request.FILES["file"]
+        # Prevent path traversal: use basename and allow only .md
+        safe_name = os.path.basename(file.name).strip()
+        if not safe_name.endswith(".md") or ".." in safe_name:
+            messages.error(request, "Only .md files are allowed.")
+            return redirect("attack_narrative_list")
 
         os.makedirs("media/uploads", exist_ok=True)
-        file_path = os.path.join("media/uploads", file.name)
+        file_path = os.path.join("media/uploads", safe_name)
 
         with open(file_path, "wb+") as destination:
             for chunk in file.chunks():
@@ -54,11 +59,16 @@ def import_attack_narrative(request):
         try:
             attack_narrative_data = import_obsidian_note(file_path)
 
-            for data in attack_narrative_data:
-                writeup_data = {key: value for key, value in data.items() if key != "tags"}
-                writeup = Writeup.objects.create(**writeup_data)
+            if not attack_narrative_data or not isinstance(attack_narrative_data, dict):
+                messages.error(request, "The file did not contain valid data.")
+                return redirect("attack_narrative_list")
 
-                # Procesar imágenes externas en el HTML
+            writeup = Writeup.objects.create(
+                title=attack_narrative_data.get("title", file.name.replace(".md", "")),
+                content_html=attack_narrative_data.get("content_html", "")
+            )
+
+            if writeup.content_html:
                 soup = BeautifulSoup(writeup.content_html, "html.parser")
                 for img in soup.find_all("img"):
                     src = img.get("src", "")
@@ -68,14 +78,10 @@ def import_attack_narrative(request):
                 writeup.content_html = str(soup)
                 writeup.save()
 
-                if "tags" in data:
-                    tag_instances = Tag.objects.filter(name__in=data["tags"])
-                    writeup.tags.set(tag_instances)
-
-                messages.success(request, f"Writeup '{writeup.title}' importado con éxito.")
+            messages.success(request, f"Writeup '{writeup.title}' imported successfully.")
 
         except Exception as e:
-            messages.error(request, f"Error al importar los datos de Obsidian: {e}")
+            messages.error(request, f"Error importing Obsidian data: {e}")
             return redirect("attack_narrative_list")
 
         return redirect("attack_narrative_list")
@@ -86,30 +92,95 @@ def import_attack_narrative(request):
 @login_required
 def attack_narrative_list(request):
     """
-    Vista protegida para listar los Writeups
+    List Writeups (new app style).
     """
-    attack_narratives = Writeup.objects.all()
+    attack_narratives = Writeup.objects.all().order_by("-created_at")
     return render(request, "attack_narrative/attack_narrative_list.html", {"attack_narratives": attack_narratives})
 
 
-@csrf_exempt
+@login_required
+def writeup_create(request):
+    """Create a new Writeup (title + content_html with CKEditor)."""
+    if request.method == "POST":
+        form = WriteupForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Writeup created.")
+            return redirect("attack_narrative_list")
+    else:
+        form = WriteupForm()
+    return render(request, "attack_narrative/writeup_form.html", {"form": form})
+
+
+@login_required
+def writeup_edit(request, pk):
+    """Edit an existing Writeup."""
+    writeup = get_object_or_404(Writeup, pk=pk)
+    if request.method == "POST":
+        form = WriteupForm(request.POST, instance=writeup)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Writeup updated.")
+            return redirect("attack_narrative_list")
+    else:
+        form = WriteupForm(instance=writeup)
+    return render(request, "attack_narrative/writeup_form.html", {"form": form, "writeup": writeup})
+
+
+@login_required
+def writeup_delete(request, pk):
+    """Delete a Writeup."""
+    writeup = get_object_or_404(Writeup, pk=pk)
+    title = writeup.title
+    writeup.delete()
+    messages.success(request, f"Writeup '{title}' deleted.")
+    return redirect("attack_narrative_list")
+
+
+# Allowed image extensions and max size (5MB) for upload
+ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+MAX_UPLOAD_IMAGE_SIZE = 5 * 1024 * 1024
+
+
+def _safe_upload_filename(name):
+    """Return a safe filename (no path traversal, alphanumeric + safe ext)."""
+    base = os.path.basename(name).strip()
+    if not base or ".." in base or base.startswith("/"):
+        return None
+    ext = os.path.splitext(base)[1].lower()
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        return None
+    # Keep a short safe base (alphanumeric + hyphen) + original ext
+    safe_base = "".join(c for c in os.path.splitext(base)[0] if c.isalnum() or c in "-_")[:80] or "image"
+    return safe_base + ext
+
+
+@login_required
 def upload_writeup_image(request):
     """
-    Subida de imágenes desde el editor CKEditor (manual upload)
+    Image upload from editor (e.g. CKEditor). Requires auth; validates type and size.
     """
-    if request.method == "POST" and request.FILES.get("upload"):
-        writeup_title = request.POST.get("writeup_title", "temp").replace(" ", "_")
-        image = request.FILES["upload"]
+    if request.method != "POST" or not request.FILES.get("upload"):
+        return JsonResponse({"error": "Invalid request"}, status=400)
 
-        upload_dir = os.path.join(settings.PROTECTED_MEDIA_ROOT, writeup_title)
-        os.makedirs(upload_dir, exist_ok=True)
+    image = request.FILES["upload"]
+    if image.size > MAX_UPLOAD_IMAGE_SIZE:
+        return JsonResponse({"error": "File too large"}, status=400)
 
-        file_path = os.path.join(upload_dir, image.name)
-        with open(file_path, "wb+") as destination:
-            for chunk in image.chunks():
-                destination.write(chunk)
+    safe_name = _safe_upload_filename(image.name)
+    if not safe_name:
+        return JsonResponse({"error": "Invalid or disallowed file type"}, status=400)
 
-        image_url = f"/protected_media/{writeup_title}/{image.name}"
-        return JsonResponse({ "url": image_url })
+    writeup_title = request.POST.get("writeup_title", "temp").replace(" ", "_")[:80]
+    writeup_title = "".join(c for c in writeup_title if c.isalnum() or c in "-_") or "temp"
 
-    return JsonResponse({ "error": "Invalid request" }, status=400)
+    upload_dir = os.path.join(settings.PROTECTED_MEDIA_ROOT, writeup_title)
+    os.makedirs(upload_dir, exist_ok=True)
+
+    file_path = os.path.join(upload_dir, safe_name)
+    with open(file_path, "wb+") as destination:
+        for chunk in image.chunks():
+            destination.write(chunk)
+
+    image_url = f"/protected_media/{writeup_title}/{safe_name}"
+    return JsonResponse({"url": image_url})

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}WriteUps — Espengler{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2 class="mb-0">WriteUps</h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'writeup_create' %}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> New WriteUp</a>
+            <a href="{% url 'import_attack_narrative' %}" class="btn btn-outline-primary"><i class="fas fa-file-upload"></i> Import (Obsidian .md)</a>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="mb-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Created</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for an in attack_narratives %}
+                        <tr>
+                            <td><strong>{{ an.title }}</strong></td>
+                            <td>{{ an.created_at|date:"Y-m-d H:i" }}</td>
+                            <td class="text-right">
+                                <a href="{% url 'writeup_edit' an.pk %}" class="btn btn-sm btn-secondary" title="Edit">Edit</a>
+                                <a href="{% url 'writeup_delete' an.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Delete this WriteUp?');">Delete</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">No WriteUps yet. <a href="{% url 'writeup_create' %}">Create one</a> or <a href="{% url 'import_attack_narrative' %}">import</a> an Obsidian .md file.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

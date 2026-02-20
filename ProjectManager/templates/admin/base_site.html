@@ -1,11 +1,11 @@
 {% extends "admin/base.html" %}
 {% load static i18n %}
 
-{% block title %}Panel de Administración - EspEngler{% endblock %}
+{% block title %}Administration Panel - EspEngler{% endblock %}
 
 {% block extrastyle %}
     {{ block.super }}
-    <!-- Estilos personalizados -->
+    <!-- Custom styles -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/custom.css' %}" id="custom-css">
     <link rel="stylesheet" type="text/css" href="{% static 'css/fix_select2.css' %}">
 {% endblock %}
@@ -13,7 +13,7 @@
 {% block extrahead %}
     {{ block.super }}
 
-    <!-- jQuery para Select2 (si aún no está cargado) -->
+    <!-- jQuery for Select2 (if not already loaded) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Fix para Select2 -->
@@ -22,7 +22,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             setTimeout(function () {
-                // ✅ Inyectar estilos si por algún motivo no se cargaron
+                // Inject styles if they did not load
                 const stylesToCheck = ["custom.css", "fix_select2.css"];
 
                 stylesToCheck.forEach(function (filename) {
@@ -34,18 +34,18 @@
                         link.type = "text/css";
                         link.rel = "stylesheet";
                         document.head.appendChild(link);
-                        console.log("✅ " + filename + " inyectado manualmente");
+                        console.log("✅ " + filename + " injected manually");
                     } else {
-                        console.log("✅ " + filename + " ya estaba cargado");
+                        console.log("✅ " + filename + " already loaded");
                     }
                 });
 
-                // 🔹 Ajustar estilo del área editable de CKEditor si es necesario
+                // Adjust CKEditor editable area style if needed
                 const editorArea = document.querySelector('.ck-editor__editable');
                 if (editorArea) {
-                    editorArea.style.color = "white";  // Cambiado de negro a blanco por coherencia con fondo oscuro
+                    editorArea.style.color = "white";  // White text for dark background
                 }
-            }, 1000);  // Esperamos a que el DOM y CKEditor terminen de cargar
+            }, 1000);  // Wait for DOM and CKEditor to finish loading
         });
     </script>
 {% endblock %}

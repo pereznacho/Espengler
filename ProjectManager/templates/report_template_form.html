@@ -1,53 +1,67 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <script src="https://cdn.tiny.cloud/1/wqorm0djtvmujsdvjytofh1mpy8imdr07kafxstewnnhxx9l/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            tinymce.init({
-                selector: 'textarea',
-                plugins: 'image code',
-                toolbar: 'undo redo | link image | code',
-                image_title: true,
-                automatic_uploads: true,
-                file_picker_types: 'image',
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                file_picker_callback: function (cb, value, meta) {
-                    var input = document.createElement('input');
-                    input.setAttribute('type', 'file');
-                    input.setAttribute('accept', 'image/*');
+{% extends "base.html" %}
+{% load static %}
 
-                    input.onchange = function () {
-                        var file = this.files[0];
+{% block title %}{% if form.instance.pk %}Edit report template{% else %}New report template{% endif %} — Espengler{% endblock %}
 
-                        var reader = new FileReader();
-                        reader.onload = function () {
-                            var id = 'blobid' + (new Date()).getTime();
-                            var blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-                            var base64 = reader.result.split(',')[1];
-                            var blobInfo = blobCache.create(id, file, base64);
-                            blobCache.add(blobInfo);
-                            cb(blobInfo.blobUri(), { title: file.name });
-                        };
-                        reader.readAsDataURL(file);
-                    };
+{% block extra_head %}
+{{ form.media }}
+<style>
+    .tinymce-editor-wrapper {
+        height: calc(100vh - 260px);
+        min-height: 420px;
+        position: relative;
+    }
+    .tinymce-editor-wrapper .tox-tinymce {
+        height: 100% !important;
+    }
+    .tinymce-editor-wrapper textarea {
+        height: 100% !important;
+        min-height: 300px;
+    }
+</style>
+{% endblock %}
 
-                    input.click();
-                },
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">{% if form.instance.pk %}Edit report template{% else %}New report template{% endif %}</h2>
+        <a href="{% url 'report_template_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to list</a>
+    </div>
 
-            });
-        });
-    </script>
-</head>
-<body>
-    <!-- Formulario con el campo Content -->
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }} 
-        <button type="submit">Guardar</button>
-    </form>
-</body>
-</html>
-
-
-
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="id_name">{{ form.name.label }} *</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors }}</div>{% endif %}
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_background_color">{{ form.background_color.label }}</label>
+                            {{ form.background_color }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_main_color">{{ form.main_color.label }}</label>
+                            {{ form.main_color }}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb-4">
+                    <label for="id_content">{{ form.content.label }}</label>
+                    <div class="tinymce-editor-wrapper">
+                        {{ form.content }}
+                    </div>
+                    {% if form.content.errors %}<div class="invalid-feedback d-block">{{ form.content.errors }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                <a href="{% url 'report_template_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

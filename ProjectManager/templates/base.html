@@ -1,47 +1,179 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}My Project{% endblock %}</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
-        {% block extra_css %}{% endblock %}
-    </head>
+<html lang="en" data-theme="light" data-theme-id="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <title>{% block title %}Espengler{% endblock %}</title>
+    <link rel="icon" href="{% static 'admin-interface/favicon/Logo.png' %}" type="image/png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/themes/hackthebox.css' %}">
+    <link rel="stylesheet" href="{% static 'css/themes/parrot.css' %}">
+
+    {% block extra_css %}{% endblock %}
+    {% block extra_head %}{% endblock %}
+
+    <style>
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        main { flex: 1; }
+        .navbar-brand-logo { width: 32px; height: 32px; object-fit: cover; border-radius: 50%; }
+        .navbar-nav .nav-link { color: var(--app-accent) !important; }
+        .navbar-nav .nav-link:hover { color: var(--app-accent-hover) !important; opacity: 0.9; }
+        .navbar-nav .nav-link.dropdown-toggle { color: var(--app-accent) !important; }
+        .theme-toggle { width: 40px; height: 40px; border-radius: 6px; border: 1px solid var(--app-border); background: var(--app-surface); color: var(--app-text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .theme-toggle:hover { color: var(--app-accent); background: var(--app-bg); }
+        .theme-toggle .theme-icon { margin: 0; }
+        .dropdown-menu { border: 1px solid var(--app-border); background: var(--app-surface); }
+        .dropdown-item { color: var(--app-text); }
+        .dropdown-item:hover { background: var(--app-bg); color: var(--app-accent); }
+    </style>
+    <script>
+    (function(){
+        var tid = localStorage.getItem('app-theme-id') || 'default';
+        var html = document.documentElement;
+        html.setAttribute('data-theme-id', tid);
+        if (tid === 'hackthebox' || tid === 'parrot') html.setAttribute('data-theme', 'dark');
+        else html.setAttribute('data-theme', localStorage.getItem('app-theme') || 'light');
+    })();
+    </script>
+</head>
 <body>
     <header>
-        <!-- Barra de navegación -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="{% url 'home' %}">Inicio</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+                <img src="{% static 'admin-interface/logo/Logo.png' %}" alt="Espengler" class="navbar-brand-logo">
+                <span>Espengler</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-label="Menu">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+                <ul class="navbar-nav ml-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'project_list' %}"><i class="fas fa-folder-open"></i> Projects</a>
                     </li>
-                    <!-- Agrega más elementos de navegación aquí según sea necesario -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create_project' %}"><i class="fas fa-plus-circle"></i> New project</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'attack_narrative_list' %}"><i class="fas fa-book"></i> WriteUps</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'report_template_list' %}"><i class="fas fa-file-alt"></i> Report templates</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cover_template_list' %}"><i class="fas fa-paint-brush"></i> Cover templates</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenuDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-user-circle mr-1"></i> {{ user.get_username }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenuDropdown">
+                            <span class="dropdown-item-text py-1"><i class="fas fa-palette mr-2"></i><strong>Themes</strong></span>
+                            <a class="dropdown-item theme-option py-2" href="#" data-theme-id="default"><i class="fas fa-circle-half-stroke mr-2"></i> Default (Light/Dark)</a>
+                            <a class="dropdown-item theme-option py-2" href="#" data-theme-id="hackthebox"><i class="fas fa-terminal mr-2"></i> HackTheBox</a>
+                            <a class="dropdown-item theme-option py-2" href="#" data-theme-id="parrot"><i class="fas fa-download mr-2"></i> Parrot</a>
+                            <div class="dropdown-item py-2" id="lightDarkToggleWrap">
+                                <button type="button" class="theme-toggle btn btn-sm w-100" id="appThemeToggle" title="Toggle light/dark" aria-label="Theme"><i class="fas fa-moon theme-icon theme-icon-moon"></i><i class="fas fa-sun theme-icon theme-icon-sun"></i> <span id="lightDarkLabel">Dark</span></button>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'profile_edit' %}"><i class="fas fa-user mr-2"></i> My profile</a>
+                            <a class="dropdown-item" href="{% url 'app_password_change' %}"><i class="fas fa-key mr-2"></i> Change password</a>
+                            <a class="dropdown-item" href="{% url 'project_member_list' %}"><i class="fas fa-users mr-2"></i> Project members</a>
+                            <a class="dropdown-item" href="{% url 'import_data' %}"><i class="fas fa-database mr-2"></i> Backup & Restore</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'app_logout' %}"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'app_login' %}"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
     </header>
+
     <main>
         {% block content %}
-        <!-- El contenido principal va aquí -->
         {% endblock %}
     </main>
-    <footer>
-        <!-- Pie de página -->
-        <p>My Project © 2024</p>
+
+    <footer class="py-4 text-center">
+        <p class="mb-0">Espengler — Automated security reporting tool</p>
     </footer>
 
-    <!-- Opcional: Incluir jQuery y Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    {% block extra_js %}
-    {% endblock %}
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script>
+    (function() {
+        var THEME_ID_KEY = 'app-theme-id';
+        var THEME_KEY = 'app-theme';
+        var html = document.documentElement;
+
+        function applyThemeId(id) {
+            id = id || localStorage.getItem(THEME_ID_KEY) || 'default';
+            localStorage.setItem(THEME_ID_KEY, id);
+            html.setAttribute('data-theme-id', id);
+            if (id === 'hackthebox' || id === 'parrot') {
+                html.setAttribute('data-theme', 'dark');
+                var wrap = document.getElementById('lightDarkToggleWrap');
+                if (wrap) wrap.style.display = 'none';
+            } else {
+                var stored = localStorage.getItem(THEME_KEY);
+                if (stored === 'dark' || stored === 'light') html.setAttribute('data-theme', stored);
+                else html.setAttribute('data-theme', 'light');
+                var wrap = document.getElementById('lightDarkToggleWrap');
+                if (wrap) wrap.style.display = '';
+            }
+        }
+
+        function updateLightDarkIcons() {
+            var btn = document.getElementById('appThemeToggle');
+            if (!btn) return;
+            var moon = btn.querySelector('.theme-icon-moon');
+            var sun = btn.querySelector('.theme-icon-sun');
+            var lbl = document.getElementById('lightDarkLabel');
+            var isDark = html.getAttribute('data-theme') === 'dark';
+            if (moon) moon.style.display = isDark ? 'inline-block' : 'none';
+            if (sun) sun.style.display = isDark ? 'none' : 'inline-block';
+            if (lbl) lbl.textContent = isDark ? 'Dark' : 'Light';
+        }
+
+        applyThemeId();
+
+        document.querySelectorAll('.theme-option').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                var id = el.getAttribute('data-theme-id');
+                applyThemeId(id);
+                updateLightDarkIcons();
+            });
+        });
+
+        var btn = document.getElementById('appThemeToggle');
+        if (btn) {
+            btn.addEventListener('click', function() {
+                if (html.getAttribute('data-theme-id') !== 'default') return;
+                var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem(THEME_KEY, next);
+                updateLightDarkIcons();
+            });
+            updateLightDarkIcons();
+        }
+    })();
+    </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

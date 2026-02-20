@@ -1,119 +1,565 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="{% if embed %}light{% else %}dark{% endif %}" data-theme-id="" {% if embed %}data-embed="1"{% endif %}>
 <head>
     <meta charset="UTF-8">
-    <title>Mapa Gráfico de Hosts Comprometidos</title>
-    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GraphMap — {{ project.name }}</title>
+    <script>
+    (function(){
+        if (document.documentElement.getAttribute('data-embed') === '1') return;
+        var tid = localStorage.getItem('app-theme-id');
+        if (tid === 'hackthebox' || tid === 'parrot') {
+            document.documentElement.setAttribute('data-theme-id', tid);
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    })();
+    </script>
+    <script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .node image {
-            width: 50px;
-            height: 50px;
+        :root {
+            --gm-font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --gm-radius: 12px;
+            --gm-radius-sm: 8px;
+            --gm-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            --gm-shadow-strong: 0 8px 32px rgba(0,0,0,0.12);
+            --gm-transition: 0.2s ease;
+        }
+        [data-theme="dark"] {
+            --gm-bg: #0f1216;
+            --gm-bg-elevated: #161b22;
+            --gm-bg-card: #1a1f26;
+            --gm-border: #2d333b;
+            --gm-text: #e6edf3;
+            --gm-text-muted: #8b949e;
+            --gm-accent: #28d77a;
+            --gm-accent-dim: #22c46d;
+            --gm-success: #3fb950;
+            --gm-danger: #f85149;
+            --gm-node-stroke: #0f1216;
+        }
+        [data-theme="light"] {
+            --gm-bg: #f6f8fa;
+            --gm-bg-elevated: #ffffff;
+            --gm-bg-card: #ffffff;
+            --gm-border: #d0d7de;
+            --gm-text: #1f2328;
+            --gm-text-muted: #656d76;
+            --gm-accent: #0969da;
+            --gm-accent-dim: #0550ae;
+            --gm-success: #1a7f37;
+            --gm-danger: #cf222e;
+            --gm-node-stroke: #f6f8fa;
+        }
+        [data-theme-id="hackthebox"] {
+            --gm-bg: #101927;
+            --gm-bg-elevated: #1a2332;
+            --gm-bg-card: #1a2332;
+            --gm-border: #2d3a4f;
+            --gm-text: #ffffff;
+            --gm-text-muted: #7d8da6;
+            --gm-accent: #9fef00;
+            --gm-accent-dim: #b8ff33;
+            --gm-success: #9fef00;
+            --gm-danger: #ff6b6b;
+            --gm-node-stroke: #101927;
+        }
+        [data-theme-id="parrot"] {
+            --gm-bg: #0a0e12;
+            --gm-bg-elevated: #12181f;
+            --gm-bg-card: #12181f;
+            --gm-border: #1e2832;
+            --gm-text: #ffffff;
+            --gm-text-muted: #7a8794;
+            --gm-accent: #00fff0;
+            --gm-accent-dim: #33fff5;
+            --gm-success: #00fff0;
+            --gm-danger: #ff6b6b;
+            --gm-node-stroke: #0a0e12;
         }
 
-        .node text {
-            font-size: 12px;
-            fill: #fff;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--gm-font);
+            background: var(--gm-bg);
+            color: var(--gm-text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background var(--gm-transition), color var(--gm-transition);
         }
 
-        .links line {
-            stroke: #999;
-            stroke-opacity: 0.6;
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: var(--gm-bg-elevated);
+            border-bottom: 1px solid var(--gm-border);
+            flex-shrink: 0;
         }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header h1 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .header h1 span {
+            color: var(--gm-text-muted);
+            font-weight: 500;
+        }
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--gm-radius-sm);
+            border: 1px solid var(--gm-border);
+            background: var(--gm-bg-card);
+            color: var(--gm-text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: background var(--gm-transition), color var(--gm-transition), border-color var(--gm-transition);
+        }
+        .theme-toggle:hover {
+            background: var(--gm-border);
+            color: var(--gm-text);
+        }
+        .toolbar {
+            display: flex;
+            gap: 8px;
+        }
+        .btn {
+            padding: 8px 14px;
+            border-radius: var(--gm-radius-sm);
+            border: 1px solid var(--gm-border);
+            background: var(--gm-bg-card);
+            color: var(--gm-text);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all var(--gm-transition);
+            font-family: var(--gm-font);
+        }
+        .btn:hover {
+            background: var(--gm-border);
+        }
+        .btn.primary {
+            background: var(--gm-success);
+            border-color: var(--gm-success);
+            color: #fff;
+        }
+        .btn.primary:hover {
+            filter: brightness(1.08);
+        }
+        .btn.saving {
+            background: var(--gm-accent);
+            border-color: var(--gm-accent);
+            color: #fff;
+        }
+
+        #graph-container {
+            flex: 1;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .status-bar {
+            padding: 10px 20px;
+            background: var(--gm-bg-elevated);
+            border-top: 1px solid var(--gm-border);
+            font-size: 0.75rem;
+            color: var(--gm-text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: var(--gm-bg-card);
+            border: 1px solid var(--gm-border);
+            border-radius: var(--gm-radius);
+            padding: 14px 18px;
+            font-size: 0.75rem;
+            z-index: 10;
+            box-shadow: var(--gm-shadow-strong);
+        }
+        .legend-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--gm-text);
+        }
+        .legend-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 16px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-item img {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: var(--gm-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: var(--gm-shadow-strong);
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: var(--gm-success); color: #fff; }
+        .toast.error { background: var(--gm-danger); color: #fff; }
+        .toast.info { background: var(--gm-accent); color: #fff; }
+
+        .vis-tooltip {
+            font-family: var(--gm-font) !important;
+            font-size: 12px !important;
+            padding: 12px 14px !important;
+            border-radius: var(--gm-radius-sm) !important;
+            box-shadow: var(--gm-shadow-strong) !important;
+            max-width: 320px !important;
+            white-space: pre-line !important;
+        }
+        [data-theme="dark"] .vis-tooltip {
+            background: var(--gm-bg-card) !important;
+            color: var(--gm-text) !important;
+            border: 1px solid var(--gm-border) !important;
+        }
+        [data-theme="light"] .vis-tooltip {
+            background: #fff !important;
+            color: #1f2328 !important;
+            border: 1px solid var(--gm-border) !important;
+        }
+        /* Embed mode: hide header and status bar for report capture */
+        body.embed .header,
+        body.embed .status-bar { display: none !important; }
+        body.embed #graph-container { border-radius: 0; }
+        /* Iframe preview: hide only the header to avoid duplicating buttons */
+        body.graphmap-in-iframe .header { display: none !important; }
     </style>
 </head>
-<body>
-<h1>Mapa Gráfico de Hosts del Proyecto: {{ project.name }}</h1>
-<svg width="800" height="600"></svg>
+<body class="{% if embed %}embed{% endif %}">
+    <script>
+    (function(){ if (window.self !== window.top) document.body.classList.add('graphmap-in-iframe'); })();
+    </script>
+    <header class="header">
+        <div class="header-left">
+            <h1>GraphMap <span>— {{ project.name }}</span></h1>
+            <button type="button" class="theme-toggle" id="themeToggle" title="Toggle theme (light/dark)" aria-label="Theme">🌓</button>
+        </div>
+        <div class="toolbar">
+            <button type="button" class="btn" id="refreshMapBtn" title="Refresh map (load latest owned/OS changes)">⟳ Refresh</button>
+            <button type="button" class="btn" onclick="resetLayout()">↻ Reset</button>
+            <button type="button" class="btn" onclick="fitAll()">⊡ Fit</button>
+            <button type="button" class="btn primary" id="saveBtn" onclick="saveAllPositions()">💾 Save positions</button>
+        </div>
+    </header>
 
-<script>
-    const nodes = JSON.parse('{{ nodes|safe }}');
-    const links = JSON.parse('{{ links|safe }}');
-    const csrfToken = '{{ csrf_token }}';
+    <div id="graph-container"></div>
 
-    const svg = d3.select("svg"),
-          width = +svg.attr("width"),
-          height = +svg.attr("height");
+    <div class="status-bar">
+        <span id="statusText">Nodes: 0 · Edges: 0</span>
+        <span>Drag nodes to reposition · Save to persist</span>
+    </div>
 
-    const simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink(links).id(d => d.id).distance(150))
-        .force("charge", d3.forceManyBody().strength(-300))
-        .force("center", d3.forceCenter(width / 2, height / 2))
-        .on("tick", ticked);
+    <div class="toast" id="toast"></div>
 
-    const link = svg.append("g")
-        .attr("class", "links")
-        .selectAll("line")
-        .data(links)
-        .enter().append("line")
-        .attr("stroke-width", 2);
+    <script>
+        const csrfToken = '{{ csrf_token }}';
+        const rawNodes = {{ nodes_json|safe }};
+        const rawEdges = {{ edges_json|safe }};
+        const consultantImg = "{{ consultant_img|escapejs }}";
+        const ownedImg = "{{ owned_img|escapejs }}";
+        const iconUrls = {{ icon_urls_json|safe }};
 
-    const node = svg.append("g")
-        .attr("class", "nodes")
-        .selectAll("g")
-        .data(nodes)
-        .enter().append("g")
-        .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended));
+        const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+        const consultantColor = isDarkTheme
+            ? { background: '#22c46d', border: '#28d77a', highlight: { background: '#28d77a', border: '#32e885' } }
+            : { background: '#1f6feb', border: '#388bfd', highlight: { background: '#388bfd', border: '#58a6ff' } };
 
-    node.append("image")
-        .attr("xlink:href", d => {
-            switch (d.type) {
-                case "windows": return "/static/icons/windows.png";
-                case "linux": return "/static/icons/linux.png";
-                default: return "/static/icons/unknown.png";
+        function nodeColor(node) {
+            if (node.type === 'consultant') return consultantColor;
+            if (node.owned) return { background: '#f85149', border: '#da3633', highlight: { background: '#ff7b72', border: '#f85149' } };
+            const colors = {
+                windows: { background: '#0078D4', border: '#106EBE', highlight: { background: '#1a86e0', border: '#0078D4' } },
+                windows_xp: { background: '#0078D4', border: '#106EBE', highlight: { background: '#1a86e0', border: '#0078D4' } },
+                windows_vista: { background: '#0078D4', border: '#106EBE', highlight: { background: '#1a86e0', border: '#0078D4' } },
+                windows_7: { background: '#0078D4', border: '#106EBE', highlight: { background: '#1a86e0', border: '#0078D4' } },
+                windows_8: { background: '#0078D4', border: '#106EBE', highlight: { background: '#1a86e0', border: '#0078D4' } },
+                windows_10: { background: '#0078D4', border: '#106EBE', highlight: { background: '#1a86e0', border: '#0078D4' } },
+                windows_11: { background: '#0078D4', border: '#106EBE', highlight: { background: '#1a86e0', border: '#0078D4' } },
+                consultant: consultantColor,
+                linux: { background: '#333', border: '#222', highlight: { background: '#444', border: '#333' } },
+                ubuntu: { background: '#E95420', border: '#c34113', highlight: { background: '#f06320', border: '#E95420' } },
+                debian: { background: '#A80030', border: '#8a0028', highlight: { background: '#c40038', border: '#A80030' } },
+                kali: { background: '#557C94', border: '#456b80', highlight: { background: '#658ca8', border: '#557C94' } },
+                arch: { background: '#1793D1', border: '#1273a8', highlight: { background: '#1ca3e8', border: '#1793D1' } },
+                fedora: { background: '#3C6EB4', border: '#2d5a96', highlight: { background: '#4a7ec4', border: '#3C6EB4' } },
+                redhat: { background: '#EE0000', border: '#cc0000', highlight: { background: '#ff1a1a', border: '#EE0000' } },
+                macos: { background: '#555', border: '#444', highlight: { background: '#666', border: '#555' } },
+                android: { background: '#3DDC84', border: '#2eb86a', highlight: { background: '#5ae09e', border: '#3DDC84' } },
+                ios: { background: '#555', border: '#444', highlight: { background: '#666', border: '#555' } },
+                printer: { background: '#003399', border: '#002266', highlight: { background: '#0044bb', border: '#003399' } },
+                printer_epson: { background: '#003399', border: '#002266', highlight: { background: '#0044bb', border: '#003399' } },
+                printer_hp: { background: '#0096D6', border: '#0077a8', highlight: { background: '#00a5e8', border: '#0096D6' } },
+                printer_canon: { background: '#333', border: '#222', highlight: { background: '#444', border: '#333' } },
+                printer_brother: { background: '#333', border: '#222', highlight: { background: '#444', border: '#333' } },
+                printer_lexmark: { background: '#0066CC', border: '#0052a3', highlight: { background: '#007ae0', border: '#0066CC' } },
+                router: { background: '#0490D2', border: '#0370a8', highlight: { background: '#05a0e8', border: '#0490D2' } },
+                router_cisco: { background: '#0490D2', border: '#0370a8', highlight: { background: '#05a0e8', border: '#0490D2' } },
+                router_netgear: { background: '#6A0E0E', border: '#4a0a0a', highlight: { background: '#8a1212', border: '#6A0E0E' } },
+                router_tplink: { background: '#4ACBD6', border: '#3aa8b2', highlight: { background: '#5ae0ec', border: '#4ACBD6' } },
+                router_mikrotik: { background: '#F2C112', border: '#c29a0e', highlight: { background: '#ffd024', border: '#F2C112' } },
+                router_ubiquiti: { background: '#0559C9', border: '#044499', highlight: { background: '#0668e0', border: '#0559C9' } },
+                router_dlink: { background: '#0072C6', border: '#005a9e', highlight: { background: '#0088e0', border: '#0072C6' } },
+                router_aruba: { background: '#00627F', border: '#004d62', highlight: { background: '#007a9e', border: '#00627F' } },
+                nas: { background: '#2D7EC1', border: '#236399', highlight: { background: '#3894d4', border: '#2D7EC1' } },
+                nas_synology: { background: '#2D7EC1', border: '#236399', highlight: { background: '#3894d4', border: '#2D7EC1' } },
+                nas_qnap: { background: '#0066CC', border: '#0052a3', highlight: { background: '#007ae0', border: '#0066CC' } },
+                iot: { background: '#C51A4A', border: '#9e1540', highlight: { background: '#e01f58', border: '#C51A4A' } },
+                iot_raspberrypi: { background: '#C51A4A', border: '#9e1540', highlight: { background: '#e01f58', border: '#C51A4A' } },
+                iot_arduino: { background: '#00979D', border: '#007880', highlight: { background: '#00b0b8', border: '#00979D' } },
+                camera: { background: '#00B3D5', border: '#008fa8', highlight: { background: '#00c8ec', border: '#00B3D5' } },
+                camera_hikvision: { background: '#333', border: '#222', highlight: { background: '#444', border: '#333' } },
+                camera_dahua: { background: '#333', border: '#222', highlight: { background: '#444', border: '#333' } },
+                camera_axis: { background: '#ED2139', border: '#c21b2f', highlight: { background: '#ff2d45', border: '#ED2139' } },
+                server: { background: '#007DB8', border: '#006494', highlight: { background: '#0094d4', border: '#007DB8' } },
+                firewall: { background: '#EE3124', border: '#c2281e', highlight: { background: '#ff3d30', border: '#EE3124' } },
+                switch: { background: '#0490D2', border: '#0370a8', highlight: { background: '#05a0e8', border: '#0490D2' } }
+            };
+            return colors[node.type] || { background: '#6e7681', border: '#8b949e', highlight: { background: '#8b949e', border: '#c9d1d9' } };
+        }
+
+        function buildTooltip(node) {
+            const nl = '\n';
+            if (node.type === 'consultant') return node.label + nl + 'Attack origin / Consultant';
+            let t = node.label + nl;
+            if (node.ip) t += 'IP: ' + node.ip + nl;
+            if (node.fqdn) t += 'FQDN: ' + node.fqdn + nl;
+            if (node.url) t += 'URL: ' + node.url + nl;
+            t += 'OS: ' + node.type + nl;
+            t += 'Compromised: ' + (node.owned ? 'Yes' : 'No') + nl;
+            if (node.ports && node.ports.length) {
+                t += nl + 'Ports:' + nl;
+                node.ports.forEach(p => { t += '  ' + p.number + '/' + p.protocol + ' — ' + (p.service || '') + nl; });
             }
-        })
-        .attr("x", -25)
-        .attr("y", -25)
-        .attr("width", 50)
-        .attr("height", 50);
+            return t;
+        }
 
-    node.append("text")
-        .attr("dx", 30)
-        .attr("dy", ".35em")
-        .text(d => d.id);
+        const strokeColor = document.documentElement.getAttribute('data-theme') === 'light' ? '#f6f8fa' : '#0f1216';
+        const fontColor = document.documentElement.getAttribute('data-theme') === 'light' ? '#1f2328' : '#e6edf3';
 
-    function ticked() {
-        link
-            .attr("x1", d => d.source.x)
-            .attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x)
-            .attr("y2", d => d.target.y);
+        const visNodes = new vis.DataSet(rawNodes.map(n => {
+            const type = n.type || 'unknown';
+            let iconUrl = iconUrls[type] || iconUrls.unknown;
+            if (n.type === 'consultant') iconUrl = consultantImg;
+            else if (n.owned) iconUrl = ownedImg;
+            const label = n.type === 'consultant' ? n.label : (n.owned ? n.label + ' ✓ COMPROMISED' : n.label);
+            const size = n.type === 'consultant' ? 40 : (n.owned ? 36 : 32);
+            return {
+                id: n.id,
+                label: label,
+                title: buildTooltip(n),
+                shape: 'image',
+                image: iconUrl,
+                size: size,
+                color: nodeColor(n),
+                borderWidth: (n.owned || n.type === 'consultant') ? 4 : 2,
+                x: n.x !== undefined ? n.x : undefined,
+                y: n.y !== undefined ? n.y : undefined,
+                fixed: n.fixed || false,
+                font: {
+                    color: fontColor,
+                    size: 12,
+                    face: 'DM Sans, sans-serif',
+                    strokeWidth: 2,
+                    strokeColor: strokeColor
+                },
+                shadow: { enabled: true, color: 'rgba(0,0,0,0.25)', size: 8 }
+            };
+        }));
 
-        node
-            .attr("transform", d => `translate(${d.x},${d.y})`);
-    }
+        const visEdges = new vis.DataSet(rawEdges.map(e => ({
+            from: e.from,
+            to: e.to,
+            arrows: { to: { enabled: true, scaleFactor: 0.8 } },
+            color: { color: document.documentElement.getAttribute('data-theme') === 'light' ? '#d0d7de' : '#30363d', highlight: isDarkTheme ? '#28d77a' : '#58a6ff', hover: isDarkTheme ? '#28d77a' : '#58a6ff' },
+            width: 2,
+            smooth: { type: 'cubicBezier', roundness: 0.3 }
+        })));
 
-    function dragstarted(event, d) {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
-    }
-
-    function dragged(event, d) {
-        d.fx = event.x;
-        d.fy = event.y;
-    }
-
-    function dragended(event, d) {
-        if (!event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
-
-        // Guardar nueva posición en el backend
-        fetch(`/project/save_node_position/${d.id}/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken,
+        const options = {
+            physics: {
+                enabled: true,
+                solver: 'forceAtlas2Based',
+                forceAtlas2Based: {
+                    gravitationalConstant: -60,
+                    centralGravity: 0.008,
+                    springLength: 180,
+                    springConstant: 0.04,
+                    damping: 0.4,
+                    avoidOverlap: 0.6
+                },
+                stabilization: { iterations: 200, updateInterval: 25 }
             },
-            body: JSON.stringify({ x: d.x, y: d.y })
-        }).then(res => {
-            if (!res.ok) console.error("Error guardando posición");
-        });
-    }
-</script>
+            interaction: { hover: true, tooltipDelay: 200, dragNodes: true, zoomView: true, dragView: true, navigationButtons: false },
+            edges: { smooth: { type: 'cubicBezier' } },
+            layout: { improvedLayout: true }
+        };
+
+        var network = null;
+
+        function initGraph() {
+            var container = document.getElementById('graph-container');
+            if (!container || container.offsetWidth === 0 || container.offsetHeight === 0) return false;
+            network = new vis.Network(container, { nodes: visNodes, edges: visEdges }, options);
+            document.getElementById('statusText').textContent = 'Nodes: ' + visNodes.length + ' · Edges: ' + visEdges.length;
+            if (window.self !== window.top) {
+                setTimeout(function() { network.redraw(); network.fit({ animation: false }); }, 200);
+                window.addEventListener('resize', function() { if (network) network.redraw(); });
+            }
+            network.on('dragEnd', function (params) {
+                if (params.nodes.length > 0) {
+                    var nodeId = params.nodes[0];
+                    if (nodeId === 0) return;
+                    var positions = network.getPositions([nodeId]);
+                    var pos = positions[nodeId];
+                    visNodes.update({ id: nodeId, fixed: { x: true, y: true } });
+                    savePosition(nodeId, pos.x, pos.y);
+                }
+            });
+            network.on('dragStart', function (params) {
+                if (params.nodes.length > 0 && params.nodes[0] !== 0) visNodes.update({ id: params.nodes[0], fixed: false });
+            });
+            network.on('stabilizationIterationsDone', function () {
+                network.setOptions({ physics: { enabled: false } });
+            });
+            document.getElementById('refreshMapBtn').addEventListener('click', function() {
+                var url = window.location.pathname;
+                var sep = url.indexOf('?') >= 0 ? '&' : '?';
+                window.location.href = url + sep + '_=' + Date.now();
+            });
+            return true;
+        }
+
+        if (window.self !== window.top) {
+            var initAttempts = 0;
+            var maxAttempts = 40;
+            function tryInit() {
+                if (initGraph()) return;
+                initAttempts++;
+                if (initAttempts < maxAttempts) setTimeout(tryInit, 80);
+            }
+            setTimeout(tryInit, 100);
+        } else {
+            initGraph();
+        }
+
+        function savePosition(nodeId, x, y) {
+            fetch(`/project/save_node_position/${nodeId}/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                body: JSON.stringify({ x: x, y: y })
+            }).then(res => {
+                if (res.ok) showToast('Position saved', 'success');
+                else showToast('Error saving', 'error');
+            }).catch(() => showToast('Network error', 'error'));
+        }
+
+        function saveAllPositions() {
+            if (!network) return;
+            const btn = document.getElementById('saveBtn');
+            btn.classList.add('saving');
+            btn.textContent = '⏳ Saving…';
+            const positions = network.getPositions();
+            const entries = Object.entries(positions).filter(([id]) => parseInt(id, 10) !== 0);
+            const promises = entries.map(([id, pos]) =>
+                fetch(`/project/save_node_position/${id}/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+                    body: JSON.stringify({ x: pos.x, y: pos.y })
+                })
+            );
+            Promise.all(promises).then(results => {
+                btn.classList.remove('saving');
+                btn.textContent = '💾 Save positions';
+                showToast(results.every(r => r.ok) ? `Saved ${results.length} positions` : 'Some failed', results.every(r => r.ok) ? 'success' : 'error');
+            }).catch(() => {
+                btn.classList.remove('saving');
+                btn.textContent = '💾 Save positions';
+                showToast('Network error', 'error');
+            });
+        }
+
+        function resetLayout() {
+            if (!network) return;
+            visNodes.forEach(n => visNodes.update({ id: n.id, fixed: false, x: undefined, y: undefined }));
+            network.stabilize(300);
+            showToast('Layout reset. Drag and save.', 'info');
+        }
+        function fitAll() {
+            if (network) network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
+        }
+        window.resetLayout = resetLayout;
+        window.fitAll = fitAll;
+        window.saveAllPositions = saveAllPositions;
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => { toast.className = 'toast'; }, 2500);
+        }
+
+        // Theme toggle (skip in embed mode; skip when app theme is HackTheBox)
+        (function() {
+            var themeBtn = document.getElementById('themeToggle');
+            if (document.body.classList.contains('embed')) return;
+            if (document.documentElement.getAttribute('data-theme-id') === 'hackthebox' || document.documentElement.getAttribute('data-theme-id') === 'parrot') {
+                if (themeBtn) themeBtn.style.display = 'none';
+                return;
+            }
+            const stored = localStorage.getItem('graphmap-theme');
+            if (stored === 'light' || stored === 'dark') {
+                document.documentElement.setAttribute('data-theme', stored);
+            }
+            if (themeBtn) themeBtn.addEventListener('click', function() {
+                const html = document.documentElement;
+                const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', next);
+                localStorage.setItem('graphmap-theme', next);
+                this.textContent = next === 'dark' ? '🌓' : '🌙';
+            });
+            if (themeBtn) {
+                const theme = document.documentElement.getAttribute('data-theme');
+                themeBtn.textContent = theme === 'dark' ? '🌓' : '🌙';
+            }
+        })();
+    </script>
 </body>
 </html>

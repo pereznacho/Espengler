@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Project members — Espengler{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2 class="mb-0">Project members</h2>
+        <div class="d-flex gap-2">
+            {% if user.is_staff %}
+            <a href="{% url 'user_create' %}" class="btn btn-primary"><i class="fas fa-user-plus"></i> Add new user</a>
+            {% endif %}
+            <a href="{% url 'project_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to projects</a>
+        </div>
+    </div>
+    <p class="text-muted mb-4">Select a project to add or remove users. {% if user.is_staff %}Create users with <strong>Add new user</strong>, then assign them to projects below.{% endif %}</p>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Members</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in projects %}
+                        <tr>
+                            <td><strong>{{ project.name|default:"—" }}</strong></td>
+                            <td>{{ project.members.count }} user(s)</td>
+                            <td class="text-right">
+                                <a href="{% url 'project_members_manage' project.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-users-cog"></i> Manage members</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">No projects yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

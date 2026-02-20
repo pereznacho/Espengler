@@ -1,24 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Change Project</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-5">
-    <h2>Change Project Details</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save changes</button>
-        <a href="{% url 'project_list' %}" class="btn btn-secondary">Cancel</a>
-    </form>
-</div>
+{% extends "base.html" %}
+{% load static %}
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+{% block title %}Edit project — Espengler{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Edit project</h2>
+        <a href="{% url 'project_detail' form.instance.pk %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to project</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_name">{{ form.name.label }} *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_language">{{ form.language.label }}</label>
+                            {{ form.language }}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_description">{{ form.description.label }}</label>
+                    {{ form.description }}
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_start_date">{{ form.start_date.label }}</label>
+                            {{ form.start_date }}
+                            {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_end_date">{{ form.end_date.label }}</label>
+                            {{ form.end_date }}
+                            {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_report_template">{{ form.report_template.label }}</label>
+                    {{ form.report_template }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_cover_template">{{ form.cover_template.label }}</label>
+                    {{ form.cover_template }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_scope">{{ form.scope.label }}</label>
+                    {{ form.scope }}
+                </div>
+                <div class="form-group mb-4">
+                    <label>{{ form.attack_narratives.label }}</label>
+                    <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                        {{ form.attack_narratives }}
+                    </div>
+                    <small class="form-text text-muted">Select Writeups to assign to this project.</small>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save changes</button>
+                <a href="{% url 'project_detail' form.instance.pk %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

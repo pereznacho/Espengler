@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}New cover template — Espengler{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">New cover template</h2>
+        <a href="{% url 'cover_template_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to list</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted mb-4">Fill in the required fields. After saving you will be taken to the visual designer to arrange the layout.</p>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_name">{{ form.name.label }} *</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_analisys_type">{{ form.analisys_type.label }} *</label>
+                            {{ form.analisys_type }}
+                            {% if form.analisys_type.errors %}<div class="invalid-feedback d-block">{{ form.analisys_type.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_customer_name">{{ form.customer_name.label }} *</label>
+                    {{ form.customer_name }}
+                    {% if form.customer_name.errors %}<div class="invalid-feedback d-block">{{ form.customer_name.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_subtitle">{{ form.subtitle.label }}</label>
+                    {{ form.subtitle }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_consultant_name">{{ form.consultant_name.label }}</label>
+                    {{ form.consultant_name }}
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_start_date">{{ form.start_date.label }} *</label>
+                            <input type="date" name="start_date" id="id_start_date" class="form-control" value="{{ form.start_date.value|date:'Y-m-d' }}" required>
+                            {% if form.start_date.errors %}<div class="invalid-feedback d-block">{{ form.start_date.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_end_date">{{ form.end_date.label }} *</label>
+                            <input type="date" name="end_date" id="id_end_date" class="form-control" value="{{ form.end_date.value|date:'Y-m-d' }}" required>
+                            {% if form.end_date.errors %}<div class="invalid-feedback d-block">{{ form.end_date.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_customer_image">{{ form.customer_image.label }} *</label>
+                    {{ form.customer_image }}
+                    <small class="form-text text-muted">Main image for the cover (required).</small>
+                    {% if form.customer_image.errors %}<div class="invalid-feedback d-block">{{ form.customer_image.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_customer_image_scale">{{ form.customer_image_scale.label }}</label>
+                    {{ form.customer_image_scale }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_cover_background_color">{{ form.cover_background_color.label }}</label>
+                    {{ form.cover_background_color }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_header_image">{{ form.header_image.label }}</label>
+                    {{ form.header_image }}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_customer_header_image">{{ form.customer_header_image.label }}</label>
+                    {{ form.customer_header_image }}
+                </div>
+                <div class="form-group mb-4">
+                    <label for="id_background_image">{{ form.background_image.label }}</label>
+                    {{ form.background_image }}
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Create and design</button>
+                <a href="{% url 'cover_template_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

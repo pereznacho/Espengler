@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Visual cover designer — Espengler{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cover-creator-root { background: var(--app-bg); min-height: calc(100vh - 56px); padding: 20px; }
+    .cover-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding: 14px 20px; background: var(--app-surface); border: 1px solid var(--app-border); border-radius: var(--app-radius-lg); }
+    .cover-toolbar label { color: var(--app-text-secondary); margin: 0 8px 0 0; }
+    .cover-toolbar input[type="text"], .cover-toolbar input[type="date"] { background: var(--app-surface); border: 1px solid var(--app-border); color: var(--app-text); border-radius: var(--app-radius); padding: 8px 12px; }
+    .cover-canvas-wrap { display: flex; justify-content: center; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+    .cover-canvas { position: relative; width: 21cm; min-height: 29.7cm; background: #fff; box-shadow: 0 4px 24px rgba(0,0,0,.1); color: #111; font-family: 'Calibri', sans-serif; }
+    .cover-canvas .zone { position: absolute; border: 2px dashed var(--app-accent); background: rgba(9, 105, 218, 0.08); cursor: move; display: flex; align-items: center; justify-content: center; transition: background .2s; overflow: hidden; box-sizing: border-box; }
+    .cover-canvas .zone:hover { background: rgba(9, 105, 218, 0.15); }
+    .cover-canvas .zone .zone-label { font-size: 10px; color: var(--app-accent); font-weight: 600; text-align: center; padding: 4px; pointer-events: none; }
+    .cover-canvas .zone .zone-preview { position: absolute; inset: 0; object-fit: contain; width: 100%; height: 100%; pointer-events: none; }
+    .cover-canvas .zone.has-image .zone-label { opacity: 0; }
+    .cover-canvas .zone.has-image:hover .zone-label { opacity: 1; background: rgba(0,0,0,0.6); color: #fff; }
+    .cover-canvas .zone-bg { left: 0; top: 0; width: 100%; height: 100%; z-index: 0; cursor: pointer; background: transparent; }
+    .cover-canvas .zone .resize-handle { position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; background: var(--app-accent); cursor: nwse-resize; opacity: 0.8; border-radius: 2px 0 0 0; }
+    .cover-canvas .zone .resize-handle:hover { opacity: 1; }
+    .cover-canvas .zone-title { flex-direction: column; justify-content: center; align-items: center; cursor: default; border: 1px solid var(--app-border); background: rgba(255,255,255,0.98); }
+    .cover-canvas .zone-title .title-text { font-size: 22pt; font-weight: bold; text-align: center; margin-bottom: 6px; }
+    .cover-canvas .zone-title .subtitle-text { font-size: 11pt; color: #555; text-align: center; margin-bottom: 4px; }
+    .cover-canvas .zone-title .dates-text { font-size: 10pt; color: #333; text-align: center; }
+    .cover-text-panel { width: 280px; background: var(--app-surface); border: 1px solid var(--app-border); border-radius: var(--app-radius-lg); padding: 16px; }
+    .cover-text-panel h3 { color: var(--app-text); font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+    .cover-text-panel .form-group { margin-bottom: 10px; }
+    .cover-text-panel input, .cover-text-panel select { background: var(--app-surface); border: 1px solid var(--app-border); color: var(--app-text); width: 100%; padding: 8px 12px; border-radius: 6px; }
+    .cover-text-panel .scale-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .cover-text-panel .scale-row input[type="range"] { flex: 1; }
+    .cover-text-panel .scale-value { font-weight: 600; color: var(--app-accent); }
+    .hidden-input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
+    .cover-hint { font-size: 12px; color: var(--app-text-muted); margin-top: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cover-creator-root">
+    <form method="post" enctype="multipart/form-data" id="coverForm">
+        {% csrf_token %}
+        <input type="hidden" name="cover_layout_json" id="cover_layout_json" value="">
+        <div class="cover-toolbar">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <label for="id_name">Template name</label>
+                <input type="text" name="name" id="id_name" value="{{ form.instance.name|default:'' }}" maxlength="255" required style="width: 220px;">
+                <button type="submit" class="btn btn-primary">Save cover</button>
+            </div>
+            {% if project %}
+            <a href="{% url 'project_detail' project.pk %}" class="btn btn-secondary">Back to project</a>
+            {% elif template %}
+            <a href="{% url 'cover_template_list' %}" class="btn btn-secondary">Back to cover templates</a>
+            {% endif %}
+        </div>
+
+        <div class="cover-canvas-wrap">
+            <div class="cover-text-panel">
+                <h3>Cover text</h3>
+                <div class="form-group">
+                    <label for="id_analisys_type">{{ form.analisys_type.label }}</label>
+                    <input type="text" name="analisys_type" id="id_analisys_type" value="{{ form.instance.analisys_type|default:'' }}" required class="form-control" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="id_customer_name">{{ form.customer_name.label }}</label>
+                    <input type="text" name="customer_name" id="id_customer_name" value="{{ form.instance.customer_name|default:'' }}" required class="form-control" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label>{{ form.subtitle.label }}</label>
+                    <input type="text" name="subtitle" value="{{ form.instance.subtitle|default:'' }}" placeholder="Optional" class="form-control" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label>{{ form.consultant_name.label }}</label>
+                    <input type="text" name="consultant_name" value="{{ form.instance.consultant_name|default:'' }}" placeholder="Optional" class="form-control" maxlength="255">
+                </div>
+                <div class="form-group">
+                    <label for="id_start_date">{{ form.start_date.label }}</label>
+                    <input type="date" name="start_date" id="id_start_date" value="{{ form.instance.start_date|date:'Y-m-d' }}" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="id_end_date">{{ form.end_date.label }}</label>
+                    <input type="date" name="end_date" id="id_end_date" value="{{ form.instance.end_date|date:'Y-m-d' }}" required class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Main image scale (%)</label>
+                    <div class="scale-row">
+                        <input type="range" name="customer_image_scale" id="id_customer_image_scale" min="10" max="100" value="{{ form.instance.customer_image_scale|default:100 }}">
+                        <span class="scale-value" id="scaleValue">100</span>%
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="id_cover_background_color">Page background color</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="color" id="cover_page_color_picker" value="{{ form.instance.cover_background_color|default:'#FFFFFF' }}" title="Choose color" style="width: 40px; height: 36px; padding: 2px; cursor: pointer; border: 1px solid var(--app-border); border-radius: 6px;">
+                        <input type="text" name="cover_background_color" id="id_cover_background_color" value="{{ form.instance.cover_background_color|default:'#FFFFFF' }}" maxlength="7" class="form-control" style="width: 90px;" placeholder="#FFFFFF">
+                    </div>
+                    <small class="form-text text-muted">Default white. All elements are displayed on top.</small>
+                </div>
+                <p class="cover-hint">Drag zones on the sheet to position them. Use the bottom-right corner to resize. Click on an image zone to upload a file.</p>
+            </div>
+
+            <div>
+                <div class="cover-canvas" id="coverCanvas" style="background: {{ form.instance.cover_background_color|default:'#FFFFFF' }};">
+                    <div class="zone zone-bg" data-slot="background_image" data-input="id_background_image" data-layout-key="" title="Click or drag background image">
+                        <span class="zone-label">Background (click or drag)</span>
+                        <img class="zone-preview" id="preview-bg" alt="" style="object-fit: cover; opacity: 0.2;">
+                    </div>
+                    <div class="zone zone-header-left" data-layout-key="header_left" data-slot="header_image" data-input="id_header_image" title="Consultant logo — drag to move">
+                        <span class="zone-label">Consultant logo</span>
+                        <img class="zone-preview" id="preview-header-left" alt="">
+                        <span class="resize-handle" title="Resize"></span>
+                    </div>
+                    <div class="zone zone-header-right" data-layout-key="header_right" data-slot="customer_header_image" data-input="id_customer_header_image" title="Client logo — drag to move">
+                        <span class="zone-label">Client logo</span>
+                        <img class="zone-preview" id="preview-header-right" alt="">
+                        <span class="resize-handle" title="Resize"></span>
+                    </div>
+                    <div class="zone zone-title" data-layout-key="title_block" data-slot="text" title="Title block — drag to move">
+                        <span class="title-text" id="previewTitle">Offensive Security Assessment: <span id="pType">[Type]</span> — <span id="pName">[Client]</span></span>
+                        <span class="subtitle-text" id="previewSubtitle" style="display: none;"></span>
+                        <span style="font-size: 15.5pt; font-weight: bold; color: #FF8C00;">| EXECUTIVE/TECHNICAL REPORT |</span>
+                        <span class="subtitle-text" id="previewConsultant" style="display: none;"></span>
+                        <span class="dates-text">Start date: <span id="pStart">--/--/--</span> — End: <span id="pEnd">--/--/--</span></span>
+                        <span class="resize-handle" title="Resize"></span>
+                    </div>
+                    <div class="zone zone-main-img" data-layout-key="customer_image" data-slot="customer_image" data-input="id_customer_image" title="Main image — drag to move">
+                        <span class="zone-label">Main image</span>
+                        <img class="zone-preview" id="preview-main" alt="" style="width: 100%;">
+                        <span class="resize-handle" title="Resize"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="file" name="background_image" id="id_background_image" accept="image/*" class="hidden-input">
+        <input type="file" name="header_image" id="id_header_image" accept="image/*" class="hidden-input">
+        <input type="file" name="customer_header_image" id="id_customer_header_image" accept="image/*" class="hidden-input">
+        <input type="file" name="customer_image" id="id_customer_image" accept="image/*" class="hidden-input">
+    </form>
+</div>
+
+<script>
+(function() {
+    var form = document.getElementById('coverForm');
+    var canvas = document.getElementById('coverCanvas');
+    var layoutInput = document.getElementById('cover_layout_json');
+
+    var DEFAULT_LAYOUT = {
+        header_left:   { left: 2,  top: 2,  width: 18, height: 8 },
+        header_right:  { left: 80, top: 2,  width: 18, height: 8 },
+        title_block:   { left: 5,  top: 22, width: 90, height: 25 },
+        customer_image: { left: 10, top: 55, width: 80, height: 35 }
+    };
+
+    var layout = {};
+    try {
+        layout = JSON.parse('{{ cover_layout_json|escapejs }}') || DEFAULT_LAYOUT;
+    } catch (e) {
+        layout = DEFAULT_LAYOUT;
+    }
+    if (typeof layout !== 'object' || !layout.header_left) {
+        layout = DEFAULT_LAYOUT;
+    }
+
+    function applyLayoutToZones() {
+        canvas.querySelectorAll('.zone[data-layout-key]').forEach(function(zone) {
+            var key = zone.getAttribute('data-layout-key');
+            if (!key || !layout[key]) return;
+            var L = layout[key];
+            zone.style.left = L.left + '%';
+            zone.style.top = L.top + '%';
+            zone.style.width = L.width + '%';
+            zone.style.height = L.height + '%';
+        });
+    }
+
+    function getLayoutFromZones() {
+        canvas.querySelectorAll('.zone[data-layout-key]').forEach(function(zone) {
+            var key = zone.getAttribute('data-layout-key');
+            if (!key) return;
+            var l = parseFloat(zone.style.left) || 0;
+            var t = parseFloat(zone.style.top) || 0;
+            var w = parseFloat(zone.style.width) || 20;
+            var h = parseFloat(zone.style.height) || 10;
+            layout[key] = { left: l, top: t, width: w, height: h };
+        });
+        layoutInput.value = JSON.stringify(layout);
+    }
+
+    function canvasRect() {
+        var r = canvas.getBoundingClientRect();
+        return { left: r.left, top: r.top, width: r.width, height: r.height };
+    }
+
+    applyLayoutToZones();
+    getLayoutFromZones();
+
+    // Initial image preview
+    var initialBg = '{{ cover_image_urls.background|default:"" }}';
+    var initialHeaderLeft = '{{ cover_image_urls.header_left|default:"" }}';
+    var initialHeaderRight = '{{ cover_image_urls.header_right|default:"" }}';
+    var initialMain = '{{ cover_image_urls.customer_image|default:"" }}';
+    if (initialBg) document.getElementById('preview-bg').src = initialBg;
+    if (initialHeaderLeft) { document.getElementById('preview-header-left').src = initialHeaderLeft; document.querySelector('.zone-header-left').classList.add('has-image'); }
+    if (initialHeaderRight) { document.getElementById('preview-header-right').src = initialHeaderRight; document.querySelector('.zone-header-right').classList.add('has-image'); }
+    if (initialMain) { document.getElementById('preview-main').src = initialMain; document.querySelector('.zone-main-img').classList.add('has-image'); }
+
+    // Arrastrar para mover
+    var dragging = null, dragStartX, dragStartY, dragStartLeft, dragStartTop, hasMoved, didDrag = false;
+    canvas.querySelectorAll('.zone[data-layout-key]').forEach(function(zone) {
+        zone.addEventListener('mousedown', function(e) {
+            if (e.target.classList.contains('resize-handle')) return;
+            var key = zone.getAttribute('data-layout-key');
+            if (!key) return;
+            dragging = key;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            dragStartLeft = parseFloat(zone.style.left) || layout[key].left;
+            dragStartTop = parseFloat(zone.style.top) || layout[key].top;
+            hasMoved = false;
+            e.preventDefault();
+        });
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (!dragging) return;
+        hasMoved = true;
+        var zone = canvas.querySelector('.zone[data-layout-key="' + dragging + '"]');
+        if (!zone) return;
+        var R = canvasRect();
+        var dxPct = ((e.clientX - dragStartX) / R.width) * 100;
+        var dyPct = ((e.clientY - dragStartY) / R.height) * 100;
+        var newLeft = Math.max(0, Math.min(100 - (layout[dragging].width || 20), dragStartLeft + dxPct));
+        var newTop = Math.max(0, Math.min(100 - (layout[dragging].height || 10), dragStartTop + dyPct));
+        zone.style.left = newLeft + '%';
+        zone.style.top = newTop + '%';
+        layout[dragging].left = newLeft;
+        layout[dragging].top = newTop;
+        getLayoutFromZones();
+    });
+    document.addEventListener('mouseup', function() {
+        if (dragging) {
+            didDrag = hasMoved;
+            getLayoutFromZones();
+            dragging = null;
+        }
+    });
+
+    // Resize con el handle
+    var resizing = null, resizeStartX, resizeStartY, resizeStartW, resizeStartH;
+    canvas.querySelectorAll('.zone .resize-handle').forEach(function(handle) {
+        handle.addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+            var zone = handle.closest('.zone');
+            var key = zone.getAttribute('data-layout-key');
+            if (!key) return;
+            resizing = key;
+            resizeStartX = e.clientX;
+            resizeStartY = e.clientY;
+            resizeStartW = parseFloat(zone.style.width) || layout[key].width;
+            resizeStartH = parseFloat(zone.style.height) || layout[key].height;
+            e.preventDefault();
+        });
+    });
+    document.addEventListener('mousemove', function(e) {
+        if (!resizing) return;
+        var zone = canvas.querySelector('.zone[data-layout-key="' + resizing + '"]');
+        if (!zone) return;
+        var R = canvasRect();
+        var dw = ((e.clientX - resizeStartX) / R.width) * 100;
+        var dh = ((e.clientY - resizeStartY) / R.height) * 100;
+        var newW = Math.max(5, Math.min(95, resizeStartW + dw));
+        var newH = Math.max(5, Math.min(95, resizeStartH + dh));
+        var left = parseFloat(zone.style.left) || 0;
+        var top = parseFloat(zone.style.top) || 0;
+        if (left + newW > 100) newW = 100 - left;
+        if (top + newH > 100) newH = 100 - top;
+        zone.style.width = newW + '%';
+        zone.style.height = newH + '%';
+        layout[resizing].width = newW;
+        layout[resizing].height = newH;
+        getLayoutFromZones();
+    });
+    document.addEventListener('mouseup', function() {
+        if (resizing) {
+            getLayoutFromZones();
+            resizing = null;
+        }
+    });
+
+    // Click on zone (without dragging) -> open file input
+    canvas.querySelectorAll('.zone[data-input]').forEach(function(zone) {
+        var inputId = zone.getAttribute('data-input');
+        var input = document.getElementById(inputId);
+        if (!input) return;
+        zone.addEventListener('click', function(e) {
+            if (e.target.classList.contains('resize-handle')) return;
+            if (zone.getAttribute('data-slot') === 'text') return;
+            if (didDrag) { didDrag = false; return; }
+            e.preventDefault();
+            input.click();
+        });
+        input.addEventListener('change', function() {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function(ev) {
+                var preview = zone.querySelector('.zone-preview');
+                if (preview) {
+                    preview.src = ev.target.result;
+                    if (zone.classList.contains('zone-bg')) preview.style.opacity = '0.2';
+                    zone.classList.add('has-image');
+                }
+                if (inputId === 'id_customer_image') updateMainScale();
+            };
+            reader.readAsDataURL(input.files[0]);
+        });
+        zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.style.background = 'rgba(9, 105, 218, 0.15)'; });
+        zone.addEventListener('dragleave', function() { zone.style.background = ''; });
+        zone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            zone.style.background = '';
+            if (e.dataTransfer.files && e.dataTransfer.files[0] && e.dataTransfer.files[0].type.indexOf('image') !== -1) {
+                var dt = new DataTransfer();
+                dt.items.add(e.dataTransfer.files[0]);
+                input.files = dt.files;
+                input.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+
+    function updateMainScale() {
+        var scale = parseInt(document.getElementById('id_customer_image_scale').value, 10) || 100;
+        document.getElementById('scaleValue').textContent = scale;
+        var img = document.getElementById('preview-main');
+        if (img && img.src) img.style.width = scale + '%';
+    }
+
+    function updateText() {
+        var type = (form.querySelector('[name="analisys_type"]') || {}).value || '[Tipo]';
+        var name = (form.querySelector('[name="customer_name"]') || {}).value || '[Cliente]';
+        var start = (form.querySelector('[name="start_date"]') || {}).value || '--/--/--';
+        var end = (form.querySelector('[name="end_date"]') || {}).value || '--/--/--';
+        var sub = form.querySelector('[name="subtitle"]');
+        var cons = form.querySelector('[name="consultant_name"]');
+        document.getElementById('pType').textContent = type;
+        document.getElementById('pName').textContent = name;
+        document.getElementById('pStart').textContent = start;
+        document.getElementById('pEnd').textContent = end;
+        var ps = document.getElementById('previewSubtitle');
+        var pc = document.getElementById('previewConsultant');
+        if (sub && sub.value) { ps.textContent = sub.value; ps.style.display = 'block'; } else { ps.style.display = 'none'; }
+        if (cons && cons.value) { pc.textContent = 'Consultor: ' + cons.value; pc.style.display = 'block'; } else { pc.style.display = 'none'; }
+    }
+
+    form.querySelectorAll('input[type="text"], input[type="date"], select').forEach(function(el) {
+        el.addEventListener('input', updateText);
+        el.addEventListener('change', updateText);
+    });
+    document.getElementById('id_customer_image_scale').addEventListener('input', updateMainScale);
+
+    updateText();
+    updateMainScale();
+
+    // Page background color: sync picker, text input and canvas
+    var colorPicker = document.getElementById('cover_page_color_picker');
+    var colorInput = document.getElementById('id_cover_background_color');
+    function applyPageColor(hex) {
+        if (!hex || !/^#[0-9A-Fa-f]{6}$/.test(hex)) hex = '#FFFFFF';
+        canvas.style.background = hex;
+        if (colorPicker) colorPicker.value = hex;
+        if (colorInput) colorInput.value = hex;
+    }
+    if (colorPicker) {
+        colorPicker.addEventListener('input', function() { applyPageColor(colorPicker.value); });
+    }
+    if (colorInput) {
+        colorInput.addEventListener('input', function() { applyPageColor(colorInput.value); });
+        colorInput.addEventListener('change', function() { applyPageColor(colorInput.value); });
+    }
+    applyPageColor(colorInput ? colorInput.value : '#FFFFFF');
+})();
+</script>
+{% endblock %}

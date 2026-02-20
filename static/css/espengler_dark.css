@@ -1,0 +1,737 @@
+/*
+ * ═══════════════════════════════════════════════════════════
+ *  ESPENGLER 2.0 — Dark theme
+ *  Acento verde terminal, fondo gris/azul oscuro
+ * ═══════════════════════════════════════════════════════════
+ */
+
+/* ──────────────── CSS Custom Properties (verde + gris/azul oscuro) ──────────────── */
+:root {
+    --es-bg-primary: #0f1419;
+    --es-bg-secondary: #161b22;
+    --es-bg-card: #1c2128;
+    --es-bg-input: #21262d;
+    --es-border: #30363d;
+    --es-border-hover: #484f58;
+    --es-text-primary: #e6edf3;
+    --es-text-secondary: #8b949e;
+    --es-text-muted: #6e7681;
+    --es-accent: #00ff41;
+    --es-accent-dim: #00cc33;
+    --es-accent-glow: rgba(0, 255, 65, 0.15);
+    --es-accent-blue: #28d77a;
+    --es-danger: #f85149;
+    --es-warning: #d29922;
+    --es-success: #3fb950;
+    --es-info: #28d77a;
+    --es-glass-bg: rgba(22, 27, 34, 0.75);
+    --es-glass-blur: blur(12px);
+    --es-radius: 8px;
+    --es-radius-lg: 12px;
+    --es-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --es-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --es-shadow-glow: 0 0 20px rgba(0, 255, 65, 0.1);
+    --es-font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    --es-spacing-xs: 4px;
+    --es-spacing-sm: 8px;
+    --es-spacing-md: 16px;
+    --es-spacing-lg: 24px;
+    --es-spacing-xl: 32px;
+}
+
+/* ──────────────── Utility Components (pentesting / ethical hacking) ──────────────── */
+.es-card {
+    background: var(--es-glass-bg);
+    backdrop-filter: var(--es-glass-blur);
+    -webkit-backdrop-filter: var(--es-glass-blur);
+    border: 1px solid var(--es-border);
+    border-radius: var(--es-radius-lg);
+    padding: var(--es-spacing-lg);
+    transition: var(--es-transition);
+}
+.es-card:hover {
+    border-color: var(--es-border-hover);
+    box-shadow: var(--es-shadow), var(--es-shadow-glow);
+}
+.es-panel {
+    background: var(--es-bg-secondary);
+    border: 1px solid var(--es-border);
+    border-radius: var(--es-radius-lg);
+    padding: var(--es-spacing-lg);
+}
+.es-btn-primary {
+    background: linear-gradient(135deg, var(--es-accent-dim), var(--es-accent));
+    border: none;
+    color: #000;
+    font-weight: 600;
+    border-radius: var(--es-radius);
+    padding: var(--es-spacing-sm) var(--es-spacing-md);
+    transition: var(--es-transition);
+}
+.es-btn-primary:hover {
+    box-shadow: 0 0 20px var(--es-accent-glow);
+    transform: translateY(-1px);
+}
+.es-btn-ghost {
+    background: transparent;
+    border: 1px solid var(--es-border);
+    color: var(--es-text-secondary);
+    border-radius: var(--es-radius);
+    padding: var(--es-spacing-sm) var(--es-spacing-md);
+    transition: var(--es-transition);
+}
+.es-btn-ghost:hover {
+    border-color: var(--es-accent);
+    color: var(--es-accent);
+}
+.es-navbar {
+    background: var(--es-glass-bg);
+    backdrop-filter: var(--es-glass-blur);
+    -webkit-backdrop-filter: var(--es-glass-blur);
+    border-bottom: 1px solid var(--es-border);
+}
+.es-brand {
+    color: var(--es-accent);
+    font-family: var(--es-font-mono);
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+.es-footer {
+    background: var(--es-bg-secondary);
+    border-top: 1px solid var(--es-border);
+    color: var(--es-text-muted);
+    font-size: 0.8rem;
+}
+
+/* Main app navbar (base.html) */
+.navbar.es-navbar .nav-link {
+    color: var(--es-text-secondary);
+    transition: var(--es-transition);
+}
+.navbar.es-navbar .nav-link:hover { color: var(--es-accent); }
+.navbar-dark .navbar-toggler { border-color: var(--es-border); }
+.navbar-dark .navbar-toggler-icon { filter: invert(0.8); }
+
+/* ──────────────── Global Body ──────────────── */
+body {
+    background-color: var(--es-bg-primary) !important;
+    color: var(--es-text-primary) !important;
+    font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+}
+
+/* ──────────────── Jazzmin / AdminLTE OVERRIDES ──────────────── */
+
+/* Main wrapper */
+.wrapper, .content-wrapper {
+    background-color: var(--es-bg-primary) !important;
+}
+
+/* Navbar */
+.main-header.navbar {
+    background: var(--es-glass-bg) !important;
+    backdrop-filter: var(--es-glass-blur);
+    -webkit-backdrop-filter: var(--es-glass-blur);
+    border-bottom: 1px solid var(--es-border) !important;
+    box-shadow: none !important;
+}
+
+.main-header .navbar-nav .nav-link {
+    color: var(--es-text-secondary) !important;
+    transition: var(--es-transition);
+}
+
+.main-header .navbar-nav .nav-link:hover {
+    color: var(--es-accent) !important;
+}
+
+/* Brand */
+.brand-link {
+    border-bottom: 1px solid var(--es-border) !important;
+    background: var(--es-bg-secondary) !important;
+}
+
+.brand-link .brand-text {
+    color: var(--es-accent) !important;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+/* Sidebar */
+.main-sidebar {
+    background: var(--es-bg-secondary) !important;
+    border-right: 1px solid var(--es-border);
+}
+
+.sidebar .nav-sidebar .nav-item > .nav-link {
+    color: var(--es-text-secondary) !important;
+    border-radius: var(--es-radius);
+    margin: 2px 8px;
+    transition: var(--es-transition);
+}
+
+.sidebar .nav-sidebar .nav-item > .nav-link:hover {
+    background: var(--es-accent-glow) !important;
+    color: var(--es-accent) !important;
+}
+
+.sidebar .nav-sidebar .nav-item > .nav-link.active {
+    background: var(--es-accent-glow) !important;
+    color: var(--es-accent) !important;
+    border-left: 3px solid var(--es-accent);
+}
+
+.sidebar .nav-sidebar .nav-item > .nav-link > .nav-icon {
+    color: var(--es-text-muted) !important;
+    transition: var(--es-transition);
+}
+
+.sidebar .nav-sidebar .nav-item > .nav-link:hover > .nav-icon,
+.sidebar .nav-sidebar .nav-item > .nav-link.active > .nav-icon {
+    color: var(--es-accent) !important;
+}
+
+.nav-sidebar .nav-header {
+    color: var(--es-text-muted) !important;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+}
+
+/* User panel */
+.user-panel .info a {
+    color: var(--es-text-primary) !important;
+}
+
+/* ──────────────── Content Cards (Glassmorphism) ──────────────── */
+.card {
+    background: var(--es-glass-bg) !important;
+    backdrop-filter: var(--es-glass-blur);
+    -webkit-backdrop-filter: var(--es-glass-blur);
+    border: 1px solid var(--es-border) !important;
+    border-radius: var(--es-radius-lg) !important;
+    box-shadow: var(--es-shadow) !important;
+    transition: var(--es-transition);
+}
+
+.card:hover {
+    border-color: var(--es-border-hover) !important;
+    box-shadow: var(--es-shadow), var(--es-shadow-glow) !important;
+}
+
+.card-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--es-border) !important;
+    color: var(--es-text-primary) !important;
+}
+
+.card-body {
+    color: var(--es-text-primary) !important;
+}
+
+.card-footer {
+    background: transparent !important;
+    border-top: 1px solid var(--es-border) !important;
+}
+
+.card-title {
+    color: var(--es-text-primary) !important;
+    font-weight: 600;
+}
+
+/* ──────────────── Tables ──────────────── */
+.table {
+    color: var(--es-text-primary) !important;
+}
+
+.table thead th {
+    background: var(--es-bg-secondary) !important;
+    color: var(--es-accent) !important;
+    border-bottom: 2px solid var(--es-accent) !important;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.table td, .table th {
+    border-color: var(--es-border) !important;
+    padding: 10px 14px;
+    vertical-align: middle;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(22, 27, 34, 0.5) !important;
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: var(--es-bg-card) !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--es-accent-glow) !important;
+    transition: var(--es-transition);
+}
+
+/* ──────────────── Forms & Inputs ──────────────── */
+.form-control, input[type="text"], input[type="password"],
+input[type="email"], input[type="number"], input[type="url"],
+textarea, select {
+    background-color: var(--es-bg-input) !important;
+    color: var(--es-text-primary) !important;
+    border: 1px solid var(--es-border) !important;
+    border-radius: var(--es-radius) !important;
+    transition: var(--es-transition);
+}
+
+.form-control:focus, input:focus, textarea:focus, select:focus {
+    border-color: var(--es-accent) !important;
+    box-shadow: 0 0 0 3px var(--es-accent-glow) !important;
+    outline: none !important;
+}
+
+label {
+    color: var(--es-text-secondary) !important;
+    font-weight: 500;
+}
+
+.help-block, .helptext {
+    color: var(--es-text-muted) !important;
+}
+
+/* Select2 overrides for dark theme */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    background-color: var(--es-bg-input) !important;
+    border-color: var(--es-border) !important;
+    color: var(--es-text-primary) !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--es-text-primary) !important;
+}
+
+.select2-container--default .select2-results__option {
+    background-color: var(--es-bg-card) !important;
+    color: var(--es-text-primary) !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--es-accent-glow) !important;
+    color: var(--es-accent) !important;
+}
+
+.select2-dropdown {
+    background-color: var(--es-bg-card) !important;
+    border-color: var(--es-border) !important;
+}
+
+.select2-search__field {
+    background-color: var(--es-bg-input) !important;
+    color: var(--es-text-primary) !important;
+}
+
+/* ──────────────── Buttons ──────────────── */
+.btn-primary, .btn-success {
+    background: linear-gradient(135deg, var(--es-accent-dim), var(--es-accent)) !important;
+    border: none !important;
+    color: #000 !important;
+    font-weight: 600;
+    border-radius: var(--es-radius) !important;
+    transition: var(--es-transition);
+    text-shadow: none !important;
+}
+
+.btn-primary:hover, .btn-success:hover {
+    box-shadow: 0 0 20px var(--es-accent-glow), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #da3633, var(--es-danger)) !important;
+    border: none !important;
+    color: #fff !important;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #1ea855, var(--es-accent-blue)) !important;
+    border: none !important;
+    color: #fff !important;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #b08800, var(--es-warning)) !important;
+    border: none !important;
+    color: #000 !important;
+}
+
+.btn-secondary, .btn-default {
+    background: var(--es-bg-input) !important;
+    border: 1px solid var(--es-border) !important;
+    color: var(--es-text-secondary) !important;
+}
+
+.btn-secondary:hover, .btn-default:hover {
+    background: var(--es-border) !important;
+    color: var(--es-text-primary) !important;
+}
+
+/* ──────────────── Breadcrumb ──────────────── */
+.breadcrumb {
+    background: transparent !important;
+}
+
+.breadcrumb-item a {
+    color: var(--es-accent-blue) !important;
+}
+
+.breadcrumb-item.active {
+    color: var(--es-text-secondary) !important;
+}
+
+.content-header h1 {
+    color: var(--es-text-primary) !important;
+}
+
+/* ──────────────── Footer ──────────────── */
+.main-footer {
+    background: var(--es-bg-secondary) !important;
+    border-top: 1px solid var(--es-border) !important;
+    color: var(--es-text-muted) !important;
+}
+
+.main-footer a {
+    color: var(--es-accent) !important;
+}
+
+/* ──────────────── Pagination ──────────────── */
+.pagination .page-link {
+    background: var(--es-bg-input) !important;
+    border-color: var(--es-border) !important;
+    color: var(--es-text-secondary) !important;
+}
+
+.pagination .page-link:hover {
+    background: var(--es-accent-glow) !important;
+    color: var(--es-accent) !important;
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--es-accent) !important;
+    border-color: var(--es-accent) !important;
+    color: #000 !important;
+}
+
+/* ──────────────── Alerts / Messages ──────────────── */
+.alert {
+    border-radius: var(--es-radius) !important;
+    border: 1px solid var(--es-border) !important;
+}
+
+.alert-success {
+    background: rgba(63, 185, 80, 0.15) !important;
+    border-color: var(--es-success) !important;
+    color: var(--es-success) !important;
+}
+
+.alert-danger {
+    background: rgba(248, 81, 73, 0.15) !important;
+    border-color: var(--es-danger) !important;
+    color: var(--es-danger) !important;
+}
+
+.alert-warning {
+    background: rgba(210, 153, 34, 0.15) !important;
+    border-color: var(--es-warning) !important;
+    color: var(--es-warning) !important;
+}
+
+.alert-info {
+    background: rgba(88, 166, 255, 0.15) !important;
+    border-color: var(--es-info) !important;
+    color: var(--es-info) !important;
+}
+
+/* ──────────────── Modals ──────────────── */
+.modal-content {
+    background: var(--es-bg-card) !important;
+    border: 1px solid var(--es-border) !important;
+    border-radius: var(--es-radius-lg) !important;
+    box-shadow: var(--es-shadow) !important;
+}
+
+.modal-header {
+    border-bottom-color: var(--es-border) !important;
+}
+
+.modal-footer {
+    border-top-color: var(--es-border) !important;
+}
+
+.modal-title {
+    color: var(--es-text-primary) !important;
+}
+
+/* ──────────────── Tabs ──────────────── */
+.nav-tabs {
+    border-bottom-color: var(--es-border) !important;
+}
+
+.nav-tabs .nav-link {
+    color: var(--es-text-secondary) !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    transition: var(--es-transition);
+    padding: 8px 16px;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--es-accent) !important;
+    border-bottom-color: var(--es-accent-glow) !important;
+}
+
+.nav-tabs .nav-link.active {
+    background: transparent !important;
+    color: var(--es-accent) !important;
+    border-bottom-color: var(--es-accent) !important;
+    font-weight: 600;
+}
+
+/* ──────────────── Severity Badges ──────────────── */
+.badge-critical, .badge-severity-critical {
+    background: linear-gradient(135deg, #8b0000, #cc0000) !important;
+    color: #fff !important;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+}
+
+.badge-high, .badge-severity-high {
+    background: linear-gradient(135deg, #cc4400, var(--es-danger)) !important;
+    color: #fff !important;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+.badge-medium, .badge-severity-medium {
+    background: linear-gradient(135deg, #b08800, var(--es-warning)) !important;
+    color: #000 !important;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+.badge-low, .badge-severity-low {
+    background: linear-gradient(135deg, #1a7f37, var(--es-success)) !important;
+    color: #fff !important;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+.badge-info, .badge-severity-info {
+    background: var(--es-bg-input) !important;
+    color: var(--es-text-secondary) !important;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+/* ──────────────── Scrollbar ──────────────── */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--es-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--es-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--es-border-hover);
+}
+
+/* ──────────────── Dropdowns ──────────────── */
+.dropdown-menu {
+    background: var(--es-bg-card) !important;
+    border: 1px solid var(--es-border) !important;
+    border-radius: var(--es-radius) !important;
+    box-shadow: var(--es-shadow) !important;
+}
+
+.dropdown-item {
+    color: var(--es-text-secondary) !important;
+    transition: var(--es-transition);
+}
+
+.dropdown-item:hover {
+    background: var(--es-accent-glow) !important;
+    color: var(--es-accent) !important;
+}
+
+.dropdown-divider {
+    border-color: var(--es-border) !important;
+}
+
+/* ──────────────── Django Admin Changelist ──────────────── */
+#changelist-filter {
+    background: var(--es-bg-card) !important;
+    border: 1px solid var(--es-border);
+    border-radius: var(--es-radius);
+}
+
+#changelist-filter h2, #changelist-filter h3 {
+    color: var(--es-accent) !important;
+}
+
+#changelist-filter li a {
+    color: var(--es-text-secondary) !important;
+}
+
+#changelist-filter li a:hover,
+#changelist-filter li.selected a {
+    color: var(--es-accent) !important;
+}
+
+/* Admin object tools */
+.object-tools a {
+    background: var(--es-bg-input) !important;
+    color: var(--es-text-primary) !important;
+    border: 1px solid var(--es-border) !important;
+    border-radius: var(--es-radius) !important;
+}
+
+.object-tools a:hover {
+    background: var(--es-accent-glow) !important;
+    color: var(--es-accent) !important;
+    border-color: var(--es-accent) !important;
+}
+
+/* ──────────────── Code Blocks ──────────────── */
+code, pre, .code-block {
+    font-family: var(--es-font-mono) !important;
+}
+
+pre {
+    background: var(--es-bg-secondary) !important;
+    color: var(--es-text-primary) !important;
+    border: 1px solid var(--es-border);
+    border-radius: var(--es-radius);
+    padding: 12px 16px;
+}
+
+code {
+    background: rgba(0, 255, 65, 0.08);
+    color: var(--es-accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.88em;
+}
+
+/* ──────────────── Micro-Animations ──────────────── */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 5px var(--es-accent-glow); }
+    50% { box-shadow: 0 0 20px var(--es-accent-glow); }
+}
+
+.card {
+    animation: fadeInUp 0.4s ease-out both;
+}
+
+/* Stagger card animations */
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.2s; }
+.card:nth-child(4) { animation-delay: 0.3s; }
+
+/* ──────────────── Links ──────────────── */
+a {
+    color: var(--es-accent-blue);
+    transition: var(--es-transition);
+}
+
+a:hover {
+    color: var(--es-accent);
+    text-decoration: none;
+}
+
+/* ──────────────── Horizontal Rules ──────────────── */
+hr {
+    border-color: var(--es-border);
+}
+
+/* ──────────────── Fieldset ──────────────── */
+fieldset {
+    border: 1px solid var(--es-border) !important;
+    border-radius: var(--es-radius-lg) !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+}
+
+fieldset > legend, .fieldBox > label {
+    color: var(--es-accent) !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ──────────────── Inline Admin ──────────────── */
+.inline-group .tabular td {
+    background: var(--es-bg-card) !important;
+    border-color: var(--es-border) !important;
+}
+
+.inline-group .tabular th {
+    background: var(--es-bg-secondary) !important;
+    color: var(--es-accent) !important;
+    border-color: var(--es-border) !important;
+}
+
+/* ──────────────── Checkbox & Radio ──────────────── */
+input[type="checkbox"], input[type="radio"] {
+    accent-color: var(--es-accent);
+}
+
+/* ──────────────── Toast / Notification ──────────────── */
+.messagelist li {
+    background: var(--es-bg-card) !important;
+    border: 1px solid var(--es-border) !important;
+    border-radius: var(--es-radius) !important;
+    color: var(--es-text-primary) !important;
+    padding: 10px 16px;
+}
+
+.messagelist li.success {
+    border-left: 4px solid var(--es-success) !important;
+}
+
+.messagelist li.error {
+    border-left: 4px solid var(--es-danger) !important;
+}
+
+.messagelist li.warning {
+    border-left: 4px solid var(--es-warning) !important;
+}

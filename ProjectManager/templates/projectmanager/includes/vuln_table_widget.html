@@ -1,0 +1,430 @@
+{% comment %}
+Reusable vulnerability table widget with sort, filter, and search.
+Usage: {% include "projectmanager/includes/vuln_table_widget.html" with vulnerabilities=vulns project_id=project_info.pk %}
+{% endcomment %}
+
+<div class="vuln-table-widget" id="vuln-table-widget">
+    <!-- Controls -->
+    <div class="vtw-controls">
+        <div class="vtw-search">
+            <input type="text" id="vtw-search-input" placeholder="🔍  Search vulnerabilities..." class="vtw-input">
+        </div>
+        <div class="vtw-filters">
+            <select id="vtw-filter-severity" class="vtw-select">
+                <option value="">All Severities</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+                <option value="Info">Info</option>
+            </select>
+            <button type="button" class="vtw-btn vtw-btn-ghost" onclick="vtwResetFilters()">
+                ↺ Reset
+            </button>
+        </div>
+        <div class="vtw-column-toggles">
+            <span class="vtw-label">Columns:</span>
+            <label class="vtw-toggle"><input type="checkbox" checked data-col="severity"> Severity</label>
+            <label class="vtw-toggle"><input type="checkbox" checked data-col="name"> Name</label>
+            <label class="vtw-toggle"><input type="checkbox" checked data-col="hosts"> Hosts</label>
+            <label class="vtw-toggle"><input type="checkbox" checked data-col="port"> Port</label>
+            <label class="vtw-toggle"><input type="checkbox" checked data-col="cvss"> CVSS</label>
+            <label class="vtw-toggle"><input type="checkbox" data-col="description"> Description</label>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="vtw-table-wrap">
+        <table class="vtw-table" id="vtw-table">
+            <thead>
+                <tr>
+                    <th class="vtw-col-severity vtw-sortable" data-sort="severity" onclick="vtwSort('severity')">
+                        Severity <span class="vtw-sort-icon">⇅</span>
+                    </th>
+                    <th class="vtw-col-name vtw-sortable" data-sort="name" onclick="vtwSort('name')">
+                        Name <span class="vtw-sort-icon">⇅</span>
+                    </th>
+                    <th class="vtw-col-hosts vtw-sortable" data-sort="hosts" onclick="vtwSort('hosts')">
+                        Hosts <span class="vtw-sort-icon">⇅</span>
+                    </th>
+                    <th class="vtw-col-port vtw-sortable" data-sort="port" onclick="vtwSort('port')">
+                        Port <span class="vtw-sort-icon">⇅</span>
+                    </th>
+                    <th class="vtw-col-cvss vtw-sortable" data-sort="cvss" onclick="vtwSort('cvss')">
+                        CVSS <span class="vtw-sort-icon">⇅</span>
+                    </th>
+                    <th class="vtw-col-description" style="display:none;">
+                        Description
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="vtw-body">
+                {% for v in vulnerabilities %}
+                <tr class="vtw-row vtw-row-clickable" data-severity="{{ v.risk_factor|default:'Info' }}" data-name="{{ v.name }}"
+                    data-hosts="{{ v.hosts_affected|default:'' }}" data-port="{% if v.port %}{{ v.port.port_number }}/{{ v.port.protocol }}{% else %}-{% endif %}"
+                    data-cvss="{{ v.cvss_temporal_score|default:'0' }}" data-vuln-id="{{ v.pk }}" data-project-id="{{ project_id|default:'' }}">
+                    <td class="vtw-col-severity">
+                        {% with sev=v.risk_factor|default:"Info" %}
+                        <span class="vtw-badge vtw-sev-{{ sev|lower }}">{{ sev }}</span>
+                        {% endwith %}
+                    </td>
+                    <td class="vtw-col-name">
+                        {% if project_id %}
+                        <a href="{% url 'vulnerability_edit' project_id=project_id vuln_id=v.pk %}" class="vtw-name-link">{{ v.name }}</a>
+                        {% else %}
+                        {{ v.name }}
+                        {% endif %}
+                    </td>
+                    <td class="vtw-col-hosts">{{ v.hosts_affected }}</td>
+                    <td class="vtw-col-port">{{ v.port|default:"-" }}</td>
+                    <td class="vtw-col-cvss">
+                        {% with score=v.cvss_temporal_score|default:0 %}
+                        <span
+                            class="vtw-cvss {% if score >= 9 %}vtw-cvss-crit{% elif score >= 7 %}vtw-cvss-high{% elif score >= 4 %}vtw-cvss-med{% else %}vtw-cvss-low{% endif %}">
+                            {{ score }}
+                        </span>
+                        {% endwith %}
+                    </td>
+                    <td class="vtw-col-description" style="display:none;">{{ v.description|truncatewords:30 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="vtw-empty">No vulnerabilities found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="vtw-footer">
+        <span id="vtw-count">{{ vulnerabilities|length }} vulnerabilities</span>
+    </div>
+</div>
+
+<style>
+    .vuln-table-widget {
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    .vtw-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+        padding: 12px 16px;
+        background: var(--es-glass-bg, rgba(22, 27, 34, 0.6));
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--es-border, #30363d);
+        border-radius: var(--es-radius, 10px);
+    }
+
+    .vtw-search {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .vtw-input {
+        width: 100%;
+        padding: 8px 14px;
+        background: var(--es-bg-input, #21262d);
+        border: 1px solid var(--es-border, #30363d);
+        border-radius: var(--es-radius);
+        color: var(--es-text-primary, #e6edf3);
+        font-size: 0.9rem;
+        transition: border-color 0.2s;
+    }
+    .vtw-input:focus {
+        outline: none;
+        border-color: var(--es-accent, #00ff41);
+        box-shadow: 0 0 0 3px var(--es-accent-glow, rgba(0, 255, 65, 0.12));
+    }
+    .vtw-select {
+        padding: 8px 12px;
+        background: var(--es-bg-input, #21262d);
+        border: 1px solid var(--es-border, #30363d);
+        border-radius: var(--es-radius);
+        color: var(--es-text-primary, #e6edf3);
+        font-size: 0.85rem;
+        cursor: pointer;
+    }
+
+    .vtw-filters {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .vtw-btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+
+    .vtw-btn-ghost {
+        background: transparent;
+        color: #8b949e;
+        border: 1px solid #30363d;
+    }
+
+    .vtw-btn-ghost:hover {
+        color: var(--es-accent);
+        border-color: var(--es-accent);
+    }
+
+    .vtw-column-toggles {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .vtw-label {
+        color: #8b949e;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .vtw-toggle {
+        font-size: 0.8rem;
+        color: #8b949e;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .vtw-toggle input {
+        accent-color: var(--es-accent);
+    }
+
+    .vtw-table-wrap {
+        overflow-x: auto;
+        border-radius: var(--es-radius, 10px);
+        border: 1px solid var(--es-border, #30363d);
+    }
+
+    .vtw-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .vtw-table thead th {
+        background: var(--es-bg-secondary, #161b22);
+        color: var(--es-accent, #00ff41);
+        padding: 10px 14px;
+        text-align: left;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--es-accent);
+        white-space: nowrap;
+        user-select: none;
+    }
+
+    .vtw-sortable {
+        cursor: pointer;
+    }
+
+    .vtw-sortable:hover {
+        color: #33ff66;
+    }
+
+    .vtw-sort-icon {
+        opacity: 0.4;
+        font-size: 0.8rem;
+    }
+
+    .vtw-table tbody td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--es-bg-secondary, #21262d);
+        color: var(--es-text-primary, #e6edf3);
+    }
+    .vtw-row { transition: background 0.2s; }
+    .vtw-row:hover { background: var(--es-accent-glow, rgba(0, 255, 65, 0.04)); }
+    .vtw-row-clickable { cursor: pointer; }
+    .vtw-name-link { color: var(--es-accent, #00ff41); text-decoration: none; font-weight: 500; }
+    .vtw-name-link:hover { text-decoration: underline; color: #33ff66; }
+
+    .vtw-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .vtw-sev-critical {
+        background: linear-gradient(135deg, #8b0000, #cc0000);
+        color: #fff;
+    }
+
+    .vtw-sev-high {
+        background: linear-gradient(135deg, #cc4400, #f85149);
+        color: #fff;
+    }
+
+    .vtw-sev-medium {
+        background: linear-gradient(135deg, #b08800, #d29922);
+        color: #000;
+    }
+
+    .vtw-sev-low {
+        background: linear-gradient(135deg, #1a7f37, #3fb950);
+        color: #fff;
+    }
+
+    .vtw-sev-info,
+    .vtw-sev-none {
+        background: var(--es-bg-input, #21262d);
+        color: var(--es-text-secondary, #8b949e);
+    }
+
+    .vtw-cvss {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .vtw-cvss-crit {
+        color: #ff4444;
+    }
+
+    .vtw-cvss-high {
+        color: #f85149;
+    }
+
+    .vtw-cvss-med {
+        color: #d29922;
+    }
+
+    .vtw-cvss-low {
+        color: #3fb950;
+    }
+
+    .vtw-empty { text-align: center; padding: 32px !important; color: var(--es-text-muted, #6e7681); font-style: italic; }
+    .vtw-footer { padding: 8px 16px; color: var(--es-text-muted, #6e7681); font-size: 0.8rem; text-align: right; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const widget = document.getElementById('vuln-table-widget');
+        const tbody = document.getElementById('vtw-body');
+        if (!widget || !tbody) return;
+
+        const SEVERITY_ORDER = { 'critical': 0, 'high': 1, 'medium': 2, 'low': 3, 'info': 4, 'none': 5 };
+        let currentSort = { col: null, asc: true };
+
+        // --- Filter logic ---
+        window.vtwApplyFilters = function () {
+            const searchEl = document.getElementById('vtw-search-input');
+            const search = (searchEl && searchEl.value || '').toLowerCase().trim();
+            const sevEl = document.getElementById('vtw-filter-severity');
+            const severity = (sevEl && sevEl.value || '').toLowerCase();
+            let visible = 0;
+
+            tbody.querySelectorAll('.vtw-row').forEach(row => {
+                const rowSev = (row.dataset.severity || '').toLowerCase();
+                const rowText = row.textContent.toLowerCase();
+
+                const matchSearch = !search || rowText.includes(search);
+                const matchSev = !severity || rowSev === severity;
+
+                if (matchSearch && matchSev) {
+                    row.style.display = '';
+                    visible++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const countEl = document.getElementById('vtw-count');
+            if (countEl) countEl.textContent = visible + ' vulnerabilities';
+        };
+
+        // --- Search ---
+        const searchInput = document.getElementById('vtw-search-input');
+        if (searchInput) searchInput.addEventListener('input', window.vtwApplyFilters);
+
+        // --- Severity filter ---
+        const sevFilter = document.getElementById('vtw-filter-severity');
+        if (sevFilter) sevFilter.addEventListener('change', window.vtwApplyFilters);
+
+        // --- Column toggles (scope to this widget) ---
+        widget.querySelectorAll('.vtw-column-toggles input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', function () {
+                const col = this.getAttribute('data-col');
+                if (!col) return;
+                const display = this.checked ? '' : 'none';
+                widget.querySelectorAll('.vtw-col-' + col).forEach(el => { el.style.display = display; });
+            });
+        });
+
+        // --- Sort ---
+        window.vtwSort = function (col) {
+            if (currentSort.col === col) currentSort.asc = !currentSort.asc;
+            else { currentSort.col = col; currentSort.asc = true; }
+
+            const rows = Array.from(tbody.querySelectorAll('.vtw-row'));
+            rows.sort((a, b) => {
+                let va = a.dataset[col] || '';
+                let vb = b.dataset[col] || '';
+                if (col === 'severity') {
+                    va = SEVERITY_ORDER[va.toLowerCase()] ?? 5;
+                    vb = SEVERITY_ORDER[vb.toLowerCase()] ?? 5;
+                    return currentSort.asc ? va - vb : vb - va;
+                }
+                if (col === 'cvss') {
+                    va = parseFloat(va) || 0;
+                    vb = parseFloat(vb) || 0;
+                    return currentSort.asc ? va - vb : vb - va;
+                }
+                return currentSort.asc ? (String(va).localeCompare(String(vb))) : (String(vb).localeCompare(String(va)));
+            });
+            rows.forEach(r => tbody.appendChild(r));
+
+            widget.querySelectorAll('.vtw-sort-icon').forEach(icon => { icon.textContent = '⇅'; });
+            const activeHeader = widget.querySelector('th[data-sort="' + col + '"] .vtw-sort-icon');
+            if (activeHeader) activeHeader.textContent = currentSort.asc ? '↑' : '↓';
+        };
+
+        // --- Reset (search + severity + restore all column checkboxes) ---
+        window.vtwResetFilters = function () {
+            const searchEl = document.getElementById('vtw-search-input');
+            const sevEl = document.getElementById('vtw-filter-severity');
+            if (searchEl) searchEl.value = '';
+            if (sevEl) sevEl.value = '';
+            widget.querySelectorAll('.vtw-column-toggles input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+                const col = cb.getAttribute('data-col');
+                if (col) widget.querySelectorAll('.vtw-col-' + col).forEach(el => { el.style.display = ''; });
+            });
+            window.vtwApplyFilters();
+        };
+
+        // --- Row click: go to edit when clicking the row (not on the link itself) ---
+        const firstRow = tbody.querySelector('.vtw-row');
+        if (firstRow && firstRow.dataset.projectId) {
+            tbody.addEventListener('click', function (e) {
+                if (e.target.closest('a')) return;
+                const row = e.target.closest('.vtw-row');
+                if (!row) return;
+                const link = row.querySelector('a.vtw-name-link');
+                if (link && link.href) window.location.href = link.href;
+            });
+        }
+    });
+</script>

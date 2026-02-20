@@ -1,0 +1,17 @@
+/* Admin: estilo alineado con la app (limpio, sin tema verde antiguo). Enlaces visibles pero no todo azul. */
+:root {
+    --admin-bg: #fafbfc;
+    --admin-surface: #fff;
+    --admin-border: #e1e4e8;
+    --admin-text: #24292f;
+    --admin-text-muted: #57606a;
+    --admin-accent: #0969da;
+}
+body { background: var(--admin-bg) !important; }
+#header { background: var(--admin-surface) !important; border-bottom: 1px solid var(--admin-border) !important; }
+#branding h1 a { color: var(--admin-text) !important; }
+#content a:link, #content a:visited { color: var(--admin-accent) !important; }
+#content a:hover { text-decoration: underline; }
+.module h2, .module caption { background: var(--admin-surface) !important; color: var(--admin-text) !important; border: 1px solid var(--admin-border) !important; }
+.button, input[type=submit], .submit-row input { background: var(--admin-accent) !important; color: #fff !important; border: none !important; }
+.button:hover, input[type=submit]:hover { filter: brightness(1.05); }

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Espengler - Start
+Comment=Start Espengler and open in browser
+Exec=@INSTALL_DIR@/scripts/espengler-launcher.sh
+Icon=network-server
+Terminal=false
+Categories=Network;Security;Development;

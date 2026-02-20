@@ -1,32 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Vulnerability Manager</title>
-    <!-- Agregar Bootstrap CSS para los estilos -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <header>
-        <h1>Vulnerability Manager</h1>
-        <nav>
-            <a href="{% url 'create_project' %}">Create New Project</a>
-            <!-- Mostrar el enlace de "Inicio" solo si el proyecto está en el contexto -->
-            <a href="{% if project %}{% url 'project_detail' pk=project.id %}{% endif %}">Inicio</a>
-            <!-- other navigation links -->
-        </nav>
-    </header>
-    
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
-    
-    <footer>
-        <!-- Footer content -->
-    </footer>
+{% extends "base.html" %}
 
-    <!-- Agregar jQuery y Bootstrap JavaScript justo antes de cerrar body -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-</body>
-</html>
+{% comment %}
+This template previously defined its own HTML structure but now extends
+the main base.html to ensure consistent dark theme (Phase 4).
+Sub-templates (create_project, project_list) implementing 'block content'
+will now render into the main base.html's content block.
+{% endcomment %}

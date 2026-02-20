@@ -1,20 +1,43 @@
-<!-- report_template_list.html -->
+{% extends "base.html" %}
+{% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Templates</title>
-</head>
-<body>
-    <h1>Report Templates</h1>
-    <ul>
-        {% for template in templates %}
-            <li>{{ template.name }}</li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'report_template_create' %}">Create New Template</a>
-</body>
-</html>
+{% block title %}Report templates — Espengler{% endblock %}
 
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2 class="mb-0">Report templates</h2>
+        <a href="{% url 'report_template_create' %}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> New report template</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for template in templates %}
+                        <tr>
+                            <td><strong>{{ template.name }}</strong></td>
+                            <td class="text-right">
+                                <a href="{% url 'report_template_edit' template.pk %}" class="btn btn-sm btn-secondary" title="Edit">Edit</a>
+                                <a href="{% url 'report_template_delete' template.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Delete this report template?');">Delete</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted py-4">No report templates yet. <a href="{% url 'report_template_create' %}">Create one</a>.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

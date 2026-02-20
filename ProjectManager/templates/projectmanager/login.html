@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-theme-id="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Espengler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/themes/hackthebox.css' %}">
+    <link rel="stylesheet" href="{% static 'css/themes/parrot.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth_pages.css' %}">
+    <script>
+    (function(){
+        var tid = localStorage.getItem('app-theme-id') || 'default';
+        var html = document.documentElement;
+        html.setAttribute('data-theme-id', tid);
+        if (tid === 'hackthebox' || tid === 'parrot') html.setAttribute('data-theme', 'dark');
+        else html.setAttribute('data-theme', localStorage.getItem('app-theme') || 'dark');
+    })();
+    </script>
+</head>
+<body class="auth-page">
+    <div class="auth-bg">
+        <div class="auth-grid"></div>
+        <div class="auth-glow auth-glow-1"></div>
+        <div class="auth-glow auth-glow-2"></div>
+        <div class="auth-scanline"></div>
+    </div>
+
+    <main class="auth-main">
+        <div class="auth-card">
+            <div class="auth-card-inner">
+                <header class="auth-header">
+                    <img src="{% static 'admin-interface/logo/Logo.png' %}" alt="Espengler" class="auth-logo">
+                    <h1 class="auth-title">Espengler</h1>
+                    <p class="auth-tagline">Pentesting & Security Reporting</p>
+                </header>
+
+                <form method="post" action="{% url 'app_login' %}" class="auth-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                    <div class="auth-field">
+                        <label for="id_username">User</label>
+                        <input type="text" name="username" id="id_username" required autofocus
+                               placeholder="username" value="{{ form.username.value|default:'' }}"
+                               autocomplete="username" spellcheck="false">
+                        {% if form.username.errors %}
+                            <ul class="auth-errors">{{ form.username.errors }}</ul>
+                        {% endif %}
+                    </div>
+                    <div class="auth-field">
+                        <label for="id_password">Password</label>
+                        <input type="password" name="password" id="id_password" required
+                               placeholder="••••••••" autocomplete="current-password">
+                        {% if form.password.errors %}
+                            <ul class="auth-errors">{{ form.password.errors }}</ul>
+                        {% endif %}
+                    </div>
+                    {% if form.non_field_errors %}
+                        <ul class="auth-errors auth-errors-global">{{ form.non_field_errors }}</ul>
+                    {% endif %}
+                    <button type="submit" class="auth-btn">
+                        <span class="auth-btn-text">Sign in</span>
+                        <span class="auth-btn-icon">→</span>
+                    </button>
+                </form>
+
+                <p class="auth-footer">Same credentials as admin. Secure access only.</p>
+
+                <div class="auth-theme-selector">
+                    <span class="auth-theme-label">Theme</span>
+                    <div class="auth-theme-options">
+                        <button type="button" class="auth-theme-btn" data-theme-id="default" title="Default (Light/Dark)">Default</button>
+                        <button type="button" class="auth-theme-btn" data-theme-id="hackthebox" title="HackTheBox">HackTheBox</button>
+                        <button type="button" class="auth-theme-btn" data-theme-id="parrot" title="Parrot">Parrot</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="auth-copy">Espengler · Vulnerability & Report Manager</p>
+    </main>
+    <script>
+    (function(){
+        var THEME_ID_KEY = 'app-theme-id';
+        var THEME_KEY = 'app-theme';
+        document.querySelectorAll('.auth-theme-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = this.getAttribute('data-theme-id');
+                localStorage.setItem(THEME_ID_KEY, id);
+                var html = document.documentElement;
+                html.setAttribute('data-theme-id', id);
+                if (id === 'hackthebox' || id === 'parrot') html.setAttribute('data-theme', 'dark');
+                else html.setAttribute('data-theme', localStorage.getItem(THEME_KEY) || 'dark');
+                document.querySelectorAll('.auth-theme-btn').forEach(function(b) { b.classList.remove('active'); });
+                this.classList.add('active');
+            });
+        });
+        var current = document.documentElement.getAttribute('data-theme-id') || 'default';
+        document.querySelectorAll('.auth-theme-btn').forEach(function(b) {
+            if (b.getAttribute('data-theme-id') === current) b.classList.add('active');
+        });
+    })();
+    </script>
+</body>
+</html>

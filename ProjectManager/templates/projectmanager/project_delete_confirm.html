@@ -1,0 +1,23 @@
+{% extends 'projectmanager/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Delete project</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-2">You are about to permanently delete the project <strong>{{ project.name }}</strong>.</p>
+            <p class="text-muted small mb-3">
+                This will remove <strong>all data linked to this project</strong>: vulnerabilities, targets, ports, evidence images, writeup assignments, and member assignments. Cover templates and report templates are shared and will <strong>not</strong> be deleted.
+            </p>
+            <p class="mb-4">This action cannot be undone.</p>
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete project</button>
+            </form>
+            <a href="{% url 'project_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

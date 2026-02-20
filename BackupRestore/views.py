@@ -9,8 +9,6 @@ from django.http import FileResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils.timezone import now
-from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
@@ -52,7 +50,7 @@ def export_data(request):
                     rel_path = os.path.relpath(abs_path, temp_dir)
                     backup_zip.write(abs_path, arcname=rel_path)
 
-    messages.success(request, "Backup creado correctamente.")
+    messages.success(request, "Backup created successfully.")
     return FileResponse(open(zip_path, "rb"), as_attachment=True, filename=os.path.basename(zip_path))
 
 
@@ -66,7 +64,7 @@ def import_data(request):
         zip_file = request.FILES["backup_file"]
 
         if not zip_file.name.endswith(".zip"):
-            messages.error(request, "El archivo debe ser un .zip válido.")
+            messages.error(request, "The file must be a valid .zip file.")
             return redirect("import_data")
 
         temp_dir = tempfile.mkdtemp()
@@ -76,9 +74,19 @@ def import_data(request):
             for chunk in zip_file.chunks():
                 f.write(chunk)
 
+        def _safe_extract(zip_ref, dest_dir):
+            """Extract zip members only into dest_dir (prevents Zip Slip)."""
+            dest_dir = os.path.realpath(dest_dir)
+            dest_prefix = dest_dir + os.sep
+            for member in zip_ref.namelist():
+                member_path = os.path.realpath(os.path.join(dest_dir, member))
+                if not (member_path == dest_dir or member_path.startswith(dest_prefix)):
+                    raise ValueError(f"Unsafe path in zip: {member}")
+                zip_ref.extract(member, dest_dir)
+
         try:
             with ZipFile(zip_path, "r") as zip_ref:
-                zip_ref.extractall(temp_dir)
+                _safe_extract(zip_ref, temp_dir)
 
             # Restaurar medios
             for folder in ["media", "protected_media"]:
@@ -95,11 +103,11 @@ def import_data(request):
             if os.path.exists(data_path):
                 call_command("loaddata", data_path)
 
-            messages.success(request, "Backup restaurado correctamente.")
+            messages.success(request, "Backup restored successfully.")
             return redirect("import_data")
 
         except Exception as e:
-            messages.error(request, f"Ocurrió un error al importar el backup: {e}")
+            messages.error(request, f"An error occurred while importing the backup: {e}")
             return redirect("import_data")
 
     return render(request, "BackupRestore/import.html")

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if writeup %}Edit WriteUp{% else %}New WriteUp{% endif %} — Espengler{% endblock %}
+
+{% block extra_css %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">{% if writeup %}Edit WriteUp{% else %}New WriteUp{% endif %}</h2>
+        <a href="{% url 'attack_narrative_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to WriteUps</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="id_title">{{ form.title.label }} *</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group mb-4">
+                    <label for="id_content_html">{{ form.content_html.label }}</label>
+                    {{ form.content_html }}
+                    {% if form.content_html.errors %}<div class="invalid-feedback d-block">{{ form.content_html.errors }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                <a href="{% url 'attack_narrative_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ form.media.js }}
+<script src="{% static 'js/ckeditor-fix.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,344 @@
+/*
+ * HackTheBox theme — CTF / pentest aesthetic
+ * Background #101927, accent #9fef00, white text, button text = bg
+ */
+
+[data-theme-id="hackthebox"] {
+    --auth-accent: #9fef00;
+    --app-bg: #101927;
+    --app-surface: #1a2332;
+    --app-border: #2d3a4f;
+    --app-text: #ffffff;
+    --app-text-secondary: #b8c5d6;
+    --app-text-muted: #7d8da6;
+    --app-accent: #9fef00;
+    --app-accent-hover: #b8ff33;
+    --app-accent-text: #101927;
+    --app-success: #9fef00;
+    --app-danger: #ff6b6b;
+    --app-radius: 6px;
+    --app-radius-lg: 8px;
+    --app-font: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    --app-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    --app-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --es-bg-primary: var(--app-bg);
+    --es-bg-secondary: var(--app-surface);
+    --es-bg-card: var(--app-surface);
+    --es-bg-input: #1a2332;
+    --es-border: var(--app-border);
+    --es-text-primary: var(--app-text);
+    --es-text-secondary: var(--app-text-secondary);
+    --es-text-muted: var(--app-text-muted);
+    --es-accent: var(--app-accent);
+    --es-accent-dim: var(--app-accent-hover);
+    --es-accent-glow: rgba(159, 239, 0, 0.2);
+    --es-accent-blue: var(--app-accent);
+    --es-glass-bg: rgba(26, 35, 50, 0.9);
+    --es-radius: var(--app-radius);
+    --es-radius-lg: var(--app-radius-lg);
+}
+
+/* Body & main */
+[data-theme-id="hackthebox"] body {
+    background: var(--app-bg);
+    color: var(--app-text);
+}
+
+/* Navbar: terminal / CTF layout — compact, icon-first, green accent */
+[data-theme-id="hackthebox"] .navbar {
+    height: 52px;
+    padding: 0 20px;
+    background: rgba(26, 35, 50, 0.95) !important;
+    border-bottom: 1px solid var(--app-accent);
+    box-shadow: 0 0 20px rgba(159, 239, 0, 0.06);
+}
+
+[data-theme-id="hackthebox"] .navbar-brand {
+    font-family: var(--app-font);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--app-text) !important;
+}
+
+[data-theme-id="hackthebox"] .navbar-brand:hover {
+    color: var(--app-accent) !important;
+}
+
+[data-theme-id="hackthebox"] .navbar-nav .nav-link {
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: var(--app-font);
+    color: var(--app-text-secondary) !important;
+    border-radius: 4px;
+    border: 1px solid transparent;
+}
+
+[data-theme-id="hackthebox"] .navbar-nav .nav-link:hover {
+    color: var(--app-accent) !important;
+    background: rgba(159, 239, 0, 0.08) !important;
+    border-color: rgba(159, 239, 0, 0.3);
+}
+
+[data-theme-id="hackthebox"] .navbar-nav .nav-link i {
+    margin-right: 6px;
+    opacity: 0.9;
+}
+
+/* Dropdown: dark surface, green hover */
+[data-theme-id="hackthebox"] .dropdown-menu {
+    background: var(--app-surface) !important;
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow-lg);
+}
+
+[data-theme-id="hackthebox"] .dropdown-item {
+    color: var(--app-text) !important;
+}
+
+[data-theme-id="hackthebox"] .dropdown-item:hover {
+    background: rgba(159, 239, 0, 0.12) !important;
+    color: var(--app-accent) !important;
+}
+
+[data-theme-id="hackthebox"] .dropdown-divider {
+    border-color: var(--app-border);
+}
+
+/* Tabs: mismo estilo que navbar (enlace tipo WriteUps), sin bloque de color */
+[data-theme-id="hackthebox"] .nav-tabs {
+    border-bottom: 1px solid var(--app-border);
+    gap: 12px;
+    padding-left: 0;
+}
+[data-theme-id="hackthebox"] .nav-tabs .nav-item {
+    margin-right: 0;
+}
+[data-theme-id="hackthebox"] .nav-tabs .nav-link {
+    background: transparent !important;
+    color: var(--app-text-secondary) !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 4px;
+    padding: 6px 14px;
+    margin-right: 0;
+    font-weight: 500;
+    font-size: 13px;
+    font-family: var(--app-font);
+}
+[data-theme-id="hackthebox"] .nav-tabs .nav-link:hover {
+    color: var(--app-accent) !important;
+    background: rgba(159, 239, 0, 0.08) !important;
+    border-color: transparent !important;
+}
+[data-theme-id="hackthebox"] .nav-tabs .nav-link.active {
+    background: transparent !important;
+    color: var(--app-accent) !important;
+    border-bottom-color: var(--app-accent) !important;
+    font-weight: 600;
+}
+[data-theme-id="hackthebox"] .nav-tabs .nav-link i {
+    margin-right: 6px;
+    opacity: 0.9;
+}
+
+/* Título "Themes" en dropdown: mismo color que las opciones del tema activo */
+[data-theme-id="hackthebox"] .dropdown-item-text {
+    color: var(--app-accent) !important;
+    font-family: var(--app-font);
+}
+[data-theme-id="hackthebox"] .dropdown-item.theme-option {
+    color: var(--app-text) !important;
+}
+
+/* Buttons: green bg, dark text */
+[data-theme-id="hackthebox"] .btn-primary {
+    background: var(--app-accent) !important;
+    border-color: var(--app-accent) !important;
+    color: var(--app-accent-text) !important;
+    font-weight: 600;
+    font-family: var(--app-font);
+}
+
+[data-theme-id="hackthebox"] .btn-primary:hover {
+    background: var(--app-accent-hover) !important;
+    border-color: var(--app-accent-hover) !important;
+    color: var(--app-accent-text) !important;
+    box-shadow: 0 0 16px rgba(159, 239, 0, 0.35);
+}
+
+[data-theme-id="hackthebox"] .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--app-border);
+    color: var(--app-text-secondary);
+}
+
+[data-theme-id="hackthebox"] .btn-secondary:hover {
+    border-color: var(--app-accent);
+    color: var(--app-accent);
+    background: rgba(159, 239, 0, 0.06);
+}
+
+[data-theme-id="hackthebox"] .btn-success {
+    background: var(--app-accent) !important;
+    border-color: var(--app-accent) !important;
+    color: var(--app-accent-text) !important;
+}
+
+/* Cards: bordered, subtle glow on hover */
+[data-theme-id="hackthebox"] .card,
+[data-theme-id="hackthebox"] .glass-panel,
+[data-theme-id="hackthebox"] .es-card,
+[data-theme-id="hackthebox"] .es-panel {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-lg);
+    box-shadow: var(--app-shadow);
+}
+
+[data-theme-id="hackthebox"] .card:hover,
+[data-theme-id="hackthebox"] .es-card:hover {
+    border-color: rgba(159, 239, 0, 0.25);
+    box-shadow: 0 0 24px rgba(159, 239, 0, 0.06);
+}
+
+[data-theme-id="hackthebox"] .card h3,
+[data-theme-id="hackthebox"] .card h2,
+[data-theme-id="hackthebox"] .card-title {
+    color: var(--app-text);
+    font-family: var(--app-font);
+}
+
+/* Forms */
+[data-theme-id="hackthebox"] .form-control,
+[data-theme-id="hackthebox"] input[type="text"],
+[data-theme-id="hackthebox"] input[type="email"],
+[data-theme-id="hackthebox"] input[type="password"],
+[data-theme-id="hackthebox"] input[type="date"],
+[data-theme-id="hackthebox"] input[type="number"],
+[data-theme-id="hackthebox"] select,
+[data-theme-id="hackthebox"] textarea {
+    background: var(--es-bg-input);
+    border: 1px solid var(--app-border);
+    color: var(--app-text);
+}
+
+[data-theme-id="hackthebox"] .form-control:focus,
+[data-theme-id="hackthebox"] input:focus,
+[data-theme-id="hackthebox"] select:focus,
+[data-theme-id="hackthebox"] textarea:focus {
+    border-color: var(--app-accent);
+    box-shadow: 0 0 0 3px rgba(159, 239, 0, 0.15);
+}
+
+[data-theme-id="hackthebox"] label {
+    color: var(--app-text-secondary);
+}
+
+/* Tables */
+[data-theme-id="hackthebox"] .table th {
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-bottom: 1px solid var(--app-accent);
+}
+
+[data-theme-id="hackthebox"] .table td {
+    color: var(--app-text-secondary);
+    border-bottom: 1px solid var(--app-border);
+}
+
+[data-theme-id="hackthebox"] .table tbody tr:hover {
+    background: rgba(159, 239, 0, 0.04);
+}
+
+/* Footer */
+[data-theme-id="hackthebox"] footer {
+    background: var(--app-surface) !important;
+    border-top: 1px solid var(--app-border);
+    color: var(--app-text-muted);
+}
+
+/* Theme toggle / Themes dropdown button in navbar */
+[data-theme-id="hackthebox"] .theme-toggle,
+[data-theme-id="hackthebox"] .themes-dropdown-btn {
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    color: var(--app-text-secondary);
+}
+
+[data-theme-id="hackthebox"] .theme-toggle:hover,
+[data-theme-id="hackthebox"] .themes-dropdown-btn:hover {
+    border-color: var(--app-accent);
+    color: var(--app-accent);
+}
+
+/* Auth pages (login/logout) when theme is hackthebox — used from auth_pages */
+[data-theme-id="hackthebox"].auth-page body,
+[data-theme-id="hackthebox"] .auth-page {
+    background: #101927;
+}
+
+[data-theme-id="hackthebox"] .auth-bg {
+    background: #101927;
+}
+
+[data-theme-id="hackthebox"] .auth-grid {
+    background-image:
+        linear-gradient(rgba(159, 239, 0, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(159, 239, 0, 0.04) 1px, transparent 1px);
+}
+
+[data-theme-id="hackthebox"] .auth-glow-1,
+[data-theme-id="hackthebox"] .auth-glow-2 {
+    background: #9fef00;
+}
+
+[data-theme-id="hackthebox"] .auth-title,
+[data-theme-id="hackthebox"] .auth-card h1 {
+    color: #ffffff;
+}
+
+[data-theme-id="hackthebox"] .auth-btn {
+    background: #9fef00;
+    color: #101927;
+    font-weight: 600;
+}
+
+[data-theme-id="hackthebox"] .auth-btn:hover {
+    background: #b8ff33;
+    color: #101927;
+    box-shadow: 0 0 20px rgba(159, 239, 0, 0.3);
+}
+
+[data-theme-id="hackthebox"] .auth-card {
+    border: 1px solid rgba(159, 239, 0, 0.25);
+}
+[data-theme-id="hackthebox"] .auth-card-inner {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+[data-theme-id="hackthebox"] .auth-header {
+    border-bottom-color: #9fef00;
+}
+
+[data-theme-id="hackthebox"] .auth-field input {
+    background: #1a2332;
+    border-color: #2d3a4f;
+    color: #ffffff;
+}
+
+[data-theme-id="hackthebox"] .auth-field input:focus {
+    border-color: #9fef00;
+    box-shadow: 0 0 0 3px rgba(159, 239, 0, 0.15);
+}
+
+[data-theme-id="hackthebox"] .auth-field label {
+    color: #b8c5d6;
+}
+
+[data-theme-id="hackthebox"] .auth-copy,
+[data-theme-id="hackthebox"] .auth-footer,
+[data-theme-id="hackthebox"] .auth-tagline {
+    color: #7d8da6;
+}

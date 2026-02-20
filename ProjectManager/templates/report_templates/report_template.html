@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Informe - {{ project.name }}</title>
+    <title>Report - {{ project.name }}</title>
     <style>
-        /* Estilos CSS para las tablas de vulnerabilidades */
+        /* CSS styles for vulnerability tables */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -16,23 +16,23 @@
     </style>
 </head>
 <body>
-    <h1>Nombre del proyecto: {{ project.name }}</h1>
-    <h2>Template seleccionado: {{ project.report_template }}</h2>
-    <!-- Renderizar el contenido de la plantilla seleccionada aquí -->
+    <h1>Project name: {{ project.name }}</h1>
+    <h2>Selected template: {{ project.report_template }}</h2>
+    <!-- Render selected template content here -->
     {% if project.report_template %}
         {{ project.report_template.content|safe }}
     {% else %}
-        <p>No se ha seleccionado ningún template de informe.</p>
+        <p>No report template has been selected.</p>
     {% endif %}
 
-    <h2>Tablas de vulnerabilidades:</h2>
-    <!-- Renderizar las tablas de vulnerabilidades aquí -->
+    <h2>Vulnerability tables:</h2>
+    <!-- Render vulnerability tables here -->
     <table>
         <thead>
             <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <!-- Otros encabezados de la tabla -->
+                <th>Name</th>
+                <th>Description</th>
+                <!-- Other table headers -->
             </tr>
         </thead>
         <tbody>
@@ -40,31 +40,31 @@
             <tr>
                 <td>{{ vulnerability.name }}</td>
                 <td>{{ vulnerability.description }}</td>
-                <!-- Otros datos de la vulnerabilidad -->
+                <!-- Other vulnerability data -->
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <!-- Área del editor TinyMCE -->
+    <!-- TinyMCE editor area -->
     <textarea id="editor" name="content"></textarea>
 
     <script>
-        // Definimos la función para insertar el marcador de posición fuera de la función tinymce.init
+        // Define function to insert placeholder outside tinymce.init
         function insertPlaceholderImage() {
             var placeholderHTML = '<img src="/static/img/image-placeholder.jpg" id="placeholder_vulnerabilities" alt="Overall Vulnerabilities Placeholder">';
             tinymce.activeEditor.execCommand('mceInsertContent', false, placeholderHTML);
         }
 
-        // Configuración y activación de TinyMCE
+        // TinyMCE configuration and init
         tinymce.init({
             selector: '#editor',
             plugins: 'image',
-            toolbar: 'undo redo | link image | placeholder_button', // Agregamos el botón placeholder_button al toolbar
+            toolbar: 'undo redo | link image | placeholder_button',
             setup: function(editor) {
-                // Registramos el botón en el editor
+                // Register button in editor
                 editor.ui.registry.addButton('placeholder_button', {
-                    text: 'Insertar Marcador de Posición',
+                    text: 'Insert Placeholder',
                     onAction: function() {
                         insertPlaceholderImage();
                     }

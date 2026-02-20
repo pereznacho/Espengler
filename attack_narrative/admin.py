@@ -44,7 +44,7 @@ class WriteupAdmin(admin.ModelAdmin):
             file = request.FILES.get("file")
 
             if not file:
-                messages.error(request, "No se subió ningún archivo.")
+                messages.error(request, "No file was uploaded.")
                 return redirect("admin:attack_narrative_writeup_changelist")
 
             file_path = os.path.join("media/uploads", file.name)
@@ -60,11 +60,11 @@ class WriteupAdmin(admin.ModelAdmin):
                 attack_narrative_data = import_obsidian_note(file_path)
 
                 if not isinstance(attack_narrative_data, dict):
-                    messages.error(request, "Error en el formato del archivo: la conversión a diccionario falló.")
+                    messages.error(request, "File format error: conversion to dictionary failed.")
                     return redirect("admin:attack_narrative_writeup_changelist")
 
                 if not attack_narrative_data:
-                    messages.error(request, "El archivo no contiene datos válidos.")
+                    messages.error(request, "The file does not contain valid data.")
                     return redirect("admin:attack_narrative_writeup_changelist")
 
                 # Crear el Writeup
@@ -73,7 +73,7 @@ class WriteupAdmin(admin.ModelAdmin):
                     content_html=attack_narrative_data["content_html"]
                 )
 
-                messages.success(request, f"Writeup '{writeup.title}' importado correctamente.")
+                messages.success(request, f"Writeup '{writeup.title}' imported successfully.")
 
             except Exception as e:
                 logger.error(f"Error al importar: {e}")

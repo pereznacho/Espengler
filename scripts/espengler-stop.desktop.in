@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Espengler - Stop
+Comment=Stop Espengler service
+Exec=@INSTALL_DIR@/scripts/espengler-stop.sh
+Icon=process-stop
+Terminal=false
+Categories=Network;Security;Development;

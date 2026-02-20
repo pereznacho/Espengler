@@ -1,30 +1,156 @@
+/* ═══════════════════════════════════════════════════════════
+ * ESPENGLER 2.0 — Login Page Theme
+ * Acento verde, fondo gris/azul oscuro
+ * ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
 body.jazzmin-login-page {
-    background-color: #172042 !important;
+    background: var(--es-bg-primary, #0f1419) !important;
+    background-image:
+        radial-gradient(ellipse at 20% 50%, var(--es-accent-glow, rgba(0, 255, 65, 0.04)) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(88, 166, 255, 0.03) 0%, transparent 50%);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
 }
 
 body.jazzmin-login-page .login-box {
     background-color: transparent !important;
+    max-width: 420px;
 }
 
 body.jazzmin-login-page .login-logo a {
-    color: #ffffff !important;
+    color: var(--es-accent, #00ff41) !important;
+    font-family: var(--es-font-mono, 'JetBrains Mono', monospace);
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 1.4rem;
+    text-shadow: 0 0 20px var(--es-accent-glow, rgba(0, 255, 65, 0.3));
 }
 
 body.jazzmin-login-page .card {
-    border-radius: 10px;
-    padding: 20px;
-    background-color: #1e1e1e;
-    border: 1px solid #28d57a;
-    box-shadow: 0 0 12px rgba(40, 213, 122, 0.3);
+    border-radius: var(--es-radius-lg, 16px);
+    padding: 32px 28px;
+    background: var(--es-glass-bg, rgba(22, 27, 34, 0.75)) !important;
+    backdrop-filter: var(--es-glass-blur, blur(16px));
+    -webkit-backdrop-filter: var(--es-glass-blur, blur(16px));
+    border: 1px solid var(--es-border, rgba(48, 54, 61, 0.8));
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(0, 255, 65, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    animation: loginFadeIn 0.6s ease-out;
+}
+
+@keyframes loginFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes borderGlow {
+
+    0%,
+    100% {
+        border-color: rgba(48, 54, 61, 0.8);
+    }
+
+    50% {
+        border-color: rgba(0, 255, 65, 0.3);
+    }
+}
+
+body.jazzmin-login-page .card:hover {
+    animation: borderGlow 2s ease-in-out infinite;
+}
+
+body.jazzmin-login-page .card-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(48, 54, 61, 0.5) !important;
+    color: #e6edf3 !important;
+}
+
+body.jazzmin-login-page label {
+    color: #8b949e !important;
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+body.jazzmin-login-page .form-control {
+    background-color: #21262d !important;
+    border: 1px solid #30363d !important;
+    color: #e6edf3 !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.jazzmin-login-page .form-control:focus {
+    border-color: var(--es-accent, #00ff41) !important;
+    box-shadow: 0 0 0 3px var(--es-accent-glow, rgba(0, 255, 65, 0.15)) !important;
+    outline: none !important;
+}
+
+body.jazzmin-login-page .form-control::placeholder {
+    color: #6e7681 !important;
 }
 
 body.jazzmin-login-page .btn-primary {
-    background-color: #28d57a !important;
-    border-color: #28d57a !important;
-    color: #000 !important; /* opcional: texto negro para mejor contraste */
+    background: linear-gradient(135deg, var(--es-accent-dim, #00cc33), var(--es-accent, #00ff41)) !important;
+    border: none !important;
+    color: #000 !important;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 255, 65, 0.25);
 }
 
 body.jazzmin-login-page .btn-primary:hover {
-    background-color: #23be6b !important; /* un tono un poco más oscuro al pasar el mouse */
-    border-color: #23be6b !important;
+    background: linear-gradient(135deg, #00ff41, #33ff66) !important;
+    box-shadow: 0 6px 24px rgba(0, 255, 65, 0.35) !important;
+    transform: translateY(-2px);
+}
+
+body.jazzmin-login-page .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 255, 65, 0.2) !important;
+}
+
+body.jazzmin-login-page a {
+    color: #28d77a !important;
+    transition: color 0.2s;
+}
+
+body.jazzmin-login-page a:hover {
+    color: var(--es-accent, #00ff41) !important;
+}
+
+/* Subtle scan line effect on the page */
+body.jazzmin-login-page::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 255, 65, 0.008) 2px,
+            rgba(0, 255, 65, 0.008) 4px);
+    z-index: 9999;
 }

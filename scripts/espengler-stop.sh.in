@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Stop Espengler (systemd user service or fallback PID).
+# INSTALL_DIR is replaced at install time; if not, resolve from this script's path.
+INSTALL_DIR="@INSTALL_DIR@"
+if [ "$INSTALL_DIR" = "@INSTALL_DIR@" ] || [ ! -d "$INSTALL_DIR" ]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    INSTALL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+fi
+SERVICE="espengler"
+PIDFILE="$INSTALL_DIR/.espengler.pid"
+
+# Stop systemd user service if it is running
+if systemctl --user is-active --quiet "$SERVICE" 2>/dev/null; then
+    systemctl --user stop "$SERVICE" 2>/dev/null
+fi
+
+# Stop fallback process (started by launcher when systemd was not available)
+if [ -f "$PIDFILE" ]; then
+    pid=$(cat "$PIDFILE")
+    if kill -0 "$pid" 2>/dev/null; then
+        kill "$pid" 2>/dev/null
+    fi
+    rm -f "$PIDFILE"
+fi

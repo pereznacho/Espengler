@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Ubuntu: círculo naranja + 3 puntos (uno arriba, dos abajo) -->
+  <circle cx="16" cy="16" r="13" fill="none" stroke="#E95420" stroke-width="2"/>
+  <circle cx="16" cy="10" r="2.5" fill="#E95420"/>
+  <circle cx="10" cy="18" r="2.5" fill="#E95420"/>
+  <circle cx="22" cy="18" r="2.5" fill="#E95420"/>
+</svg>

@@ -1,176 +1,420 @@
 {% extends "base.html" %}
 {% load static %}
 
-<head>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-        #graphmap-container {
-            width: 100%;
-            height: 600px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            background-color: #f9f9f9;
-        }
-    </style>
-</head>
+{% block title %}{{ project_info.name }} — Espengler{% endblock %}
 
-<body>
-    <div class="container mt-5">
-        <h1>Detalles del Proyecto: {{ project_info.name }}</h1>
+{% block extra_css %}
+<style>
+    .project-header { padding: 0 0 20px; border-bottom: 1px solid var(--app-border); margin-bottom: 24px; }
+    .project-header h1 { color: var(--app-text); font-size: 1.5rem; font-weight: 600; margin: 0; }
+    .project-header h1 span { color: var(--app-accent); }
+    .nav-tabs { border-bottom: 1px solid var(--app-border); gap: 12px; }
+    .nav-tabs .nav-link {
+        color: var(--app-text-secondary); border: none; border-bottom: 2px solid transparent;
+        padding: 6px 14px; font-weight: 500; font-size: 14px; background: transparent;
+    }
+    .nav-tabs .nav-link:hover { color: var(--app-accent); }
+    .nav-tabs .nav-link.active { color: var(--app-accent); border-bottom-color: var(--app-accent); font-weight: 600; }
+    .glass-panel { margin-top: 20px; }
+    .glass-panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--app-border); color: var(--app-text); }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .info-card .label { color: var(--app-text-muted); font-size: 12px; margin-bottom: 4px; }
+    .info-card .value { color: var(--app-text); font-size: 14px; font-weight: 600; }
+    .targets-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .targets-table thead th { font-size: 13px; font-weight: 600; color: var(--app-text); text-align: left; padding: 12px 16px; border-bottom: 2px solid var(--app-border); background: var(--app-bg); }
+    .targets-table tbody td { font-size: 14px; color: var(--app-text); padding: 12px 16px; border-bottom: 1px solid var(--app-border); vertical-align: middle; }
+    .targets-table tbody tr:hover { background: var(--app-bg); }
+    .targets-table .col-ip { width: 12%; font-family: ui-monospace, monospace; }
+    .targets-table .col-fqdn { width: 18%; }
+    .targets-table .col-url { width: 18%; font-size: 12px; }
+    .targets-table .col-os { width: 14%; }
+    .targets-table .col-status { width: 14%; }
+    .targets-table .col-actions { width: 12%; white-space: nowrap; }
+    .btn-status-owned { background: var(--app-danger); color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-status-owned:hover { filter: brightness(1.1); }
+    .btn-status-not-owned { background: var(--app-bg); color: var(--app-text-muted); border: 1px solid var(--app-border); padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; }
+    .btn-status-not-owned:hover { background: var(--app-border); color: var(--app-text); }
+    .dark-table thead th { font-size: 12px; font-weight: 600; color: var(--app-text-secondary); }
+    .badge-owned { background: var(--app-danger); color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .badge-not-owned { background: var(--app-bg); color: var(--app-text-muted); padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .writeup-item { margin-bottom: 16px; }
+    .writeup-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .writeup-content { font-size: 14px; line-height: 1.6; color: var(--app-text-secondary); }
+    .writeup-content img { max-width: 100%; border-radius: 6px; margin: 8px 0; }
+    .graphmap-frame { width: 100%; height: 600px; border: 1px solid var(--app-border); border-radius: 8px; background: var(--app-bg); }
+    .graphmap-link { text-decoration: none; }
+    .graphmap-link:hover { text-decoration: none; }
+    .empty-state { text-align: center; padding: 40px; color: var(--app-text-muted); }
+    .report-config-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+    }
+    .report-config-form { display: inline-flex; margin: 0; }
+</style>
+{% endblock %}
 
-        <!-- Pestañas -->
-        <ul class="nav nav-tabs" id="projectTabs">
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#info">Info</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#targets">Targets</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#vulnerabilities">Vulnerabilities</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#attack_narratives">Writeups</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#graphmap">GraphMap</a>
-            </li>
-        </ul>
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="project-header">
+        <h1><span>▸</span> {{ project_info.name }}</h1>
+    </div>
 
-        <!-- Contenido de las Pestañas -->
-        <div class="tab-content">
-            <!-- Info -->
-            <div class="tab-pane fade show active" id="info">
-                <h3>Información General</h3>
-                <p>Nombre: {{ project_info.name }}</p>
-                <p>Descripción: {{ project_info.description }}</p>
-                <p>Fecha de Inicio: {{ project_info.start_date }}</p>
-                <p>Fecha de Fin: {{ project_info.end_date }}</p>
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab">
+                <i class="fas fa-info-circle"></i>&nbsp; Info
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="targets-tab" data-toggle="tab" href="#targets" role="tab">
+                <i class="fas fa-crosshairs"></i>&nbsp; Targets
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="vulns-tab" data-toggle="tab" href="#vulnerabilities" role="tab">
+                <i class="fas fa-bug"></i>&nbsp; Vulnerabilities
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="writeups-tab" data-toggle="tab" href="#attack_narratives" role="tab">
+                <i class="fas fa-file-alt"></i>&nbsp; Writeups
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="import-tab" data-toggle="tab" href="#import" role="tab">
+                <i class="fas fa-file-upload"></i>&nbsp; Import
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="graphmap-tab" data-toggle="tab" href="#graphmap" role="tab">
+                <i class="fas fa-project-diagram"></i>&nbsp; GraphMap
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="projectTabContent">
+
+        <!-- ── Info ── -->
+        <div class="tab-pane fade show active" id="info" role="tabpanel">
+            <div class="glass-panel">
+                <h3>Project Information</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="label">Name</div>
+                        <div class="value">{{ project_info.name }}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Description</div>
+                        <div class="value">{{ project_info.description|default:"—" }}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Start Date</div>
+                        <div class="value">{{ project_info.start_date|default:"—" }}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">End Date</div>
+                        <div class="value">{{ project_info.end_date|default:"—" }}</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Targets -->
-            <div class="tab-pane fade" id="targets">
+            <div class="glass-panel mt-4">
+                <h3>Report Configuration</h3>
+                <div class="report-config-actions">
+                    <a href="{% url 'change_project' project_info.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit project & Writeups
+                    </a>
+                    <a href="{% url 'configurar_tapa_reporte' project_info.pk %}" class="btn btn-primary">
+                        <i class="fas fa-paint-brush"></i> Design Cover & Config
+                    </a>
+                    <form action="{% url 'generate_report' project_info.pk %}" method="post" class="report-config-form">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-file-download"></i> Generate Report
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Targets ── -->
+        <div class="tab-pane fade" id="targets" role="tabpanel">
+            <div class="glass-panel">
                 <h3>Targets</h3>
                 {% if targets %}
-                    <table class="table table-striped">
+                <div class="table-responsive">
+                    <table class="targets-table">
                         <thead>
                             <tr>
-                                <th>IP Address</th>
-                                <th>FQDN</th>
-                                <th>OS</th>
-                                <th>Owned</th>
+                                <th class="col-ip">IP Address</th>
+                                <th class="col-fqdn">FQDN</th>
+                                <th class="col-url">URL</th>
+                                <th class="col-os">OS</th>
+                                <th class="col-status">Status</th>
+                                <th class="col-actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for target in targets %}
-                                <tr>
-                                    <td>{{ target.ip_address }}</td>
-                                    <td>{{ target.fqdn }}</td>
-                                    <td>{{ target.os }}</td>
-                                    <td>{{ target.owned|yesno:"Yes,No" }}</td>
-                                </tr>
+                            <tr data-target-id="{{ target.pk }}">
+                                <td class="col-ip">{{ target.ip_address|default:"—" }}</td>
+                                <td class="col-fqdn">{{ target.fqdn|default:"—" }}</td>
+                                <td class="col-url"><span class="text-truncate d-inline-block" style="max-width: 180px;" title="{{ target.urlAddress|default:'' }}">{{ target.urlAddress|default:"—" }}</span></td>
+                                <td class="col-os">{{ target.os|default:"Unknown" }}</td>
+                                <td class="col-status">
+                                    <button type="button" class="btn-status-{% if target.owned %}owned{% else %}not-owned{% endif %}" data-target-id="{{ target.pk }}" data-owned="{{ target.owned|yesno:'true,false' }}" title="Click to toggle">{% if target.owned %}OWNED{% else %}Not Owned{% endif %}</button>
+                                </td>
+                                <td class="col-actions">
+                                    <a href="{% url 'target_edit' project_info.pk target.pk %}" class="btn btn-sm btn-primary" title="View and edit target"><i class="fas fa-edit"></i> Edit</a>
+                                </td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
                 {% else %}
-                    <p>No hay targets disponibles.</p>
+                <div class="empty-state">No targets available.</div>
                 {% endif %}
             </div>
+        </div>
 
-            <!-- Vulnerabilities -->
-            <div class="tab-pane fade" id="vulnerabilities">
-                <h3>Vulnerabilities</h3>
-                {% if vulnerabilities %}
-                    <table class="table table-bordered">
+        <!-- ── Vulnerabilities ── -->
+        <div class="tab-pane fade" id="vulnerabilities" role="tabpanel">
+            <div class="glass-panel">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <h3 class="mb-0">Vulnerabilities</h3>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'add_vulnerability_to_project' project_info.pk %}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Add vulnerability</a>
+                        <a href="{% url 'add_evidence_image' project_info.pk %}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-image"></i> Add evidence image</a>
+                    </div>
+                </div>
+                {% include "projectmanager/includes/vuln_table_widget.html" with vulnerabilities=vulnerabilities project_id=project_info.pk %}
+            </div>
+            <div class="glass-panel mt-4">
+                <h3>Report preview</h3>
+                <p class="text-muted small mb-3">This is how the vulnerability summary table will appear in the generated DOCX.</p>
+                <div class="vtw-table-wrap">
+                    <table class="dark-table report-preview-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Hosts Affected</th>
+                                <th>Vulnerability</th>
+                                <th>Severity</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for vulnerability in vulnerabilities %}
-                                <tr>
-                                    <td>{{ vulnerability.name }}</td>
-                                    <td>{{ vulnerability.description }}</td>
-                                    <td>{{ vulnerability.hosts_affected }}</td>
-                                </tr>
+                            {% for v in vulnerabilities_sorted_for_report %}
+                            <tr>
+                                <td>{{ v.name }}</td>
+                                <td>
+                                    {% if v.risk_factor == 'Critical' %}<span class="vtw-badge vtw-sev-critical">Critical</span>
+                                    {% elif v.risk_factor == 'High' %}<span class="vtw-badge vtw-sev-high">High</span>
+                                    {% elif v.risk_factor == 'Medium' %}<span class="vtw-badge vtw-sev-medium">Medium</span>
+                                    {% elif v.risk_factor == 'Low' %}<span class="vtw-badge vtw-sev-low">Low</span>
+                                    {% else %}<span class="vtw-badge vtw-sev-info">{{ v.risk_factor|default:"Info" }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="2" class="text-center text-muted py-3">No vulnerabilities. The report table will be empty.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                {% else %}
-                    <p>No hay vulnerabilidades disponibles.</p>
-                {% endif %}
-            </div>
-
-            <!-- ✅ Nueva Pestaña para Writeups -->
-            <div class="tab-pane fade" id="attack_narratives">
-                <h3>Writeups Asignados</h3>
-                {% if attack_narratives %}
-                    <ul>
-                        {% for attack_narrative in attack_narratives %}
-                            <li>
-                                <strong>{{ attack_narrative.title }}</strong>
-                                <div>{{ attack_narrative.content_html|safe }}</div>  <!-- ✅ Renderiza el contenido con estilos -->
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p>No hay Writeups asignados a este proyecto.</p>
-                {% endif %}
-            </div>
-
-            <!-- GraphMap -->
-            <div class="tab-pane fade" id="graphmap">
-                <h3>GraphMap</h3>
-                <div id="graphmap-container"></div>
-                <script>
-                    document.addEventListener("DOMContentLoaded", function() {
-                        const nodesData = JSON.parse('{{ nodes|safe }}');
-                        const linksData = JSON.parse('{{ edges|safe }}');
-
-                        const svg = d3.select("#graphmap-container").append("svg")
-                            .attr("width", "100%")
-                            .attr("height", 600);
-
-                        const simulation = d3.forceSimulation(nodesData)
-                            .force("link", d3.forceLink(linksData).id(d => d.id).distance(150))
-                            .force("charge", d3.forceManyBody().strength(-300))
-                            .force("center", d3.forceCenter(300, 300));
-
-                        const link = svg.append("g")
-                            .selectAll("line")
-                            .data(linksData)
-                            .enter().append("line")
-                            .attr("stroke-width", 2)
-                            .attr("stroke", "#999");
-
-                        const node = svg.append("g")
-                            .selectAll("circle")
-                            .data(nodesData)
-                            .enter().append("circle")
-                            .attr("r", 20)
-                            .attr("fill", "#007bff");
-
-                        simulation.on("tick", () => {
-                            link
-                                .attr("x1", d => d.source.x)
-                                .attr("y1", d => d.source.y)
-                                .attr("x2", d => d.target.x)
-                                .attr("y2", d => d.target.y);
-
-                            node
-                                .attr("cx", d => d.x)
-                                .attr("cy", d => d.y);
-                        });
-                    });
-                </script>
+                </div>
             </div>
         </div>
+
+        <!-- ── Writeups ── -->
+        <div class="tab-pane fade" id="attack_narratives" role="tabpanel">
+            <div class="glass-panel">
+                <h3>Writeups</h3>
+                {% if attack_narratives %}
+                {% for an in attack_narratives %}
+                <div class="writeup-item">
+                    <h4>{{ an.title }}</h4>
+                    <div class="writeup-content">{{ an.content_html|safe }}</div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">No writeups assigned to this project.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ── Import scan files ── -->
+        <div class="tab-pane fade" id="import" role="tabpanel">
+            <div class="glass-panel">
+                <h3>Import scan files</h3>
+                <p class="text-muted mb-4">Upload output files from Nessus, Nmap, Netsparker, Acunetix, or Burp Suite to import targets and vulnerabilities into this project.</p>
+                <div class="row">
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-shield-alt text-primary"></i> Nessus</h5>
+                                <form method="post" enctype="multipart/form-data" action="{% url 'import_nessus_file' project_info.pk %}">
+                                    {% csrf_token %}
+                                    <div class="form-group mb-2">
+                                        <label for="id_nessus_file" class="small">Nessus file</label>
+                                        <input id="id_nessus_file" type="file" name="nessus_file" class="form-control form-control-sm" accept=".nessus" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-upload"></i> Upload</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-network-wired text-primary"></i> Nmap XML</h5>
+                                <form method="post" enctype="multipart/form-data" action="{% url 'import_nmap_xml' project_info.pk %}">
+                                    {% csrf_token %}
+                                    <div class="form-group mb-2">
+                                        <label for="id_nmap_file" class="small">Nmap XML file</label>
+                                        <input id="id_nmap_file" type="file" name="nmap_file" class="form-control form-control-sm" accept=".xml" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-upload"></i> Upload</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-search text-primary"></i> Netsparker</h5>
+                                <form method="post" enctype="multipart/form-data" action="{% url 'import_netsparker_file' project_info.pk %}">
+                                    {% csrf_token %}
+                                    <div class="form-group mb-2">
+                                        <label for="id_netsparker_file" class="small">Netsparker XML file</label>
+                                        <input id="id_netsparker_file" type="file" name="netsparker_file" class="form-control form-control-sm" accept=".xml" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-upload"></i> Upload</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-bug text-primary"></i> Acunetix</h5>
+                                <form method="post" enctype="multipart/form-data" action="{% url 'import_acunetix_file' project_info.pk %}">
+                                    {% csrf_token %}
+                                    <div class="form-group mb-2">
+                                        <label for="id_acunetix_file" class="small">Acunetix XML file</label>
+                                        <input id="id_acunetix_file" type="file" name="acunetix_file" class="form-control form-control-sm" accept=".xml" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-upload"></i> Upload</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-code text-primary"></i> Burp Suite</h5>
+                                <form method="post" enctype="multipart/form-data" action="{% url 'import_burp_file' project_info.pk %}">
+                                    {% csrf_token %}
+                                    <div class="form-group mb-2">
+                                        <label for="id_burp_file" class="small">Burp XML file</label>
+                                        <input id="id_burp_file" type="file" name="burp_file" class="form-control form-control-sm" accept=".xml" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="fas fa-upload"></i> Upload</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── GraphMap ── -->
+        <div class="tab-pane fade" id="graphmap" role="tabpanel">
+            <div class="glass-panel">
+                <h3>GraphMap</h3>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <a href="{% url 'graph_map' project_info.pk %}" target="_blank" class="graphmap-link mr-2">
+                        <i class="fas fa-project-diagram"></i> Open Interactive GraphMap
+                    </a>
+                    <span class="text-muted mx-1">|</span>
+                    <button type="button" class="btn btn-sm btn-secondary" id="graphmap-preview-refresh" title="Reload map">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary" id="graphmap-preview-reset" title="Reset layout">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <button type="button" class="btn btn-sm btn-secondary" id="graphmap-preview-fit" title="Fit view">
+                        <i class="fas fa-compress-arrows-alt"></i> Fit
+                    </button>
+                    <button type="button" class="btn btn-sm btn-primary" id="graphmap-preview-save" title="Save positions">
+                        <i class="fas fa-save"></i> Save positions
+                    </button>
+                </div>
+                <iframe id="graphmap-iframe" class="graphmap-frame" data-src="{% url 'graph_map' project_info.pk %}"
+                    frameborder="0" title="GraphMap"></iframe>
+            </div>
+        </div>
+
     </div>
-</body>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    function getCookie(name) {
+        var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        return v ? v[2] : null;
+    }
+    document.querySelectorAll('.btn-status-owned, .btn-status-not-owned').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var targetId = this.getAttribute('data-target-id');
+            var fd = new FormData();
+            fd.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+            fetch('/project/target/' + targetId + '/toggle_owned/', { method: 'POST', body: fd, credentials: 'same-origin', headers: { 'X-CSRFToken': getCookie('csrftoken') } })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    btn.setAttribute('data-owned', data.owned);
+                    btn.textContent = data.owned ? 'OWNED' : 'Not Owned';
+                    btn.className = data.owned ? 'btn-status-owned' : 'btn-status-not-owned';
+                });
+        });
+    });
+    // Load GraphMap iframe when tab is shown (short delay so iframe has dimensions)
+    function loadGraphMapIframe(forceReload) {
+        var graphmapIframe = document.getElementById('graphmap-iframe');
+        if (!graphmapIframe) return;
+        var dataSrc = graphmapIframe.getAttribute('data-src');
+        if (!dataSrc) return;
+        if (forceReload) graphmapIframe.src = '';
+        if (!graphmapIframe.src || forceReload) {
+            graphmapIframe.src = dataSrc;
+        }
+    }
+    function callGraphMapMethod(method) {
+        var iframe = document.getElementById('graphmap-iframe');
+        try {
+            if (iframe && iframe.contentWindow && typeof iframe.contentWindow[method] === 'function') {
+                iframe.contentWindow[method]();
+            }
+        } catch (e) { /* cross-origin o no cargado */ }
+    }
+    var graphmapTab = document.getElementById('graphmap-tab');
+    var graphmapIframe = document.getElementById('graphmap-iframe');
+    if (graphmapTab && graphmapIframe) {
+        graphmapTab.addEventListener('shown.bs.tab', function() {
+            setTimeout(function() { loadGraphMapIframe(false); }, 120);
+        });
+        if (graphmapTab.classList.contains('active')) {
+            setTimeout(function() { loadGraphMapIframe(false); }, 150);
+        }
+    }
+    document.getElementById('graphmap-preview-refresh').addEventListener('click', function() { loadGraphMapIframe(true); });
+    document.getElementById('graphmap-preview-reset').addEventListener('click', function() { callGraphMapMethod('resetLayout'); });
+    document.getElementById('graphmap-preview-fit').addEventListener('click', function() { callGraphMapMethod('fitAll'); });
+    document.getElementById('graphmap-preview-save').addEventListener('click', function() { callGraphMapMethod('saveAllPositions'); });
+})();
+</script>
+{% endblock %}

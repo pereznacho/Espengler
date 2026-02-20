@@ -9,19 +9,19 @@
     <h1>Targets</h1>
     <form method="POST">
         {% csrf_token %}
-        <label for="project">Seleccione un proyecto:</label>
+        <label for="project">Select a project:</label>
         <select name="project" id="project">
-            <option value="">Todos los proyectos</option>
+            <option value="">All projects</option>
             {% for project in projects %}
                 <option value="{{ project.id }}">{{ project.name }}</option>
             {% endfor %}
         </select>
-        <button type="submit">Filtrar</button>
+        <button type="submit">Filter</button>
     </form>
     <ul>
         {% for host in hosts %}
             <li>{{ host.ip_address }}</li>
-            <!-- Agrega más detalles de los hosts según sea necesario -->
+            <!-- Add more host details as needed -->
         {% endfor %}
     </ul>
 </body>

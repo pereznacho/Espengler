@@ -3,13 +3,13 @@
 <div class="action-form">
   <form action="" method="post">{% csrf_token %}
     <fieldset>
-      <legend>Asignar Targets y Puertos</legend>
+      <legend>Assign Targets and Ports</legend>
       {{ form.as_p }}
     </fieldset>
     <div class="submit-row">
-      <!-- Aquí asumimos que "apply" es el nombre de la acción a realizar -->
+      <!-- We assume "apply" is the action name -->
       <input type="hidden" name="action" value="apply">
-      <input type="submit" name="_apply" value="Aplicar">
+      <input type="submit" name="_apply" value="Apply">
     </div>
   </form>
 </div>

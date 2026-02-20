@@ -1,0 +1,452 @@
+/*
+ * Parrot theme — same palette (cyan #00fff0, dark bg), new layout: panel/dashboard style
+ * Left-accent panels, pill nav, rounded blocks, more spacing.
+ */
+
+[data-theme-id="parrot"] {
+    --auth-accent: #00fff0;
+    --app-bg: #0a0e12;
+    --app-surface: #12181f;
+    --app-border: #1e2832;
+    --app-text: #ffffff;
+    --app-text-secondary: #b0bcc8;
+    --app-text-muted: #7a8794;
+    --app-accent: #00fff0;
+    --app-accent-hover: #33fff5;
+    --app-accent-text: #0a0e12;
+    --app-success: #00fff0;
+    --app-danger: #ff6b6b;
+    --app-radius: 8px;
+    --app-radius-lg: 12px;
+    --app-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+    --app-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    --app-shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.45);
+    --es-bg-primary: var(--app-bg);
+    --es-bg-secondary: var(--app-surface);
+    --es-bg-card: var(--app-surface);
+    --es-bg-input: #12181f;
+    --es-border: var(--app-border);
+    --es-text-primary: var(--app-text);
+    --es-text-secondary: var(--app-text-secondary);
+    --es-text-muted: var(--app-text-muted);
+    --es-accent: var(--app-accent);
+    --es-accent-dim: var(--app-accent-hover);
+    --es-accent-glow: rgba(0, 255, 240, 0.15);
+    --es-accent-blue: var(--app-accent);
+    --es-glass-bg: rgba(18, 24, 31, 0.92);
+    --es-radius: var(--app-radius);
+    --es-radius-lg: var(--app-radius-lg);
+}
+
+/* Body: subtle grid background (format change only) */
+[data-theme-id="parrot"] body {
+    background: var(--app-bg);
+    color: var(--app-text);
+    background-image:
+        linear-gradient(rgba(0, 255, 240, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 240, 0.02) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+[data-theme-id="parrot"] main {
+    padding: 32px 28px;
+}
+
+[data-theme-id="parrot"] main .container {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Page titles: larger, with soft accent underline */
+[data-theme-id="parrot"] main h1,
+[data-theme-id="parrot"] main .h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--app-text);
+    margin-bottom: 28px;
+    letter-spacing: -0.02em;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--app-border);
+    display: inline-block;
+    position: relative;
+}
+
+[data-theme-id="parrot"] main h1::after,
+[data-theme-id="parrot"] main .h1::after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 48px;
+    height: 2px;
+    background: var(--app-accent);
+}
+
+/* Navbar: pill style, no bottom line; soft container look */
+[data-theme-id="parrot"] .navbar {
+    height: 64px;
+    padding: 0 28px;
+    background: var(--es-glass-bg) !important;
+    border-bottom: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    border-radius: 0 0 16px 16px;
+    margin-bottom: 4px;
+}
+
+[data-theme-id="parrot"] .navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--app-text) !important;
+    font-size: 1.1rem;
+}
+
+[data-theme-id="parrot"] .navbar-brand:hover {
+    color: var(--app-accent) !important;
+}
+
+[data-theme-id="parrot"] .navbar-nav .nav-link {
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--app-text-secondary) !important;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    margin: 0 4px;
+}
+
+[data-theme-id="parrot"] .navbar-nav .nav-link:hover {
+    color: var(--app-accent) !important;
+    background: rgba(0, 255, 240, 0.1) !important;
+    border-color: rgba(0, 255, 240, 0.2);
+}
+
+[data-theme-id="parrot"] .navbar-nav .nav-link i {
+    margin-right: 8px;
+    opacity: 0.9;
+}
+
+/* Dropdown: more rounded, padded */
+[data-theme-id="parrot"] .dropdown-menu {
+    background: var(--app-surface) !important;
+    border: 1px solid var(--app-border);
+    border-radius: 14px;
+    box-shadow: var(--app-shadow-lg);
+    padding: 12px 0;
+    min-width: 240px;
+    margin-top: 8px;
+}
+
+[data-theme-id="parrot"] .dropdown-item {
+    color: var(--app-text) !important;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin: 0 8px;
+}
+
+[data-theme-id="parrot"] .dropdown-item:hover {
+    background: rgba(0, 255, 240, 0.1) !important;
+    color: var(--app-accent) !important;
+}
+
+[data-theme-id="parrot"] .dropdown-divider {
+    border-color: var(--app-border);
+    margin: 8px 0;
+}
+
+/* Tabs: pill style, active = filled */
+[data-theme-id="parrot"] .nav-tabs {
+    border-bottom: 1px solid var(--app-border);
+    gap: 8px;
+    padding-left: 0;
+}
+[data-theme-id="parrot"] .nav-tabs .nav-item {
+    margin-right: 0;
+}
+[data-theme-id="parrot"] .nav-tabs .nav-link {
+    background: var(--app-surface) !important;
+    color: var(--app-text-secondary) !important;
+    border: 1px solid var(--app-border) !important;
+    border-bottom-color: var(--app-border) !important;
+    border-radius: 999px;
+    padding: 10px 20px;
+    margin-right: 4px;
+    font-weight: 500;
+    font-size: 14px;
+}
+[data-theme-id="parrot"] .nav-tabs .nav-link:hover {
+    color: var(--app-accent) !important;
+    background: rgba(0, 255, 240, 0.08) !important;
+    border-color: rgba(0, 255, 240, 0.25) !important;
+}
+[data-theme-id="parrot"] .nav-tabs .nav-link.active {
+    background: rgba(0, 255, 240, 0.12) !important;
+    color: var(--app-accent) !important;
+    border-color: var(--app-accent) !important;
+    font-weight: 600;
+}
+[data-theme-id="parrot"] .nav-tabs .nav-link i {
+    margin-right: 8px;
+    opacity: 0.9;
+}
+
+/* Dropdown themes label */
+[data-theme-id="parrot"] .dropdown-item-text {
+    color: var(--app-accent) !important;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+    padding: 4px 20px 8px;
+}
+[data-theme-id="parrot"] .dropdown-item.theme-option {
+    color: var(--app-text) !important;
+}
+
+/* Buttons: pill primary, outline secondary */
+[data-theme-id="parrot"] .btn-primary {
+    background: var(--app-accent) !important;
+    border-color: var(--app-accent) !important;
+    color: var(--app-accent-text) !important;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 10px 24px;
+}
+
+[data-theme-id="parrot"] .btn-primary:hover {
+    background: var(--app-accent-hover) !important;
+    border-color: var(--app-accent-hover) !important;
+    color: var(--app-accent-text) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 240, 0.25);
+}
+
+[data-theme-id="parrot"] .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--app-border);
+    color: var(--app-text-secondary);
+    border-radius: 999px;
+    padding: 10px 24px;
+}
+
+[data-theme-id="parrot"] .btn-secondary:hover {
+    border-color: var(--app-accent);
+    color: var(--app-accent);
+    background: rgba(0, 255, 240, 0.06);
+}
+
+[data-theme-id="parrot"] .btn-success {
+    background: var(--app-accent) !important;
+    border-color: var(--app-accent) !important;
+    color: var(--app-accent-text) !important;
+    border-radius: 999px;
+}
+
+/* Cards: left accent bar, rounded, more padding */
+[data-theme-id="parrot"] .card,
+[data-theme-id="parrot"] .glass-panel,
+[data-theme-id="parrot"] .es-card,
+[data-theme-id="parrot"] .es-panel {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-left: 4px solid var(--app-accent);
+    border-radius: var(--app-radius-lg);
+    box-shadow: var(--app-shadow);
+    padding: 28px;
+}
+
+[data-theme-id="parrot"] .card:hover,
+[data-theme-id="parrot"] .es-card:hover {
+    border-left-color: var(--app-accent-hover);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 255, 240, 0.06);
+}
+
+[data-theme-id="parrot"] .card h3,
+[data-theme-id="parrot"] .card h2,
+[data-theme-id="parrot"] .card-title {
+    color: var(--app-text);
+}
+
+/* Forms: rounded inputs, focus ring */
+[data-theme-id="parrot"] .form-control,
+[data-theme-id="parrot"] input[type="text"],
+[data-theme-id="parrot"] input[type="email"],
+[data-theme-id="parrot"] input[type="password"],
+[data-theme-id="parrot"] input[type="date"],
+[data-theme-id="parrot"] input[type="number"],
+[data-theme-id="parrot"] input[type="file"],
+[data-theme-id="parrot"] select,
+[data-theme-id="parrot"] textarea {
+    background: var(--es-bg-input);
+    border: 1px solid var(--app-border);
+    color: var(--app-text);
+    border-radius: 10px;
+}
+
+[data-theme-id="parrot"] .form-control:focus,
+[data-theme-id="parrot"] input:focus,
+[data-theme-id="parrot"] select:focus,
+[data-theme-id="parrot"] textarea:focus {
+    border-color: var(--app-accent);
+    box-shadow: 0 0 0 3px rgba(0, 255, 240, 0.12);
+}
+
+[data-theme-id="parrot"] label {
+    color: var(--app-text-secondary);
+    font-weight: 500;
+}
+
+/* Tables: rounded container, striped rows */
+[data-theme-id="parrot"] .table {
+    border-radius: var(--app-radius-lg);
+    overflow: hidden;
+}
+
+[data-theme-id="parrot"] .table th {
+    background: rgba(0, 255, 240, 0.08);
+    color: var(--app-text);
+    border-bottom: 1px solid var(--app-accent);
+    padding: 14px 16px;
+}
+
+[data-theme-id="parrot"] .table td {
+    color: var(--app-text-secondary);
+    border-bottom: 1px solid var(--app-border);
+    padding: 12px 16px;
+}
+
+[data-theme-id="parrot"] .table tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme-id="parrot"] .table tbody tr:hover {
+    background: rgba(0, 255, 240, 0.06);
+}
+
+/* Footer: rounded top corners */
+[data-theme-id="parrot"] footer {
+    background: var(--app-surface) !important;
+    border-top: 1px solid var(--app-border);
+    border-radius: 16px 16px 0 0;
+    color: var(--app-text-muted);
+    padding: 20px 28px;
+}
+
+/* Theme toggle: pill style */
+[data-theme-id="parrot"] .theme-toggle,
+[data-theme-id="parrot"] .themes-dropdown-btn {
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    color: var(--app-text-secondary);
+    border-radius: 999px;
+}
+
+[data-theme-id="parrot"] .theme-toggle:hover,
+[data-theme-id="parrot"] .themes-dropdown-btn:hover {
+    border-color: var(--app-accent);
+    color: var(--app-accent);
+}
+
+/* ========== Auth pages (login/logout) — same colors, panel layout ========== */
+[data-theme-id="parrot"].auth-page body,
+[data-theme-id="parrot"] .auth-page {
+    background: #0a0e12;
+}
+
+[data-theme-id="parrot"] .auth-bg {
+    background: linear-gradient(165deg, #0a0e12 0%, #0d1319 50%, #0a0e12 100%);
+}
+
+[data-theme-id="parrot"] .auth-grid {
+    background-image:
+        linear-gradient(rgba(0, 255, 240, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 240, 0.025) 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+[data-theme-id="parrot"] .auth-glow-1,
+[data-theme-id="parrot"] .auth-glow-2 {
+    background: #00fff0;
+    opacity: 0.1;
+    border-radius: 50%;
+}
+
+[data-theme-id="parrot"] .auth-title,
+[data-theme-id="parrot"] .auth-card h1 {
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+[data-theme-id="parrot"] .auth-tagline {
+    color: var(--app-text-secondary);
+    font-size: 14px;
+}
+
+[data-theme-id="parrot"] .auth-btn {
+    background: #00fff0;
+    color: #0a0e12;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 32px;
+    font-size: 15px;
+}
+
+[data-theme-id="parrot"] .auth-btn:hover {
+    background: #33fff5;
+    color: #0a0e12;
+    box-shadow: 0 0 24px rgba(0, 255, 240, 0.25);
+}
+
+/* Auth: single panel only (no nested card) */
+[data-theme-id="parrot"] .auth-card {
+    border: 1px solid rgba(0, 255, 240, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+[data-theme-id="parrot"] .auth-card-inner {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+[data-theme-id="parrot"] .auth-header {
+    border-bottom-color: var(--app-accent);
+}
+
+[data-theme-id="parrot"] .auth-field input {
+    background: #12181f;
+    border: 1px solid #1e2832;
+    color: #ffffff;
+    border-radius: 12px;
+}
+
+[data-theme-id="parrot"] .auth-field input:focus {
+    border-color: #00fff0;
+    box-shadow: 0 0 0 3px rgba(0, 255, 240, 0.12);
+}
+
+[data-theme-id="parrot"] .auth-field label {
+    color: #b0bcc8;
+}
+
+[data-theme-id="parrot"] .auth-copy,
+[data-theme-id="parrot"] .auth-footer,
+[data-theme-id="parrot"] .auth-tagline {
+    color: #7a8794;
+}
+
+[data-theme-id="parrot"] .auth-theme-selector .auth-theme-label {
+    color: var(--app-text-secondary);
+}
+[data-theme-id="parrot"] .auth-theme-btn {
+    border: 1px solid var(--app-border);
+    color: var(--app-text-secondary);
+    background: var(--app-surface);
+    border-radius: 999px;
+}
+[data-theme-id="parrot"] .auth-theme-btn:hover,
+[data-theme-id="parrot"] .auth-theme-btn.active {
+    border-color: var(--app-accent);
+    color: var(--app-accent);
+    background: rgba(0, 255, 240, 0.06);
+}

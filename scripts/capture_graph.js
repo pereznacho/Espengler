@@ -16,7 +16,7 @@ if (!projectId || !sessionCookie) {
 
 // 📌 Rutas y configuraciones
 const IMAGE_PATH = path.join(__dirname, '../static/images', `graphmap_project_${projectId}.png`);
-const GRAPHMAP_URL = `http://localhost:8000/admin/ProjectManager/project/${projectId}/change/#graphmap-tab`;
+const GRAPHMAP_URL = `http://localhost:8000/project/${projectId}/graph_map/`;
 
 (async () => {
     try {
@@ -57,10 +57,10 @@ const GRAPHMAP_URL = `http://localhost:8000/admin/ProjectManager/project/${proje
 
         // 📌 Acceder a GraphMap
         console.log(`📌 Navegando a GraphMap del Proyecto ${projectId}...`);
-        await page.goto(GRAPHMAP_URL, { waitUntil: 'networkidle2' });
+        await page.goto(GRAPHMAP_URL + '?embed=1', { waitUntil: 'networkidle2' });
 
         console.log("⌛ Esperando que el contenedor de GraphMap cargue...");
-        await page.waitForSelector("#graphmap-container", { timeout: 60000 });
+        await page.waitForSelector("#graph-container", { timeout: 60000 });
 
         console.log("🔄 Esperando que GraphMap tenga nodos...");
         let nodesLoaded = false;
@@ -69,9 +69,9 @@ const GRAPHMAP_URL = `http://localhost:8000/admin/ProjectManager/project/${proje
 
         while (!nodesLoaded && attempts < maxAttempts) {
             nodesLoaded = await page.evaluate(() => {
-                const images = document.querySelectorAll("#graphmap-container image");
-                const links = document.querySelectorAll("#graphmap-container line");
-                return images.length > 0 && links.length > 0;  // ✅ Verifica que haya nodos y enlaces
+                const images = document.querySelectorAll("#graph-container canvas");
+                // Vis.js uses canvas, so we check for canvas or valid network instance
+                return !!document.querySelector("#graph-container canvas");
             });
 
             if (nodesLoaded) {
@@ -95,7 +95,7 @@ const GRAPHMAP_URL = `http://localhost:8000/admin/ProjectManager/project/${proje
         }
 
         console.log("📸 Capturando imagen del contenedor GraphMap...");
-        const graphMapContainer = await page.$("#graphmap-container");
+        const graphMapContainer = await page.$("#graph-container");
         if (graphMapContainer) {
             await graphMapContainer.screenshot({ path: IMAGE_PATH });
             console.log(`✅ Imagen guardada en: ${IMAGE_PATH}`);

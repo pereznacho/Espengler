@@ -1,4 +1,6 @@
 {% extends "admin/login.html" %}
+{% load static %}
 {% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/app.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin_login.css' %}">
 {% endblock %}

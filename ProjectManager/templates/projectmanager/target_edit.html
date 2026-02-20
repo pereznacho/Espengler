@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit target — {{ project.name }} — Espengler{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2>Edit target</h2>
+        <a href="{% url 'project_detail' project.pk %}#targets" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to project</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted mb-3">Update IP, FQDN, URL, OS and status as you gather information during the assessment.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_ip_address">{{ form.ip_address.label }}</label>
+                            {{ form.ip_address }}
+                            {% if form.ip_address.errors %}<div class="invalid-feedback d-block">{{ form.ip_address.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="id_fqdn">{{ form.fqdn.label }}</label>
+                            {{ form.fqdn }}
+                            {% if form.fqdn.errors %}<div class="invalid-feedback d-block">{{ form.fqdn.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_urlAddress">{{ form.urlAddress.label }}</label>
+                    {{ form.urlAddress }}
+                    {% if form.urlAddress.errors %}<div class="invalid-feedback d-block">{{ form.urlAddress.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_os">{{ form.os.label }}</label>
+                    {{ form.os }}
+                    <small class="form-text text-muted">e.g. Linux, Windows 10, Ubuntu (used for GraphMap icon).</small>
+                    {% if form.os.errors %}<div class="invalid-feedback d-block">{{ form.os.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    <div class="form-check">
+                        {{ form.owned }}
+                        <label class="form-check-label" for="id_owned">{{ form.owned.label }}</label>
+                    </div>
+                    <small class="form-text text-muted">Mark as compromised when you have access.</small>
+                </div>
+                <div class="form-group mb-4">
+                    <label for="id_jumped_from">{{ form.jumped_from.label }}</label>
+                    {{ form.jumped_from }}
+                    <small class="form-text text-muted">Target from which you pivoted to this one (for attack path).</small>
+                    {% if form.jumped_from.errors %}<div class="invalid-feedback d-block">{{ form.jumped_from.errors }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                <a href="{% url 'project_detail' project.pk %}#targets" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

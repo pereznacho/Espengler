@@ -1,20 +1,40 @@
-<!-- login.html -->
+{% extends "base.html" %}
+{% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <h2>Login</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Log In</button>
-    </form>
-    <!-- Enlace para ir al formulario de registro -->
-    <p>¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate</a></p>
-</body>
-</html>
+{% block title %}Login — Espengler{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-page { min-height: calc(100vh - 120px); display: flex; align-items: center; justify-content: center; padding: var(--es-spacing-lg); }
+    .login-card { max-width: 420px; width: 100%; }
+    .login-card .card { background: var(--es-glass-bg); backdrop-filter: var(--es-glass-blur); border: 1px solid var(--es-border); border-radius: var(--es-radius-lg); padding: var(--es-spacing-xl); }
+    .login-card .card-title { color: var(--es-accent); font-family: var(--es-font-mono); font-weight: 700; letter-spacing: 2px; }
+    .login-card .form-control { background: var(--es-bg-input); border-color: var(--es-border); color: var(--es-text-primary); }
+    .login-card .form-control:focus { border-color: var(--es-accent); box-shadow: 0 0 0 3px var(--es-accent-glow); }
+    .login-card .btn-primary { background: linear-gradient(135deg, var(--es-accent-dim), var(--es-accent)); border: none; color: #000; font-weight: 600; }
+    .login-card .btn-primary:hover { box-shadow: 0 0 20px var(--es-accent-glow); }
+    .login-card a { color: var(--es-accent-blue); }
+    .login-card a:hover { color: var(--es-accent); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-page">
+    <div class="login-card">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">◆ LOGIN</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Log In</button>
+                </form>
+                <p class="mt-3 mb-0 text-center">
+                    <small class="text-muted">Don't have an account?</small>
+                    <a href="{% url 'register' %}">Register</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

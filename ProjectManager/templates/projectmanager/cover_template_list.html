@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cover templates — Espengler{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2 class="mb-0">Cover templates</h2>
+        <a href="{% url 'cover_template_create' %}" class="btn btn-primary"><i class="fas fa-plus-circle"></i> New cover template</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Customer</th>
+                            <th>Type</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for template in templates %}
+                        <tr>
+                            <td><strong>{{ template.name }}</strong></td>
+                            <td>{{ template.customer_name }}</td>
+                            <td>{{ template.analisys_type }}</td>
+                            <td class="text-right">
+                                <a href="{% url 'visual_cover_designer_template' template.pk %}" class="btn btn-sm btn-primary" title="Design">Design</a>
+                                <a href="{% url 'cover_template_delete' template.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Delete this cover template?');">Delete</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No cover templates yet. <a href="{% url 'cover_template_create' %}">Create one</a>.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

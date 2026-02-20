@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from deep_translator import GoogleTranslator 
 from deep_translator.exceptions import NotValidLength
 from attack_narrative.models import Writeup
@@ -10,11 +11,12 @@ class Project(models.Model):
     description = models.TextField(null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    language = models.CharField(max_length=2, choices=[('EN', 'English'), ('ES', 'Español')])
+    language = models.CharField(max_length=2, choices=[('EN', 'English'), ('ES', 'Spanish')])
     report_template = models.ForeignKey('ReportTemplate', on_delete=models.SET_NULL, null=True, blank=True)
     scope = models.TextField(null=True, blank=True)  # Nuevo campo de alcance
     cover_template = models.ForeignKey('ReportCoverTemplate', on_delete=models.SET_NULL, null=True, blank=True)  # Aquí está el campo
     attack_narratives = models.ManyToManyField(Writeup, related_name='projects', blank=True)
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='member_projects', blank=True, help_text='Users with access to this project.')
 
 
 
@@ -143,6 +145,8 @@ class EvidenceImage(models.Model):
 class ReportTemplate(models.Model):
     name = models.CharField(max_length=100, unique=True)
     content = models.TextField()
+    background_color = models.CharField(max_length=7, default='#FFFFFF', help_text="Hex color code (e.g. #FFFFFF)")
+    main_color = models.CharField(max_length=7, default='#000000', help_text="Hex color code for main text (e.g. #000000)")
 
     def __str__(self):
         return self.name
@@ -152,11 +156,30 @@ class ReportCoverTemplate(models.Model):
     name = models.CharField(max_length=255, unique=True)
     analisys_type = models.CharField(max_length=255)
     customer_name = models.CharField(max_length=255)
+    subtitle = models.CharField(max_length=255, blank=True, help_text="Optional subtitle (e.g. Report type).")
+    consultant_name = models.CharField(max_length=255, blank=True, help_text="Optional consultant or team name.")
     start_date = models.DateField()
     end_date = models.DateField()
     customer_image = models.ImageField(upload_to='imagenes/')
     header_image = models.ImageField(upload_to='imagenes/', null=True, blank=True)
-    customer_header_image = models.ImageField(upload_to='imagenes/', null=True, blank=True)  # Cliente    
+    customer_header_image = models.ImageField(upload_to='imagenes/', null=True, blank=True)  # Cliente
+    background_image = models.ImageField(upload_to='imagenes/', null=True, blank=True, help_text="Optional background for the cover.")
+    customer_image_scale = models.PositiveSmallIntegerField(
+        default=100,
+        help_text="Scale of the main (customer) image as percentage (10-100). 100 = full width."
+    )
+    # Posiciones y tamaños de cada zona en % (left, top, width, height). Se usa en el diseñador visual.
+    cover_layout = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Layout positions: header_left, header_right, title_block, customer_image with left, top, width, height (%)."
+    )
+    cover_background_color = models.CharField(
+        max_length=7,
+        default="#FFFFFF",
+        blank=True,
+        help_text="Cover page background color (hex, e.g. #FFFFFF for white)."
+    )
 
     def __str__(self):
         return self.name
