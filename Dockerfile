@@ -2,58 +2,57 @@ FROM python:3.11-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instalación de dependencias del sistema necesarias para Puppeteer, Pillow, etc.
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    libmagic1 \
-    curl \
-    gnupg \
-    libjpeg-dev \
-    zlib1g-dev \
-    libpng-dev \
-    libxslt1-dev \
-    libxml2-dev \
-    libglib2.0-0 \
-    fonts-liberation \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libxss1 \
-    libasound2 \
-    libxshmfence-dev \
-    libgbm-dev \
-    ca-certificates \
-    chromium \
-    && rm -rf /var/lib/apt/lists/*
+# Liberar espacio en la imagen base para que apt no falle por disco lleno
+RUN rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* 2>/dev/null; \
+    find /usr/share -type d -name doc -exec rm -rf {} + 2>/dev/null; \
+    find /usr/share -type d -name man -exec rm -rf {} + 2>/dev/null; \
+    find /usr/share -type d -name info -exec rm -rf {} + 2>/dev/null; true
 
-# Instala Node.js (versión estable actual o LTS)
-RUN apt-get update && apt-get install -y curl gnupg && \
+# Usar /tmp como caché de apt (apt exige que exista el subdir partial)
+RUN echo 'Dir::Cache::archives "/tmp/apt-archives";' > /etc/apt/apt.conf.d/99-docker-cache \
+    && mkdir -p /tmp/apt-archives/partial
+
+# Dependencias: varias tandas pequeñas + limpieza para no saturar disco
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates libpq5 libpq-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -f /tmp/apt-archives/*.deb
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libmagic1 curl gnupg \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -f /tmp/apt-archives/*.deb
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libjpeg-dev zlib1g-dev libpng-dev libffi-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -f /tmp/apt-archives/*.deb
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libxslt1-dev libxml2-dev libglib2.0-0 fonts-liberation \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -f /tmp/apt-archives/*.deb
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -f /tmp/apt-archives/*.deb
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcairo2-dev libpango1.0-dev libgdk-pixbuf-2.0-dev \
+    libnss3 libatk1.0-0 libatk-bridge2.0-0 libxss1 libasound2 \
+    libxshmfence-dev libgbm-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -f /tmp/apt-archives/*.deb
+
+# Node.js (opcional, para scripts GraphMap)
+RUN apt-get update && apt-get install -y --no-install-recommends curl gnupg && \
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs && \
-    apt-get clean
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt    
-
-RUN apt-get update && apt-get install -y locales && \
+RUN apt-get update && apt-get install -y --no-install-recommends locales && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     echo "es_ES.UTF-8 UTF-8" >> /etc/locale.gen && \
     locale-gen && \
-    update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+    update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-
-
-ENV PATH="/usr/lib/chromium:${PATH}"
-
 WORKDIR /app
 
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Generar automáticamente una SECRET_KEY segura si no viene del exterior

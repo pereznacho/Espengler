@@ -19,7 +19,6 @@ urlpatterns = [
     path('projects/<int:project_id>/add_vulnerability/', views.add_vulnerability, name='add_vulnerability_to_project'),
     path('projects/<int:project_id>/vulnerability/<int:vuln_id>/edit/', views.vulnerability_edit, name='vulnerability_edit'),
     path('projects/<int:project_id>/add_evidence/', views.add_evidence_image, name='add_evidence_image'),
-    path('__debug__/', include('debug_toolbar.urls')),
     path('targets/', views.targets_view, name='targets'),
     path('report-templates/', views.report_template_list, name='report_template_list'),
     path('report-templates/create/', views.report_template_create, name='report_template_create'),

@@ -3810,34 +3810,38 @@ GRAPH_ICON_CDN = {
     'firewall': ('fortinet', 'EE3124'),
 }
 
-# Única fuente de verdad: tipo de nodo -> archivo en static/images/graphmap/
+# Iconos del GraphMap: SOLO SVG, NUNCA PNG. Logos oficiales en static/images/graphmap/*.svg
+# (scripts/download_graphmap_logos.py: Windows desde Wikimedia Commons, resto desde Simple Icons).
 GRAPH_ICON_STATIC = {
-    'windows': 'windows.png', 'windows_xp': 'windows.png', 'windows_vista': 'windows.png',
-    'windows_7': 'windows.png', 'windows_8': 'windows.png', 'windows_10': 'windows.png', 'windows_11': 'windows.png',
-    'linux': 'linux.png', 'ubuntu': 'ubuntu.png', 'debian': 'debian.png', 'kali': 'kali.png',
-    'arch': 'arch.png', 'fedora': 'fedora.png', 'redhat': 'redhat.png', 'macos': 'macos.png',
-    'android': 'android.png', 'ios': 'macos.png', 'server': 'linux.png',
-    'printer': 'unknown.png', 'printer_epson': 'unknown.png', 'printer_hp': 'unknown.png',
-    'printer_canon': 'unknown.png', 'printer_brother': 'unknown.png', 'printer_lexmark': 'unknown.png',
-    'router': 'unknown.png', 'router_cisco': 'unknown.png', 'router_netgear': 'unknown.png',
-    'router_tplink': 'unknown.png', 'router_mikrotik': 'unknown.png', 'router_ubiquiti': 'unknown.png',
-    'router_dlink': 'unknown.png', 'router_aruba': 'unknown.png',
-    'nas': 'unknown.png', 'nas_synology': 'unknown.png', 'nas_qnap': 'unknown.png',
-    'iot': 'unknown.png', 'iot_raspberrypi': 'unknown.png', 'iot_arduino': 'unknown.png',
-    'camera': 'unknown.png', 'camera_hikvision': 'unknown.png', 'camera_dahua': 'unknown.png', 'camera_axis': 'unknown.png',
-    'firewall': 'unknown.png', 'switch': 'unknown.png', 'unknown': 'unknown.png',
+    'windows': 'windows.svg', 'windows_xp': 'windows_xp.svg', 'windows_vista': 'windows_vista.svg',
+    'windows_7': 'windows_7.svg', 'windows_8': 'windows_8.svg', 'windows_10': 'windows_10.svg',
+    'windows_11': 'windows_11.svg', 'windows_12': 'windows_12.svg', 'windows_server': 'windows_server.svg',
+    'linux': 'linux.svg', 'ubuntu': 'ubuntu.svg', 'debian': 'debian.svg', 'kali': 'kali.svg',
+    'arch': 'arch.svg', 'fedora': 'fedora.svg', 'redhat': 'redhat.svg', 'macos': 'macos.svg',
+    'android': 'android.svg', 'ios': 'macos.svg', 'server': 'linux.svg',
+    'printer': 'unknown.svg', 'printer_epson': 'unknown.svg', 'printer_hp': 'unknown.svg',
+    'printer_canon': 'unknown.svg', 'printer_brother': 'unknown.svg', 'printer_lexmark': 'unknown.svg',
+    'router': 'unknown.svg', 'router_cisco': 'unknown.svg', 'router_netgear': 'unknown.svg',
+    'router_tplink': 'unknown.svg', 'router_mikrotik': 'unknown.svg', 'router_ubiquiti': 'unknown.svg',
+    'router_dlink': 'unknown.svg', 'router_aruba': 'unknown.svg',
+    'nas': 'unknown.svg', 'nas_synology': 'unknown.svg', 'nas_qnap': 'unknown.svg',
+    'iot': 'unknown.svg', 'iot_raspberrypi': 'unknown.svg', 'iot_arduino': 'unknown.svg',
+    'camera': 'unknown.svg', 'camera_hikvision': 'unknown.svg', 'camera_dahua': 'unknown.svg', 'camera_axis': 'unknown.svg',
+    'firewall': 'unknown.svg', 'switch': 'unknown.svg', 'unknown': 'unknown.svg',
 }
 
 # Tipos de nodo que usan la plantilla imac (computadora con OS en pantalla)
 GRAPH_IMAC_TYPES = {
     'windows', 'windows_xp', 'windows_vista', 'windows_7', 'windows_8', 'windows_10', 'windows_11',
+    'windows_12', 'windows_server',
     'linux', 'ubuntu', 'debian', 'kali', 'arch', 'fedora', 'redhat', 'macos', 'android', 'ios',
     'server', 'unknown',
 }
-# Mapeo tipo -> SVG local (nombre en static/images/graphmap/) o URL CDN para SVG
+# Fuente del icono OS para graph_node_image: SOLO SVG (nunca PNG). Local o URL CDN.
 GRAPH_OS_ICON_SOURCE = {
-    'windows': 'windows.svg', 'windows_xp': 'windows.svg', 'windows_vista': 'windows.svg',
-    'windows_7': 'windows.svg', 'windows_8': 'windows.svg', 'windows_10': 'windows.svg', 'windows_11': 'windows.svg',
+    'windows': 'windows.svg', 'windows_xp': 'windows_xp.svg', 'windows_vista': 'windows_vista.svg',
+    'windows_7': 'windows_7.svg', 'windows_8': 'windows_8.svg', 'windows_10': 'windows_10.svg',
+    'windows_11': 'windows_11.svg', 'windows_12': 'windows_12.svg', 'windows_server': 'windows_server.svg',
     'linux': 'linux.svg', 'ubuntu': 'ubuntu.svg', 'debian': 'debian.svg', 'kali': 'kali.svg',
     'arch': 'arch.svg', 'fedora': 'fedora.svg', 'redhat': 'redhat.svg', 'macos': 'macos.svg',
     'ios': 'macos.svg', 'server': 'linux.svg', 'unknown': 'unknown.svg',
@@ -3942,34 +3946,22 @@ def graph_node_image(request):
     screen_w = screen_right - screen_left
     screen_h = screen_bottom - screen_top
     icon_size = min(screen_w, screen_h)
-    # Obtener icono OS: priorizar SVG con cairosvg (logos correctos) y luego PNG
-    icon_source = GRAPH_OS_ICON_SOURCE.get(node_type, 'unknown.svg')
-    icon_png = None
+    # Icono OS: SOLO SVG (oficiales). Nunca PNG.
     graphmap_dir = os.path.join(base, 'static', 'images', 'graphmap')
+    icon_source = GRAPH_OS_ICON_SOURCE.get(node_type, 'unknown.svg')
+    if (isinstance(icon_source, str) and not icon_source.startswith('http') and
+            node_type.startswith('windows') and node_type != 'windows'):
+        _version_svg = os.path.join(graphmap_dir, icon_source)
+        if not os.path.isfile(_version_svg):
+            icon_source = 'windows.svg'
+    icon_png = None
     svg_path = None
     if not (isinstance(icon_source, str) and icon_source.startswith('http')):
-        icon_basename = os.path.splitext(icon_source)[0]
         svg_path = os.path.join(graphmap_dir, icon_source)
-    # 1) Si hay cairosvg y SVG local, usarlo (Debian, Ubuntu, Linux, etc. se ven correctos)
     if cairosvg and svg_path and os.path.isfile(svg_path):
         icon_png = _svg_to_png(svg_path, icon_size, is_url=False)
     if icon_png is None and isinstance(icon_source, str) and icon_source.startswith('http') and cairosvg:
         icon_png = _svg_to_png(icon_source, icon_size, is_url=True)
-    if icon_png is None:
-        png_by_type = os.path.join(graphmap_dir, node_type + '.png')
-        if os.path.isfile(png_by_type):
-            try:
-                icon_png = Image.open(png_by_type).convert('RGBA')
-            except Exception:
-                pass
-    if icon_png is None and svg_path and not (isinstance(icon_source, str) and icon_source.startswith('http')):
-        icon_basename = os.path.splitext(icon_source)[0]
-        png_path = os.path.join(graphmap_dir, icon_basename + '.png')
-        if os.path.isfile(png_path):
-            try:
-                icon_png = Image.open(png_path).convert('RGBA')
-            except Exception:
-                pass
     if icon_png is not None:
         icon_png = icon_png.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
         paste_x = screen_left + (screen_w - icon_size) // 2
@@ -3979,7 +3971,7 @@ def graph_node_image(request):
     else:
         # Fallback sin cairosvg: dibujar un rectángulo de color en la pantalla (indicador de OS)
         fill_colors = {'windows': (0, 120, 212), 'linux': (252, 198, 36), 'ubuntu': (233, 84, 32), 'macos': (85, 85, 85), 'unknown': (100, 100, 100)}
-        rgb = fill_colors.get(node_type, fill_colors['unknown'])
+        rgb = fill_colors.get(node_type, (0, 120, 212) if node_type.startswith('windows') else fill_colors['unknown'])
         draw = ImageDraw.Draw(img)
         draw.rectangle([screen_left, screen_top, screen_right, screen_bottom], fill=rgb, outline=(60, 60, 60))
     # Equipos comprometidos: solo imacRED.png (sin rayos); la base roja es suficiente
@@ -4020,6 +4012,10 @@ def graph_map_view(request, project_id):
             node_type = 'windows_10'
         elif any(x in os_info for x in ('win 11', 'win11', 'windows 11', 'windows11')) or ('windows' in os_info and '11' in os_info) or ('win' in os_info and '11' in os_info):
             node_type = 'windows_11'
+        elif any(x in os_info for x in ('win 12', 'win12', 'windows 12', 'windows12')) or ('windows' in os_info and '12' in os_info) or ('win' in os_info and '12' in os_info):
+            node_type = 'windows_12'
+        elif any(x in os_info for x in ('windows server', 'windowsserver', 'win server', 'winserver', 'windows 20')) or ('server' in os_info and ('windows' in os_info or 'win' in os_info)):
+            node_type = 'windows_server'
         elif any(x in os_info for x in ('windows', 'win')):
             node_type = 'windows'
         elif any(x in os_info for x in ('ios', 'iphone', 'ipad')):
@@ -4164,6 +4160,8 @@ def graph_map_view(request, project_id):
         'windows_8': 'Windows 8',
         'windows_10': 'Windows 10',
         'windows_11': 'Windows 11',
+        'windows_12': 'Windows 12',
+        'windows_server': 'Windows Server',
         'linux': 'Linux',
         'ubuntu': 'Ubuntu',
         'debian': 'Debian',
@@ -4210,8 +4208,13 @@ def graph_map_view(request, project_id):
 
     import json
     # Única fuente de verdad: URLs de iconos desde el backend (evita desincronizar con la plantilla)
+    graphmap_dir = os.path.join(settings.BASE_DIR, 'static', 'images', 'graphmap')
     icon_urls = {}
     for t, filename in GRAPH_ICON_STATIC.items():
+        if t.startswith('windows') and t != 'windows':
+            path = os.path.join(graphmap_dir, filename)
+            if not os.path.isfile(path):
+                filename = 'windows.svg'
         icon_urls[t] = static('images/graphmap/' + filename)
     for t in GRAPH_ICON_CDN:
         icon_urls[t] = reverse('graph_icon_proxy') + '?type=' + t

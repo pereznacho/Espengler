@@ -6,6 +6,24 @@ Espengler is a professional tool for **automated offensive security and pentest 
 
 ---
 
+# Screenshots
+
+![Alt text](Screenshots/01.png)
+
+![Alt text](Screenshots/02.png)
+
+![Alt text](Screenshots/03.png)
+
+![Alt text](Screenshots/04.png)
+
+![Alt text](Screenshots/05.png)
+
+![Alt text](Screenshots/06.png)
+
+![Alt text](Screenshots/07.png)
+
+---
+
 ## Features
 
 ### Project and target management
@@ -255,7 +273,23 @@ flowchart TD
 | `ProjectManager/templates/` | Base layout, project list/detail, GraphMap, cover designer, report/cover templates, auth pages. |
 | `BackupRestore/templates/` | Custom Backup & Restore page (non-admin). |
 | `attack_narrative/templates/` | Writeup list/form, import attack narrative, admin overrides. |
-| `scripts/` | `capture_graph.js` (GraphMap), `generate_graphmap_pngs.py`, `migrate.sh`. |
+| `scripts/` | `capture_graph.js` (GraphMap), `download_graphmap_logos.py`, `generate_graphmap_pngs.py`, `migrate.sh`. |
+| `static/images/graphmap/` | Logos oficiales en SVG (nunca PNG) para el GraphMap. Ver `static/images/graphmap/README.md`. |
+
+### Logos del GraphMap (sistemas operativos)
+
+**Solo SVG. Nunca PNG.** Los iconos del mapa son **logos oficiales en formato SVG** en **`static/images/graphmap/`**:
+
+- **Windows** (XP, Vista, 7, 8, 10, 11, 12, Server): SVG oficiales desde Wikimedia Commons (Microsoft).
+- **Linux, Ubuntu, Debian, Kali, Arch, Fedora, Red Hat, macOS, Android**: SVG oficiales desde [Simple Icons](https://simpleicons.org).
+
+Para descargar o actualizar todos los SVG:
+
+```bash
+python3 scripts/download_graphmap_logos.py
+```
+
+Detalle: `static/images/graphmap/README.md`.
 
 ---
 
@@ -267,6 +301,10 @@ flowchart TD
 - Node.js only if you use the GraphMap PNG export script
 
 ---
+
+## Video
+[![Ver video en YouTube](https://i.ytimg.com/vi/tFnlTC5tt5s/maxresdefault.jpg)](https://www.youtube.com/watch?v=tFnlTC5tt5s)
+
 
 ## Contributing
 
