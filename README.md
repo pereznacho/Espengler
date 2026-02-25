@@ -304,9 +304,6 @@ Detalle: `static/images/graphmap/README.md`.
 ## Video
 [![Ver video en YouTube](https://i.ytimg.com/vi/tFnlTC5tt5s/maxresdefault.jpg)](https://www.youtube.com/watch?v=tFnlTC5tt5s)
 
-## Video
-[![Ver video en YouTube](https://i.ytimg.com/vi/tFnlTC5tt5s/maxresdefault.jpg)](https://www.youtube.com/watch?v=tFnlTC5tt5s)
-
 
 ## Contributing
 
