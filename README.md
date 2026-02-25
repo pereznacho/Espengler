@@ -94,7 +94,8 @@ Espengler is a professional tool for **automated offensive security and pentest 
 
    ```bash
    git clone https://github.com/pereznacho/Espengler.git
-   cd Espengler
+   cd Espengler/scripts
+   ./install-linux.sh
    ```
 
 2. Create and activate a virtual environment:
@@ -276,20 +277,18 @@ flowchart TD
 | `scripts/` | `capture_graph.js` (GraphMap), `download_graphmap_logos.py`, `generate_graphmap_pngs.py`, `migrate.sh`. |
 | `static/images/graphmap/` | Logos oficiales en SVG (nunca PNG) para el GraphMap. Ver `static/images/graphmap/README.md`. |
 
-### Logos del GraphMap (sistemas operativos)
+### GraphMap Logos
 
-**Solo SVG. Nunca PNG.** Los iconos del mapa son **logos oficiales en formato SVG** en **`static/images/graphmap/`**:
+- **Windows** (XP, Vista, 7, 8, 10, 11, 12, Server): Official SVG Logos.
+- **Linux, Ubuntu, Debian, Kali, Arch, Fedora, Red Hat, macOS, Android**: Official SVG Logos.
 
-- **Windows** (XP, Vista, 7, 8, 10, 11, 12, Server): SVG oficiales desde Wikimedia Commons (Microsoft).
-- **Linux, Ubuntu, Debian, Kali, Arch, Fedora, Red Hat, macOS, Android**: SVG oficiales desde [Simple Icons](https://simpleicons.org).
-
-Para descargar o actualizar todos los SVG:
+To download the SVG logos:
 
 ```bash
 python3 scripts/download_graphmap_logos.py
 ```
 
-Detalle: `static/images/graphmap/README.md`.
+Detail: `static/images/graphmap/README.md`.
 
 ---
 
